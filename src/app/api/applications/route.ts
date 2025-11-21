@@ -58,7 +58,8 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch {
+  } catch (error) {
+    console.error("Internal server error: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
