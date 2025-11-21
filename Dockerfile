@@ -2,8 +2,7 @@ FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:22-dev AS bui
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm ci --ignore-scripts
+COPY node_modules/ ./node_modules/
 
 COPY next.config.ts tsconfig.json ./
 COPY src/ ./src/
