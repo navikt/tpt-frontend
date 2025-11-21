@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
     const { tptBackendUrl, tptBackendScope } = getServerEnv();
 
     const accessToken = getToken(request);
-    console.log("Access Token: ", accessToken);
     if (!accessToken) {
       return NextResponse.json(
         { error: "Authentication required" },
@@ -31,7 +30,6 @@ export async function GET(request: NextRequest) {
     }
 
     const oboResult = await requestOboToken(accessToken, tptBackendScope);
-    console.log(JSON.stringify(oboResult));
     if (!oboResult.ok) {
       console.log("Authentication failed: ", oboResult.error);
       return NextResponse.json(
