@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     console.log(
       "fetch: ",
-      fetch(`${tptBackendUrl}/vulnerabilities/user`, {
+      await fetch(`${tptBackendUrl}/vulnerabilities/user`, {
         headers: {
           Authorization: `Bearer ${oboResult.token}`,
           "Content-Type": "application/json",
