@@ -28,8 +28,8 @@ spec:
     initialDelay: 30
     path: api/health
   replicas:
-    max: 2
-    min: 2
+    max: 1
+    min: 1
   resources:
     limits:
       memory: 256Mi

@@ -47,6 +47,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    console.log("Backend response: ", JSON.stringify(response));
+
     if (!response.ok) {
       return NextResponse.json(
         { error: "Failed to fetch applications" },
