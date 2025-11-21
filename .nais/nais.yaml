@@ -1,0 +1,44 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: tpt-frontend
+  namespace: appsec
+  labels:
+    team: appsec
+spec:
+  ingresses:
+    - https://tpt.intern.nav.no
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: true
+    sidecar:
+      enabled: true
+      autoLogin: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: appsec-guide
+  image: {{image}}
+  port: 8080
+  liveness:
+    initialDelay: 30
+    path: api/health
+  readiness:
+    initialDelay: 30
+    path: api/health
+  replicas:
+    max: 2
+    min: 2
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  observability:
+    logging:
+      destinations:
+        - id: loki
+  envFrom:
+    - secret: tpt-frontend
