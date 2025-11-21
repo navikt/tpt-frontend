@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${tptBackendUrl}/applications/user`, {
+    const response = await fetch(`${tptBackendUrl}/invulnerabilities/user`, {
       headers: {
         Authorization: `Bearer ${oboResult.token}`,
         "Content-Type": "application/json",
