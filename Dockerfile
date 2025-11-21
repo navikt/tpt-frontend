@@ -1,8 +1,12 @@
 FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:22-dev AS builder
 WORKDIR /app
 
-COPY package*.json ./
-COPY node_modules/ ./node_modules/
+RUN --mount=type=secret,id=NODE_AUTH_TOKEN sh -c \
+    'npm config set //npm.pkg.github.com/:_authToken=$(cat /run/secrets/NODE_AUTH_TOKEN)'
+RUN npm config set @navikt:registry=https://npm.pkg.github.com
+
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY next.config.ts tsconfig.json ./
 COPY src/ ./src/

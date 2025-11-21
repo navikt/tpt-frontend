@@ -15,13 +15,6 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
-        with: 
-          node-version: 20
-          registry-url: "https://npm.pkg.github.com"
-      - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: nais/docker-build-push@v0
         id: docker-push
         with:
@@ -30,6 +23,7 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           dockerfile: Dockerfile
           docker_context: .
+          build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
     outputs:
       image: ${{ steps.docker-push.outputs.image }}
       telemetry: ${{ steps.docker-push.outputs.telemetry }}
