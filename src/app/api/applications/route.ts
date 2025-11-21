@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 export async function GET() {
   const baseUrl = process.env.TPT_BACKEND_URL;
@@ -10,9 +11,28 @@ export async function GET() {
     );
   }
 
+  const headersList = await headers();
+  const authorization = headersList.get("authorization");
+
+  // Debug: Log available headers
+  console.log("Available headers:", Array.from(headersList.entries()));
+  console.log("Authorization header:", authorization);
+
+  if (!authorization) {
+    return NextResponse.json(
+      { error: "No authorization header found" },
+      { status: 401 }
+    );
+  }
+
   try {
     console.log("Fetching applications from", `${baseUrl}/applications/user`);
-    const response = await fetch(`${baseUrl}/applications/user`);
+    const response = await fetch(`${baseUrl}/applications/user`, {
+      headers: {
+        Authorization: authorization,
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       console.error(
