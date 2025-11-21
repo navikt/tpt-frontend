@@ -12,15 +12,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      packages: read
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
-        with: 
-          node-version: 20
-          registry-url: "https://npm.pkg.github.com"
-      - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: nais/docker-build-push@v0
         id: docker-push
         with:
