@@ -23,6 +23,8 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           dockerfile: Dockerfile
           docker_context: .
+          build_secrets: |
+            NPODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
     outputs:
       image: ${{ steps.docker-push.outputs.image }}
       telemetry: ${{ steps.docker-push.outputs.telemetry }}

@@ -1,10 +1,8 @@
 FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:22-dev AS builder
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Install dependencies (NAIS build should handle NAV package authentication)
 RUN npm ci --ignore-scripts
 
 COPY next.config.ts tsconfig.json ./
