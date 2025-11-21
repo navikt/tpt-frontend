@@ -45,6 +45,16 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    console.log(
+      "fetch: ",
+      fetch(`${tptBackendUrl}/vulnerabilities/user`, {
+        headers: {
+          Authorization: `Bearer ${oboResult.token}`,
+          "Content-Type": "application/json",
+        },
+      })
+    );
+
     console.log("Backend response: ", JSON.stringify(response));
 
     if (!response.ok) {
