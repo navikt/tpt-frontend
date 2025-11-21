@@ -1,5 +1,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import TestButton from "./TestButton";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         />
         <div className={styles.intro}>
           <h1>TPT er kult</h1>
+          <TestButton />
         </div>
       </main>
     </div>
