@@ -1,45 +1,53 @@
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { getToken, requestOboToken } from "@navikt/oasis";
 
-export async function GET() {
-  const baseUrl = process.env.TPT_BACKEND_URL;
+// Environment validation helper
+function getServerEnv() {
+  const tptBackendUrl = process.env.TPT_BACKEND_URL;
+  const tptBackendScope = process.env.TPT_BACKEND_SCOPE;
 
-  if (!baseUrl) {
-    return NextResponse.json(
-      { error: "TPT_BACKEND_URL not configured" },
-      { status: 500 }
-    );
+  if (!tptBackendUrl) {
+    throw new Error("TPT_BACKEND_URL not configured");
   }
 
-  const headersList = await headers();
-  const authorization = headersList.get("authorization");
-
-  // Debug: Log available headers
-  console.log("Available headers:", Array.from(headersList.entries()));
-  console.log("Authorization header:", authorization);
-
-  if (!authorization) {
-    return NextResponse.json(
-      { error: "No authorization header found" },
-      { status: 401 }
-    );
+  if (!tptBackendScope) {
+    throw new Error("TPT_BACKEND_SCOPE not configured");
   }
 
+  return { tptBackendUrl, tptBackendScope };
+}
+
+export async function GET(request: NextRequest) {
   try {
-    console.log("Fetching applications from", `${baseUrl}/applications/user`);
-    const response = await fetch(`${baseUrl}/applications/user`, {
+    const { tptBackendUrl, tptBackendScope } = getServerEnv();
+
+    const accessToken = getToken(request);
+    console.log("Access Token: ", accessToken);
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    const oboResult = await requestOboToken(accessToken, tptBackendScope);
+    console.log(JSON.stringify(oboResult));
+    if (!oboResult.ok) {
+      console.log("Authentication failed: ", oboResult.error);
+      return NextResponse.json(
+        { error: "Authentication failed" },
+        { status: 401 }
+      );
+    }
+
+    const response = await fetch(`${tptBackendUrl}/applications/user`, {
       headers: {
-        Authorization: authorization,
+        Authorization: `Bearer ${oboResult.token}`,
         "Content-Type": "application/json",
       },
     });
 
     if (!response.ok) {
-      console.error(
-        "Error response from backend:",
-        response.status,
-        response.statusText
-      );
       return NextResponse.json(
         { error: "Failed to fetch applications" },
         { status: response.status }
@@ -47,9 +55,11 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log("Fetched applications:", JSON.stringify(data));
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json({ error: "Network error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
