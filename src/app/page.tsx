@@ -1,25 +1,26 @@
+"use client";
+import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 
-async function fetchApplicationsData() {
-  try {
-    const response = await fetch("http://tpt-frontend/api/applications", {
-      cache: "no-store",
-    });
+export default function Home() {
+  const [applicationsData, setApplicationsData] = useState<any>(null);
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}`);
+  useEffect(() => {
+    async function fetchApplications() {
+      try {
+        const response = await fetch("/api/applications");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setApplicationsData(data);
+      } catch (error) {
+        console.error("Error fetching applications data:", error);
+      }
     }
 
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error("Server-side error fetching applications:", error);
-    return null;
-  }
-}
-
-export default async function Home() {
-  const applicationsData = await fetchApplicationsData();
+    fetchApplications();
+  }, []);
 
   return (
     <div className={styles.page}>
