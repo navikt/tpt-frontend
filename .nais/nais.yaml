@@ -18,7 +18,7 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: appsec-guide
+        - application: tpt-backend
   image: {{image}}
   port: 8080
   liveness:
