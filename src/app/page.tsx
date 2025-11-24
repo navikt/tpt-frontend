@@ -2,8 +2,8 @@ import styles from "./page.module.css";
 
 async function fetchApplicationsData() {
   try {
-    const response = await fetch("/api/applications", {
-      cache: "no-store", // Ensure fresh data on each request
+    const response = await fetch("https://tpt.intern.nav.no/api/applications", {
+      cache: "no-store",
     });
 
     if (!response.ok) {
