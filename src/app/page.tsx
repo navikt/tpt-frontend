@@ -1,9 +1,8 @@
 import styles from "./page.module.css";
-import TestButton from "./TestButton";
 
 async function fetchApplicationsData() {
   try {
-    const response = await fetch("http://localhost:3000/api/applications", {
+    const response = await fetch("/api/applications", {
       cache: "no-store", // Ensure fresh data on each request
     });
 
@@ -27,7 +26,6 @@ export default async function Home() {
       <main className={styles.main}>
         <div className={styles.intro}>
           <h1>TPT er kult</h1>
-          <TestButton />
           {applicationsData && (
             <pre
               style={{ marginTop: "20px", textAlign: "left", fontSize: "12px" }}
