@@ -2,7 +2,7 @@ import styles from "./page.module.css";
 
 async function fetchApplicationsData() {
   try {
-    const response = await fetch("https://tpt.intern.nav.no/api/applications", {
+    const response = await fetch("http://tpt-frontend/api/applications", {
       cache: "no-store",
     });
 
