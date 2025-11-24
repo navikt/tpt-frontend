@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
+import { VulnerabilitiesResponse } from "./types/vulnerabilities";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [applicationsData, setApplicationsData] = useState<any>(null);
+  const [applicationsData, setApplicationsData] =
+    useState<VulnerabilitiesResponse | null>(null);
 
   useEffect(() => {
     async function fetchApplications() {
