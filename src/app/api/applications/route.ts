@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
 
     const oboResult = await requestOboToken(accessToken, tptBackendScope);
     if (!oboResult.ok) {
-      console.log("Authentication failed: ", oboResult.error);
       return NextResponse.json(
         { error: "Authentication failed" },
         { status: 401 }
@@ -44,18 +43,6 @@ export async function GET(request: NextRequest) {
         "Content-Type": "application/json",
       },
     });
-
-    console.log(
-      "fetch: ",
-      await fetch(`${tptBackendUrl}/vulnerabilities/user`, {
-        headers: {
-          Authorization: `Bearer ${oboResult.token}`,
-          "Content-Type": "application/json",
-        },
-      })
-    );
-
-    console.log("Backend response: ", JSON.stringify(response));
 
     if (!response.ok) {
       return NextResponse.json(

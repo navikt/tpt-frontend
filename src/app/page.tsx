@@ -1,22 +1,40 @@
-import Image from "next/image";
 import styles from "./page.module.css";
 import TestButton from "./TestButton";
 
-export default function Home() {
+async function fetchApplicationsData() {
+  try {
+    const response = await fetch("http://localhost:3000/api/applications", {
+      cache: "no-store", // Ensure fresh data on each request
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Server-side error fetching applications:", error);
+    return null;
+  }
+}
+
+export default async function Home() {
+  const applicationsData = await fetchApplicationsData();
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
         <div className={styles.intro}>
           <h1>TPT er kult</h1>
           <TestButton />
+          {applicationsData && (
+            <pre
+              style={{ marginTop: "20px", textAlign: "left", fontSize: "12px" }}
+            >
+              {JSON.stringify(applicationsData, null, 2)}
+            </pre>
+          )}
         </div>
       </main>
     </div>
