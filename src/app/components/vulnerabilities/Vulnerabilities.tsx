@@ -4,37 +4,52 @@ import VulnerabilitiesTable from "./table/VulnerabilitiesTable";
 import FilterActionMenu from "./filteractionmenu/FilterActionMenu";
 
 const Vulnerabilities = () => {
-  const { data, isLoading, filters, setFilters } = useVulnerabilities();
+  const {
+    data,
+    isLoading,
+    teamFilters,
+    setTeamFilters,
+    applicationFilters,
+    setApplicationFilters,
+  } = useVulnerabilities();
 
   if (isLoading) {
     return <div>Loading vulnerabilities...</div>;
   }
 
-  console.log("data", data);
-
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          marginBottom: "8px",
-          marginTop: "2rem",
-        }}
-      >
-        <FilterActionMenu
-          filterName="Team"
-          filterOptions={[
-            "Frontend Team",
-            "Backend Team",
-            "Platform Team",
-            "Data Team",
-          ]}
-          selectedFilters={filters}
-          setFilter={setFilters}
-        />
-      </div>
-      <VulnerabilitiesTable data={data} />
+      {data ? (
+        <>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginBottom: "8px",
+              marginTop: "2rem",
+            }}
+          >
+            <FilterActionMenu
+              filterName="Team"
+              filterOptions={Object.keys(teamFilters)}
+              selectedFilters={teamFilters}
+              setFilter={setTeamFilters}
+            />
+            <FilterActionMenu
+              style={{ marginLeft: "1rem" }}
+              filterName="Application"
+              filterOptions={Object.keys(applicationFilters)}
+              selectedFilters={applicationFilters}
+              setFilter={setApplicationFilters}
+            />
+          </div>
+          <VulnerabilitiesTable
+            data={data}
+            teamFilters={teamFilters}
+            applicationFilters={applicationFilters}
+          />
+        </>
+      ) : null}
     </>
   );
 };

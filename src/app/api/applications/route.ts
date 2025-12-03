@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
+import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
 
 // Environment validation helper
 function getServerEnv() {
@@ -18,6 +19,10 @@ function getServerEnv() {
 }
 
 export async function GET(request: NextRequest) {
+  if (process.env.MOCKS_ENABLED === "true") {
+    console.log("mocks enabled - returning mock data");
+    return NextResponse.json(mockVulnerabilitiesPayload);
+  }
   try {
     const { tptBackendUrl, tptBackendScope } = getServerEnv();
 
