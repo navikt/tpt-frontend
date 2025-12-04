@@ -21,7 +21,7 @@ jobs:
           team: appsec
           dockerfile: Dockerfile
           docker_context: .
-          build_secrets: NODE_AUTH_TOKEN=${{ secrets.TPT_TOKEN }}
+          build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
     outputs:
       image: ${{ steps.docker-push.outputs.image }}
       telemetry: ${{ steps.docker-push.outputs.telemetry }}
