@@ -2,6 +2,11 @@ name: Build and deploy main
 
 on:
   workflow_dispatch:
+    inputs:
+      cachekey:
+        required: false
+        default: 'nope'
+        type: string
   push:
     branches:
       - main
@@ -19,6 +24,7 @@ jobs:
         with:
           team: appsec
           build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
+          build_args: CACHE_BUST=${{ inputs.cachekey }}
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-gcp
