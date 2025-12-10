@@ -29,7 +29,7 @@ const Criticals = () => {
     <>
       <h2 style={{ marginTop: "2rem" }}>Prioriterte sårbarheter </h2>
       {isLoading ? <div>Loading critical vulnerabilities...</div> : null}
-      {!isLoading && criticalVulnerabilities.length ? (
+      {!isLoading && criticalVulnerabilities.length === 0 ? (
         <p>
           Godt jobbet! 🙌 Vi ser ingen sårbarheter du må fikse <i>nå</i>.
         </p>
