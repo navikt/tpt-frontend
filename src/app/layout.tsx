@@ -1,6 +1,7 @@
 "use client";
 import "./globals.css";
 import { Page } from "@navikt/ds-react";
+import { InternalHeader } from "@navikt/ds-react";
 
 export default function RootLayout({
   children,
@@ -11,7 +12,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Page>
-          <Page.Block as="main" width="lg">
+          <InternalHeader>
+            <InternalHeader.Title href="/">Titt på Ting</InternalHeader.Title>
+          </InternalHeader>
+          <Page.Block as="main" width="lg" gutters>
             {children}
           </Page.Block>
         </Page>

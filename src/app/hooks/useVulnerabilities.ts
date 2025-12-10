@@ -11,10 +11,6 @@ export const useVulnerabilities = () => {
   >({});
 
   useEffect(() => {
-    console.log("filters changed", teamFilters);
-  }, [teamFilters]);
-
-  useEffect(() => {
     if (data) {
       const updatedApplicationFilters: Record<string, boolean> = {};
       data.teams.forEach((team) => {
@@ -60,6 +56,7 @@ export const useVulnerabilities = () => {
   }, []);
 
   useEffect(() => {
+    if (data) return;
     fetchData();
   }, []);
 

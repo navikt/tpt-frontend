@@ -1,5 +1,5 @@
 "use client";
-import { useVulnerabilities } from "./useVulnerabilities";
+import { useVulnerabilities } from "../../hooks/useVulnerabilities";
 import VulnerabilitiesTable from "./table/VulnerabilitiesTable";
 import FilterActionMenu from "./filteractionmenu/FilterActionMenu";
 
