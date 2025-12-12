@@ -58,7 +58,7 @@ const Criticals = () => {
               <LinkCard.Description>
                 {/* TODO: Fikse pakke og versjon fra api når tilgjengelig */}
                 PAKKE VERSJON har kritisk sårbarhet {vuln.identifier} med
-                riskscore {vuln.riskScore} i team {vuln.team}.
+                riskscore {vuln.riskScore}.
               </LinkCard.Description>
 
               <LinkCard.Footer>
