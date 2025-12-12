@@ -6,7 +6,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-001",
           name: "TPT Frontend Application",
-          environmentName: "prod-gcp",
+          environmentName: "prod",
           ingressTypes: ["external"],
           buildTime: "2025-11-27",
           vulnerabilities: [
@@ -33,7 +33,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002",
           name: "API Gateway",
-          environmentName: "dev-gcp",
+          environmentName: "dev",
           ingressTypes: ["internal"],
           buildTime: "2025-11-26",
           vulnerabilities: [
@@ -51,7 +51,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002-prod",
           name: "API Gateway",
-          environmentName: "prod-gcp",
+          environmentName: "prod",
           ingressTypes: ["internal"],
           buildTime: "2025-11-26",
           vulnerabilities: [
@@ -74,7 +74,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-003",
           name: "User Service",
-          environmentName: "prod-gcp",
+          environmentName: "prod",
           ingressTypes: [""],
           buildTime: "2025-11-25",
           vulnerabilities: [

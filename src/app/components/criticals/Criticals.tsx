@@ -45,21 +45,34 @@ const Criticals = () => {
               <LinkCard.Title>
                 <LinkCard.Anchor asChild>
                   <Link
-                    href="/eksempel"
+                    href="/"
                     onNavigate={() =>
                       alert("I'm navigating with nextjs router!")
                     }
                   >
-                    {vuln.workload.name} - {vuln.identifier}
+                    {vuln.workload.name}
                   </Link>
                 </LinkCard.Anchor>
               </LinkCard.Title>
 
-              <LinkCard.Description>{vuln.workload.name}</LinkCard.Description>
+              <LinkCard.Description>
+                {/* TODO: Fikse pakke og versjon fra api når tilgjengelig */}
+                PAKKE VERSJON har kritisk sårbarhet {vuln.identifier} med
+                riskscore 300
+              </LinkCard.Description>
 
               <LinkCard.Footer>
-                <Tag variant="info" size="small">
-                  {vuln.workload.environmentName}
+                <Tag
+                  size="small"
+                  variant={
+                    vuln.workload.environmentName === "prod"
+                      ? "success"
+                      : "info"
+                  }
+                >
+                  {vuln.workload.environmentName === "prod"
+                    ? "prod-gcp"
+                    : "dev-gcp"}
                 </Tag>
               </LinkCard.Footer>
             </LinkCard>
