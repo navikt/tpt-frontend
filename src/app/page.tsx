@@ -21,8 +21,9 @@ export default function Home() {
             Console.
           </BodyShort>
           <BodyShort>
-            Om du alikevel vil ha en komplett oversikt over alle sårbarheter, gå
-            til <Link href="/vulnerabilities">sårbarhetssiden.</Link>
+            Om du alikevel vil ha en komplett oversikt over alle sårbarheter, så
+            er disse tilgjengelig på{" "}
+            <Link href="/vulnerabilities">sårbarhetssiden.</Link>
           </BodyShort>
         </div>
         <Criticals />
