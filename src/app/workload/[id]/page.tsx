@@ -41,7 +41,7 @@ function RiskScoreCell({ vuln }: { vuln: VulnerabilityWithMultipliers }) {
           }
           size="small"
         >
-          {vuln.riskScore}
+          {Math.round(vuln.riskScore)}
         </Tag>
       </Button>
       <Popover
@@ -125,7 +125,7 @@ export default function WorkloadDetailPage() {
           </BodyShort>
         )}
         <BodyShort spacing>
-          <strong>Ingress Types:</strong> {workloadData.ingressTypes.join(", ") || "None"}
+          <strong>Ingress Types:</strong> {workloadData.ingressTypes?.join(", ") || "None"}
         </BodyShort>
       </div>
 

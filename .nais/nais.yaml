@@ -22,20 +22,20 @@ spec:
   image: {{image}}
   port: 8080
   liveness:
-    initialDelay: 30
+    initialDelay: 20
     path: api/health
   readiness:
-    initialDelay: 30
+    initialDelay: 20
     path: api/health
   replicas:
     max: 1
     min: 1
   resources:
     limits:
-      memory: 256Mi
+      memory: 128Mi
     requests:
-      cpu: 50m
-      memory: 64Mi
+      cpu: 10m
+      memory: 96Mi
   observability:
     logging:
       destinations:
