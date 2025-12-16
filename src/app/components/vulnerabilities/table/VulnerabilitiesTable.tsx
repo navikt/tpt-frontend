@@ -103,7 +103,7 @@ const VulnerabilitiesTable = ({
             <Table.DataCell>{row.team}</Table.DataCell>
             <Table.DataCell>{row.workload}</Table.DataCell>
             <Table.DataCell>{row.vulnerability}</Table.DataCell>
-            <Table.DataCell>{row.riskScore}</Table.DataCell>
+            <Table.DataCell>{Math.round(row.riskScore)}</Table.DataCell>
           </Table.Row>
         ))}
       </Table.Body>
