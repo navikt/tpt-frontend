@@ -40,5 +40,12 @@ spec:
     logging:
       destinations:
         - id: loki
+  env:
+    - name: RISK_SCORE_THRESHOLD_ASAP
+      value: "100"
+    - name: RISK_SCORE_THRESHOLD_WHEN_TIME
+      value: "50"
+    - name: RISK_SCORE_THRESHOLD_IF_BORED
+      value: "25"
   envFrom:
     - secret: tpt-frontend

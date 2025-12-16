@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Titt på Ting (TPT) Frontend
 
-## Getting Started
+Frontend-applikasjon for Titt på Ting - et prioriteringsverktøy for sårbarheter i applikasjoner.
 
-First, run the development server:
+TPT analyserer og rangerer sårbarheter basert på flere faktorer som KEV (Known Exploited Vulnerabilities), EPSS (Exploit Prediction Scoring System), eksponering, produksjonsmiljø og byggets alder. Dette gir teams mulighet til å fokusere på de mest kritiske sårbarhetene som faktisk utgjør en reell risiko.
+
+## Komme i gang
+
+### Forutsetninger
+
+- Node.js (versjon 24 eller nyere)
+- npm
+
+### Installasjon og kjøring
 
 ```bash
+# Installer avhengigheter
+npm install
+
+# Kjør utviklingsserver
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Bygg for produksjon
+npm run build
+
+# Kjør produksjonsbygget
+npm start
+
+# Kjør linter
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Åpne [http://localhost:3000](http://localhost:3000) i nettleseren.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Konfigurasjon
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### Risk Score Thresholds
 
-## Learn More
+Applikasjonen bruker tre konfigurerbare terskelverdier for risikoskåre:
 
-To learn more about Next.js, take a look at the following resources:
+- **RISK_SCORE_THRESHOLD_ASAP** (default: 100) - "FIX ASAP" - Vises på forsiden som prioriterte sårbarheter
+- **RISK_SCORE_THRESHOLD_WHEN_TIME** (default: 50) - "Fix when you have time" 
+- **RISK_SCORE_THRESHOLD_IF_BORED** (default: 25) - "Fix if bored"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Disse kan konfigureres via miljøvariabler i `.nais/nais.yaml` eller lokalt i miljøet ditt.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Henvendelser
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Spørsmål knyttet til koden eller repositoryet kan stilles som issues her på GitHub.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### For Nav-ansatte
+
+Interne henvendelser kan sendes via Slack i kanalen **#appsec**.

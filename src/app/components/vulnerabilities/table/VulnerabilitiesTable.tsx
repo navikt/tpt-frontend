@@ -41,7 +41,7 @@ const VulnerabilitiesTable = ({
     const rows: Array<{
       team: string;
       workload: string;
-      ingressTypes: string[];
+      ingressTypes: string[] | undefined;
       vulnerability: string;
       riskScore: number;
     }> = [];

@@ -1,16 +1,20 @@
 "use client";
 import { useVulnerabilities } from "../../hooks/useVulnerabilities";
+import { useConfig } from "../../hooks/useConfig";
 import { LinkCard, Tag } from "@navikt/ds-react";
 import Link from "next/link";
 
 const Criticals = () => {
   const { data, isLoading } = useVulnerabilities();
+  const { config, isLoading: configLoading } = useConfig();
+
+  const asapThreshold = config?.thresholds.asap ?? 85;
 
   const criticalVulnerabilities =
     data?.teams.flatMap((team) =>
       team.workloads.flatMap((workload) =>
         workload.vulnerabilities
-          .filter((vuln) => vuln.riskScore > 85)
+          .filter((vuln) => vuln.riskScore >= asapThreshold)
           .map((vuln) => ({
             ...vuln,
             workload: {
@@ -29,8 +33,8 @@ const Criticals = () => {
   return (
     <>
       <h2 style={{ marginTop: "2rem" }}>Prioriterte sårbarheter </h2>
-      {isLoading ? <div>Loading critical vulnerabilities...</div> : null}
-      {!isLoading && criticalVulnerabilities.length === 0 ? (
+      {isLoading || configLoading ? <div>Loading critical vulnerabilities...</div> : null}
+      {!isLoading && !configLoading && criticalVulnerabilities.length === 0 ? (
         <p>
           Godt jobbet! 🙌 Vi ser ingen sårbarheter du må fikse <i>nå</i>.
         </p>
