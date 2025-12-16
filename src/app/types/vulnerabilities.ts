@@ -11,11 +11,6 @@ export interface RiskScoreMultipliers {
 export interface Vulnerability {
   identifier: string;
   packageName: string;
-  severity: string;
-  suppressed: boolean;
-  hasKevEntry: boolean;
-  epssScore: string | null;
-  epssPercentile: string | null;
   riskScore: number;
   riskScoreMultipliers?: RiskScoreMultipliers;
 }
@@ -23,10 +18,11 @@ export interface Vulnerability {
 export interface Workload {
   id: string;
   name: string;
-  environmentName: string;
+  environment: string;
+  environmentName?: string; // For backwards compatibility
   repository?: string;
   ingressTypes?: string[];
-  buildTime: string;
+  buildTime?: string;
   vulnerabilities: Vulnerability[];
 }
 

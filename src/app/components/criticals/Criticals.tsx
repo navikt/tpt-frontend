@@ -20,7 +20,7 @@ const Criticals = () => {
             workload: {
               id: workload.id,
               name: workload.name,
-              environmentName: workload.environmentName,
+              environment: workload.environment,
               repository: workload.repository,
               ingressTypes: workload.ingressTypes,
               buildTime: workload.buildTime,
@@ -76,14 +76,12 @@ const Criticals = () => {
                 <Tag
                   size="small"
                   variant={
-                    vuln.workload.environmentName === "prod"
+                    vuln.workload.environment?.includes("prod")
                       ? "success"
                       : "info"
                   }
                 >
-                  {vuln.workload.environmentName === "prod"
-                    ? "prod-gcp"
-                    : "dev-gcp"}
+                  {vuln.workload.environment}
                 </Tag>
               </LinkCard.Footer>
             </LinkCard>

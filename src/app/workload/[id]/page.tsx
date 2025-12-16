@@ -110,8 +110,10 @@ export default function WorkloadDetailPage() {
 
       <div style={{ marginBottom: "2rem" }}>
         <BodyShort spacing><strong>Team:</strong> {workloadData.team}</BodyShort>
-        <BodyShort spacing><strong>Environment:</strong> {workloadData.environmentName}</BodyShort>
-        <BodyShort spacing><strong>Build Time:</strong> {workloadData.buildTime}</BodyShort>
+        <BodyShort spacing><strong>Environment:</strong> {workloadData.environment}</BodyShort>
+        {workloadData.buildTime && (
+          <BodyShort spacing><strong>Build Time:</strong> {workloadData.buildTime}</BodyShort>
+        )}
         {workloadData.repository && (
           <BodyShort spacing>
             <strong>Repository:</strong>{" "}
@@ -186,30 +188,20 @@ export default function WorkloadDetailPage() {
               <Table.HeaderCell>CVE ID</Table.HeaderCell>
               <Table.HeaderCell>Package</Table.HeaderCell>
               <Table.HeaderCell>Risk Score</Table.HeaderCell>
-              <Table.HeaderCell>Severity</Table.HeaderCell>
-              <Table.HeaderCell>KEV Entry</Table.HeaderCell>
-              <Table.HeaderCell>EPSS Score</Table.HeaderCell>
-              <Table.HeaderCell>Suppressed</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {workloadData.vulnerabilities.map((vuln, index) => (
-              <Table.Row key={`${vuln.identifier}-${index}`}>
-                <Table.DataCell>{vuln.identifier}</Table.DataCell>
-                <Table.DataCell>{vuln.packageName}</Table.DataCell>
-                <Table.DataCell>
-                  <RiskScoreCell vuln={vuln} />
-                </Table.DataCell>
-                <Table.DataCell>{vuln.severity}</Table.DataCell>
-                <Table.DataCell>{vuln.hasKevEntry ? "Yes" : "No"}</Table.DataCell>
-                <Table.DataCell>
-                  {vuln.epssScore && vuln.epssPercentile
-                    ? `${vuln.epssScore} (${vuln.epssPercentile}%)`
-                    : "N/A"}
-                </Table.DataCell>
-                <Table.DataCell>{vuln.suppressed ? "Yes" : "No"}</Table.DataCell>
-              </Table.Row>
-            ))}
+            {[...workloadData.vulnerabilities]
+              .sort((a, b) => b.riskScore - a.riskScore)
+              .map((vuln, index) => (
+                <Table.Row key={`${vuln.identifier}-${index}`}>
+                  <Table.DataCell>{vuln.identifier}</Table.DataCell>
+                  <Table.DataCell>{vuln.packageName}</Table.DataCell>
+                  <Table.DataCell>
+                    <RiskScoreCell vuln={vuln} />
+                  </Table.DataCell>
+                </Table.Row>
+              ))}
           </Table.Body>
         </Table>
       )}

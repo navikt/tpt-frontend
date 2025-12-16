@@ -1,7 +1,8 @@
 "use client";
 import { VulnerabilitiesResponse } from "../../../types/vulnerabilities";
-import { Table } from "@navikt/ds-react";
+import { Table, Link } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
+import NextLink from "next/link";
 
 interface VulnerabilitiesTableProps {
   data?: VulnerabilitiesResponse;
@@ -41,6 +42,7 @@ const VulnerabilitiesTable = ({
     const rows: Array<{
       team: string;
       workload: string;
+      workloadId: string;
       ingressTypes: string[] | undefined;
       vulnerability: string;
       riskScore: number;
@@ -55,6 +57,7 @@ const VulnerabilitiesTable = ({
                 rows.push({
                   team: team.team,
                   workload: workload.name,
+                  workloadId: workload.id,
                   ingressTypes: workload.ingressTypes,
                   vulnerability: vulnerability.identifier,
                   riskScore: vulnerability.riskScore,
@@ -100,8 +103,24 @@ const VulnerabilitiesTable = ({
       <Table.Body>
         {sortedRows.map((row, index) => (
           <Table.Row key={`${row.team}-${row.workload}-${index}`}>
-            <Table.DataCell>{row.team}</Table.DataCell>
-            <Table.DataCell>{row.workload}</Table.DataCell>
+            <Table.DataCell>
+              <Link
+                as={NextLink}
+                href={`https://console.nav.cloud.nais.io/team/${row.team}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {row.team}
+              </Link>
+            </Table.DataCell>
+            <Table.DataCell>
+              <Link
+                as={NextLink}
+                href={`/workload/${row.workloadId}`}
+              >
+                {row.workload}
+              </Link>
+            </Table.DataCell>
             <Table.DataCell>{row.vulnerability}</Table.DataCell>
             <Table.DataCell>{Math.round(row.riskScore)}</Table.DataCell>
           </Table.Row>

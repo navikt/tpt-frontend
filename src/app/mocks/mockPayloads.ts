@@ -6,7 +6,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-001",
           name: "TPT Frontend Application",
-          environmentName: "prod",
+          environment: "prod-gcp",
           repository: "navikt/tpt-frontend",
           ingressTypes: ["external"],
           buildTime: "2025-11-27",
@@ -14,11 +14,6 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0001",
               packageName: "express",
-              severity: "HIGH",
-              suppressed: false,
-              hasKevEntry: true,
-              epssScore: "0.85",
-              epssPercentile: "95.2",
               riskScore: 90,
               riskScoreMultipliers: {
                 base_high: 70,
@@ -33,11 +28,6 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0002",
               packageName: "lodash",
-              severity: "MEDIUM",
-              suppressed: true,
-              hasKevEntry: false,
-              epssScore: "0.32",
-              epssPercentile: "67.8",
               riskScore: 45,
               riskScoreMultipliers: {
                 base_high: 50,
@@ -54,7 +44,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002",
           name: "API Gateway",
-          environmentName: "dev",
+          environment: "dev-gcp",
           repository: "navikt/api-gateway",
           ingressTypes: ["internal"],
           buildTime: "2025-11-26",
@@ -62,11 +52,6 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0003",
               packageName: "log4j-core",
-              severity: "CRITICAL",
-              suppressed: false,
-              hasKevEntry: true,
-              epssScore: "0.97",
-              epssPercentile: "99.1",
               riskScore: 98,
               riskScoreMultipliers: {
                 base_high: 90,
@@ -83,7 +68,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002-prod",
           name: "API Gateway",
-          environmentName: "prod",
+          environment: "prod-gcp",
           repository: "navikt/api-gateway",
           ingressTypes: ["internal"],
           buildTime: "2025-11-26",
@@ -91,11 +76,6 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0003",
               packageName: "log4j-core",
-              severity: "CRITICAL",
-              suppressed: false,
-              hasKevEntry: true,
-              epssScore: "0.97",
-              epssPercentile: "99.1",
               riskScore: 98,
               riskScoreMultipliers: {
                 base_high: 90,
@@ -117,7 +97,7 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-003",
           name: "User Service",
-          environmentName: "prod",
+          environment: "prod-gcp",
           repository: "navikt/user-service",
           ingressTypes: [""],
           buildTime: "2025-11-25",
@@ -125,11 +105,6 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0004",
               packageName: "spring-core",
-              severity: "LOW",
-              suppressed: false,
-              hasKevEntry: false,
-              epssScore: "0.15",
-              epssPercentile: "23.4",
               riskScore: 20,
               riskScoreMultipliers: {
                 base_high: 30,
