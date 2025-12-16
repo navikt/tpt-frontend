@@ -4,11 +4,11 @@ import { VulnerabilitiesResponse } from "@/app/types/vulnerabilities";
 export const useVulnerabilities = () => {
   const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
   const [applicationFilters, setApplicationFilters] = useState<
     Record<string, boolean>
   >({});
+  const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (data) {
@@ -47,6 +47,20 @@ export const useVulnerabilities = () => {
           return acc;
         }, {} as Record<string, boolean>)
       );
+      const allCves = new Set<string>();
+      data.teams.forEach((team) => {
+        team.workloads.forEach((workload) => {
+          workload.vulnerabilities.forEach((vuln) => {
+            allCves.add(vuln.identifier);
+          });
+        });
+      });
+      setCveFilters(
+        Array.from(allCves).reduce((acc, cve) => {
+          acc[cve] = true;
+          return acc;
+        }, {} as Record<string, boolean>)
+      );
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching applications data:", error);
@@ -58,15 +72,17 @@ export const useVulnerabilities = () => {
   useEffect(() => {
     if (data) return;
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
     data,
     isLoading,
-    error,
     teamFilters,
     setTeamFilters,
     applicationFilters,
     setApplicationFilters,
+    cveFilters,
+    setCveFilters,
   };
 };

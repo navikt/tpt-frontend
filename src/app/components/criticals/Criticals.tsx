@@ -17,6 +17,7 @@ const Criticals = () => {
               id: workload.id,
               name: workload.name,
               environmentName: workload.environmentName,
+              repository: workload.repository,
               ingressTypes: workload.ingressTypes,
               buildTime: workload.buildTime,
             },
@@ -44,21 +45,27 @@ const Criticals = () => {
             >
               <LinkCard.Title>
                 <LinkCard.Anchor asChild>
-                  <Link
-                    href="/"
-                    onNavigate={() =>
-                      alert("I'm navigating with nextjs router!")
-                    }
-                  >
+                  <Link href={`/workload/${vuln.workload.id}`}>
                     {vuln.workload.name}
                   </Link>
                 </LinkCard.Anchor>
               </LinkCard.Title>
 
               <LinkCard.Description>
-                {/* TODO: Fikse pakke og versjon fra api når tilgjengelig */}
-                PAKKE VERSJON har kritisk sårbarhet {vuln.identifier} med
-                riskscore {vuln.riskScore}.
+                {vuln.packageName} har kritisk sårbarhet {vuln.identifier}.
+                {vuln.workload.repository && (
+                  <>
+                    <br />
+                    <a
+                      href={`https://www.github.com/${vuln.workload.repository}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {vuln.workload.repository}
+                    </a>
+                  </>
+                )}
               </LinkCard.Description>
 
               <LinkCard.Footer>

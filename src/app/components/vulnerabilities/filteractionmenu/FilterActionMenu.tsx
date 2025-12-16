@@ -1,6 +1,7 @@
 "use client";
-import { ActionMenu, Button } from "@navikt/ds-react";
+import { ActionMenu, Button, TextField } from "@navikt/ds-react";
 import { ChevronDownIcon } from "@navikt/aksel-icons";
+import { useState, useMemo } from "react";
 
 type FilterActionMenuProps = {
   filterName: string;
@@ -17,6 +18,15 @@ const FilterActionMenu = ({
   setFilter,
   style,
 }: FilterActionMenuProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredOptions = useMemo(() => {
+    if (!searchQuery) return filterOptions;
+    return filterOptions.filter((option) =>
+      option.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [filterOptions, searchQuery]);
+
   const handleCheckboxChange = (option: string) => {
     const isSelected = selectedFilters?.[option] || false;
 
@@ -40,16 +50,32 @@ const FilterActionMenu = ({
           </Button>
         </ActionMenu.Trigger>
         <ActionMenu.Content>
+          <div style={{ padding: "0.5rem", borderBottom: "1px solid #e0e0e0" }}>
+            <TextField
+              label=""
+              hideLabel
+              size="small"
+              placeholder={`Søk ${filterName.toLowerCase()}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <ActionMenu.Group label={filterName}>
-            {filterOptions.map((option, i) => (
-              <ActionMenu.CheckboxItem
-                key={option + i}
-                checked={selectedFilters?.[option] || false}
-                onCheckedChange={() => handleCheckboxChange(option)}
-              >
-                {option}
-              </ActionMenu.CheckboxItem>
-            ))}
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option, i) => (
+                <ActionMenu.CheckboxItem
+                  key={option + i}
+                  checked={selectedFilters?.[option] || false}
+                  onCheckedChange={() => handleCheckboxChange(option)}
+                >
+                  {option}
+                </ActionMenu.CheckboxItem>
+              ))
+            ) : (
+              <div style={{ padding: "0.5rem", color: "#888" }}>
+                Ingen resultater
+              </div>
+            )}
           </ActionMenu.Group>
         </ActionMenu.Content>
       </ActionMenu>

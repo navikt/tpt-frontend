@@ -11,6 +11,8 @@ const Vulnerabilities = () => {
     setTeamFilters,
     applicationFilters,
     setApplicationFilters,
+    cveFilters,
+    setCveFilters,
   } = useVulnerabilities();
 
   if (isLoading) {
@@ -42,11 +44,19 @@ const Vulnerabilities = () => {
               selectedFilters={applicationFilters}
               setFilter={setApplicationFilters}
             />
+            <FilterActionMenu
+              style={{ marginLeft: "1rem" }}
+              filterName="CVE"
+              filterOptions={Object.keys(cveFilters)}
+              selectedFilters={cveFilters}
+              setFilter={setCveFilters}
+            />
           </div>
           <VulnerabilitiesTable
             data={data}
             teamFilters={teamFilters}
             applicationFilters={applicationFilters}
+            cveFilters={cveFilters}
           />
         </>
       ) : null}
