@@ -1,8 +1,7 @@
 "use client";
 import "./globals.css";
 import { Page } from "@navikt/ds-react";
-import { InternalHeader } from "@navikt/ds-react";
-import { GlobalAlert } from "@navikt/ds-react";
+import { InternalHeader, GlobalAlert, Spacer } from "@navikt/ds-react";
 import { useUser } from "./hooks/useUser";
 
 export default function RootLayout({
@@ -24,6 +23,7 @@ export default function RootLayout({
             >
               Sårbarheter
             </InternalHeader.Title>
+            <Spacer />
             {!isLoading && user && (
               <InternalHeader.User name={user.email} description="" />
             )}
