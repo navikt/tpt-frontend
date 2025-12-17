@@ -1,7 +1,16 @@
 "use client";
 import { useVulnerabilities } from "../../hooks/useVulnerabilities";
 import { useParams } from "next/navigation";
-import { Table, Tag, Heading, BodyShort, Link as DSLink, Accordion, Popover, Button } from "@navikt/ds-react";
+import {
+  Table,
+  Tag,
+  Heading,
+  BodyShort,
+  Link as DSLink,
+  Accordion,
+  Popover,
+  Button,
+} from "@navikt/ds-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -51,16 +60,36 @@ function RiskScoreCell({ vuln }: { vuln: VulnerabilityWithMultipliers }) {
         placement="right"
       >
         <Popover.Content>
-          <Heading size="xsmall" spacing>Risk Score Multipliers</Heading>
+          <Heading size="xsmall" spacing>
+            Risk Score Multipliers
+          </Heading>
           {vuln.riskScoreMultipliers ? (
             <div style={{ fontSize: "0.875rem" }}>
-              <BodyShort size="small"><strong>Base (High):</strong> {vuln.riskScoreMultipliers.base_high}</BodyShort>
-              <BodyShort size="small"><strong>Exposure:</strong> {vuln.riskScoreMultipliers.exposure}x</BodyShort>
-              <BodyShort size="small"><strong>KEV:</strong> {vuln.riskScoreMultipliers.kev}x</BodyShort>
-              <BodyShort size="small"><strong>EPSS:</strong> {vuln.riskScoreMultipliers.epss}x</BodyShort>
-              <BodyShort size="small"><strong>Production:</strong> {vuln.riskScoreMultipliers.production}x</BodyShort>
-              <BodyShort size="small"><strong>Old Build Days:</strong> {vuln.riskScoreMultipliers.old_build_days}</BodyShort>
-              <BodyShort size="small"><strong>Old Build:</strong> {vuln.riskScoreMultipliers.old_build}x</BodyShort>
+              <BodyShort size="small">
+                <strong>Base (High):</strong>{" "}
+                {vuln.riskScoreMultipliers.base_high}
+              </BodyShort>
+              <BodyShort size="small">
+                <strong>Exposure:</strong> {vuln.riskScoreMultipliers.exposure}x
+              </BodyShort>
+              <BodyShort size="small">
+                <strong>KEV:</strong> {vuln.riskScoreMultipliers.kev}x
+              </BodyShort>
+              <BodyShort size="small">
+                <strong>EPSS:</strong> {vuln.riskScoreMultipliers.epss}x
+              </BodyShort>
+              <BodyShort size="small">
+                <strong>Production:</strong>{" "}
+                {vuln.riskScoreMultipliers.production}x
+              </BodyShort>
+              <BodyShort size="small">
+                <strong>Old Build Days:</strong>{" "}
+                {vuln.riskScoreMultipliers.old_build_days}
+              </BodyShort>
+              <BodyShort size="small">
+                <strong>Old Build:</strong>{" "}
+                {vuln.riskScoreMultipliers.old_build}x
+              </BodyShort>
             </div>
           ) : (
             <BodyShort size="small">No multiplier data available</BodyShort>
@@ -92,7 +121,9 @@ export default function WorkloadDetailPage() {
   if (!workloadData) {
     return (
       <div style={{ marginTop: "2rem" }}>
-        <Heading size="large" spacing>Workload ikke funnet</Heading>
+        <Heading size="large" spacing>
+          Workload ikke funnet
+        </Heading>
         <BodyShort>
           <Link href="/">Tilbake til forsiden</Link>
         </BodyShort>
@@ -100,19 +131,29 @@ export default function WorkloadDetailPage() {
     );
   }
 
+  const accordionItemSpacing = "1.5rem";
+
   return (
     <div style={{ marginTop: "2rem" }}>
       <Link href="/" style={{ marginBottom: "1rem", display: "inline-block" }}>
         ← Tilbake
       </Link>
 
-      <Heading size="large" spacing>{workloadData.name}</Heading>
+      <Heading size="large" spacing>
+        {workloadData.name}
+      </Heading>
 
       <div style={{ marginBottom: "2rem" }}>
-        <BodyShort spacing><strong>Team:</strong> {workloadData.team}</BodyShort>
-        <BodyShort spacing><strong>Environment:</strong> {workloadData.environment}</BodyShort>
+        <BodyShort spacing>
+          <strong>Team:</strong> {workloadData.team}
+        </BodyShort>
+        <BodyShort spacing>
+          <strong>Environment:</strong> {workloadData.environment}
+        </BodyShort>
         {workloadData.buildTime && (
-          <BodyShort spacing><strong>Build Time:</strong> {workloadData.buildTime}</BodyShort>
+          <BodyShort spacing>
+            <strong>Build Time:</strong> {workloadData.buildTime}
+          </BodyShort>
         )}
         {workloadData.repository && (
           <BodyShort spacing>
@@ -127,57 +168,71 @@ export default function WorkloadDetailPage() {
           </BodyShort>
         )}
         <BodyShort spacing>
-          <strong>Ingress Types:</strong> {workloadData.ingressTypes?.join(", ") || "None"}
+          <strong>Ingress Types:</strong>{" "}
+          {workloadData.ingressTypes?.join(", ") || "None"}
         </BodyShort>
       </div>
 
       <Accordion style={{ marginBottom: "2rem" }}>
         <Accordion.Item>
-          <Accordion.Header>Forklaring av termer og risikoskåring</Accordion.Header>
+          <Accordion.Header>
+            Forklaring av termer og risikoskåring
+          </Accordion.Header>
           <Accordion.Content>
-            <Heading size="xsmall" spacing>KEV (Known Exploited Vulnerabilities)</Heading>
-            <BodyShort spacing>
-              KEV er en liste fra CISA (Cybersecurity and Infrastructure Security Agency) 
-              over sårbarheter som er aktivt utnyttet i naturen. Sårbarheter med KEV-oppføring 
-              får høyere risikoskåre fordi de representerer en reell, dokumentert trussel.
+            <Heading size="xsmall">
+              KEV (Known Exploited Vulnerabilities)
+            </Heading>
+            <BodyShort style={{ marginBottom: accordionItemSpacing }}>
+              KEV er en liste fra CISA (Cybersecurity and Infrastructure
+              Security Agency) over sårbarheter som er aktivt utnyttet i
+              naturen. Sårbarheter med KEV-oppføring får høyere risikoskåre
+              fordi de representerer en reell, dokumentert trussel.
             </BodyShort>
 
-            <Heading size="xsmall" spacing>EPSS (Exploit Prediction Scoring System)</Heading>
-            <BodyShort spacing>
-              EPSS er et datastyrt system som predikerer sannsynligheten for at en sårbarhet 
-              vil bli utnyttet de neste 30 dagene. Høyere EPSS-skåre indikerer større 
-              sannsynlighet for aktiv utnyttelse, og øker derfor risikoskåren.
+            <Heading size="xsmall">
+              EPSS (Exploit Prediction Scoring System)
+            </Heading>
+            <BodyShort style={{ marginBottom: accordionItemSpacing }}>
+              EPSS er et datastyrt system som predikerer sannsynligheten for at
+              en sårbarhet vil bli utnyttet de neste 30 dagene. Høyere
+              EPSS-skåre indikerer større sannsynlighet for aktiv utnyttelse, og
+              øker derfor risikoskåren.
             </BodyShort>
 
-            <Heading size="xsmall" spacing>Ingress Types</Heading>
+            <Heading size="xsmall">Ingress Types</Heading>
             <BodyShort spacing>
-              <strong>External:</strong> Applikasjonen er eksponert mot internett uten 
-              autentisering. Dette gir høyest angrepsflate og påvirker risikoskåren mest.
+              <strong>External:</strong> Applikasjonen er eksponert mot
+              internett uten autentisering. Dette gir høyest angrepsflate og
+              påvirker risikoskåren mest.
             </BodyShort>
             <BodyShort spacing>
-              <strong>Authenticated:</strong> Applikasjonen er eksponert mot internett, 
-              men krever autentisering. Dette gir moderat økt risiko.
+              <strong>Authenticated:</strong> Applikasjonen er eksponert mot
+              internett, men krever autentisering. Dette gir moderat økt risiko.
             </BodyShort>
             <BodyShort spacing>
-              <strong>Internal:</strong> Applikasjonen er kun tilgjengelig internt i 
-              nettverket. Dette gir normal/baseline risiko.
+              <strong>Internal:</strong> Applikasjonen er kun tilgjengelig
+              internt i nettverket. Dette gir normal/baseline risiko.
             </BodyShort>
-            <BodyShort spacing>
-              <strong>Unknown/None:</strong> Ingen ingress er konfigurert. Dette betyr at 
-              applikasjonen ikke er tilgjengelig eksternt eller internt og får redusert risikoskåre.
+            <BodyShort style={{ marginBottom: accordionItemSpacing }}>
+              <strong>Unknown/None:</strong> Ingen ingress er konfigurert. Dette
+              betyr at applikasjonen ikke er tilgjengelig eksternt eller internt
+              og får redusert risikoskåre.
             </BodyShort>
 
-            <Heading size="xsmall" spacing>Risk Score</Heading>
+            <Heading size="xsmall">Risk Score</Heading>
             <BodyShort>
-              Risikoskåren beregnes ved å ta hensyn til flere faktorer inkludert CVE severity, 
-              KEV-status, EPSS-skåre, ingress type, produksjonsmiljø og byggets alder. 
-              Høyere skåre betyr høyere prioritet for utbedring.
+              Risikoskåren beregnes ved å ta hensyn til flere faktorer inkludert
+              CVE severity, KEV-status, EPSS-skåre, ingress type,
+              produksjonsmiljø og byggets alder. Høyere skåre betyr høyere
+              prioritet for utbedring.
             </BodyShort>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>
 
-      <Heading size="medium" spacing>Sårbarheter ({workloadData.vulnerabilities.length})</Heading>
+      <Heading size="medium" spacing>
+        Sårbarheter ({workloadData.vulnerabilities.length})
+      </Heading>
 
       {workloadData.vulnerabilities.length === 0 ? (
         <BodyShort>Ingen sårbarheter funnet.</BodyShort>

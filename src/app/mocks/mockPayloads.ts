@@ -14,7 +14,7 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0001",
               packageName: "express",
-              riskScore: 90,
+              riskScore: 200,
               riskScoreMultipliers: {
                 base_high: 70,
                 exposure: 2,

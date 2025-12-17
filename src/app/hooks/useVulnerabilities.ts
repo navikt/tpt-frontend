@@ -10,20 +10,6 @@ export const useVulnerabilities = () => {
   >({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    if (data) {
-      const updatedApplicationFilters: Record<string, boolean> = {};
-      data.teams.forEach((team) => {
-        if (teamFilters[team.team] === true) {
-          team.workloads.forEach((workload) => {
-            updatedApplicationFilters[workload.name] = true;
-          });
-        }
-      });
-      setApplicationFilters(updatedApplicationFilters);
-    }
-  }, [teamFilters, data]);
-
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -69,11 +55,28 @@ export const useVulnerabilities = () => {
     }
   }, []);
 
-  useEffect(() => {
+  useEffect(function fetchVulnerabilitiesEffect() {
     if (data) return;
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(
+    function setApplicationFilterEffect() {
+      if (data) {
+        const updatedApplicationFilters: Record<string, boolean> = {};
+        data.teams.forEach((team) => {
+          if (teamFilters[team.team] === true) {
+            team.workloads.forEach((workload) => {
+              updatedApplicationFilters[workload.name] = true;
+            });
+          }
+        });
+        setApplicationFilters(updatedApplicationFilters);
+      }
+    },
+    [teamFilters, data]
+  );
 
   return {
     data,
