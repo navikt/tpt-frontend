@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function WorkloadDetailPage() {
   const params = useParams();
-  const workloadId = params.id as string;
+  const workloadId = params.workloadId as string;
   const { data, isLoading } = useVulnerabilities();
 
   const workloadData = data?.teams

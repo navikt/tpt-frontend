@@ -33,7 +33,9 @@ const Criticals = () => {
   return (
     <>
       <h2 style={{ marginTop: "2rem" }}>Prioriterte sårbarheter </h2>
-      {isLoading || configLoading ? <div>Loading critical vulnerabilities...</div> : null}
+      {isLoading || configLoading ? (
+        <div>Loading critical vulnerabilities...</div>
+      ) : null}
       {!isLoading && !configLoading && criticalVulnerabilities.length === 0 ? (
         <p>
           Godt jobbet! 🙌 Vi ser ingen sårbarheter du må fikse <i>nå</i>.
@@ -49,7 +51,7 @@ const Criticals = () => {
             >
               <LinkCard.Title>
                 <LinkCard.Anchor asChild>
-                  <Link href={`/workload/${vuln.workload.id}`}>
+                  <Link href={`/${vuln.workload.id}/${vuln.identifier}`}>
                     {vuln.workload.name}
                   </Link>
                 </LinkCard.Anchor>

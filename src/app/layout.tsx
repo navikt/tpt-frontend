@@ -18,6 +18,12 @@ export default function RootLayout({
         <Page>
           <InternalHeader>
             <InternalHeader.Title href="/">Titt på Ting</InternalHeader.Title>
+            <InternalHeader.Title
+              href="/vulnerabilities"
+              style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
+            >
+              Sårbarheter
+            </InternalHeader.Title>
             {!isLoading && user && (
               <InternalHeader.User name={user.email} description="" />
             )}
