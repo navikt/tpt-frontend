@@ -7,10 +7,10 @@ import {
   Heading,
   BodyShort,
   Link as DSLink,
-  Accordion,
   Popover,
   Button,
 } from "@navikt/ds-react";
+import WorkloadAccordion from "../../components/workload/WorkloadAccordion";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -66,29 +66,26 @@ function RiskScoreCell({ vuln }: { vuln: VulnerabilityWithMultipliers }) {
           {vuln.riskScoreMultipliers ? (
             <div style={{ fontSize: "0.875rem" }}>
               <BodyShort size="small">
-                <strong>Base (High):</strong>{" "}
-                {vuln.riskScoreMultipliers.base_high}
+                <b>Base (High):</b> {vuln.riskScoreMultipliers.base_high}
               </BodyShort>
               <BodyShort size="small">
-                <strong>Exposure:</strong> {vuln.riskScoreMultipliers.exposure}x
+                <b>Exposure:</b> {vuln.riskScoreMultipliers.exposure}x
               </BodyShort>
               <BodyShort size="small">
-                <strong>KEV:</strong> {vuln.riskScoreMultipliers.kev}x
+                <b>KEV:</b> {vuln.riskScoreMultipliers.kev}x
               </BodyShort>
               <BodyShort size="small">
-                <strong>EPSS:</strong> {vuln.riskScoreMultipliers.epss}x
+                <b>EPSS:</b> {vuln.riskScoreMultipliers.epss}x
               </BodyShort>
               <BodyShort size="small">
-                <strong>Production:</strong>{" "}
-                {vuln.riskScoreMultipliers.production}x
+                <b>Production:</b> {vuln.riskScoreMultipliers.production}x
               </BodyShort>
               <BodyShort size="small">
-                <strong>Old Build Days:</strong>{" "}
+                <b>Old Build Days:</b>{" "}
                 {vuln.riskScoreMultipliers.old_build_days}
               </BodyShort>
               <BodyShort size="small">
-                <strong>Old Build:</strong>{" "}
-                {vuln.riskScoreMultipliers.old_build}x
+                <b>Old Build:</b> {vuln.riskScoreMultipliers.old_build}x
               </BodyShort>
             </div>
           ) : (
@@ -131,8 +128,6 @@ export default function WorkloadDetailPage() {
     );
   }
 
-  const accordionItemSpacing = "1.5rem";
-
   return (
     <div style={{ marginTop: "2rem" }}>
       <Link href="/" style={{ marginBottom: "1rem", display: "inline-block" }}>
@@ -145,19 +140,19 @@ export default function WorkloadDetailPage() {
 
       <div style={{ marginBottom: "2rem" }}>
         <BodyShort spacing>
-          <strong>Team:</strong> {workloadData.team}
+          <b>Team:</b> {workloadData.team}
         </BodyShort>
         <BodyShort spacing>
-          <strong>Environment:</strong> {workloadData.environment}
+          <b>Environment:</b> {workloadData.environment}
         </BodyShort>
         {workloadData.buildTime && (
           <BodyShort spacing>
-            <strong>Build Time:</strong> {workloadData.buildTime}
+            <b>Build Time:</b> {workloadData.buildTime}
           </BodyShort>
         )}
         {workloadData.repository && (
           <BodyShort spacing>
-            <strong>Repository:</strong>{" "}
+            <b>Repository:</b>{" "}
             <DSLink
               href={`https://www.github.com/${workloadData.repository}`}
               target="_blank"
@@ -168,67 +163,12 @@ export default function WorkloadDetailPage() {
           </BodyShort>
         )}
         <BodyShort spacing>
-          <strong>Ingress Types:</strong>{" "}
+          <b>Ingress Types:</b>{" "}
           {workloadData.ingressTypes?.join(", ") || "None"}
         </BodyShort>
       </div>
 
-      <Accordion style={{ marginBottom: "2rem" }}>
-        <Accordion.Item>
-          <Accordion.Header>
-            Forklaring av termer og risikoskåring
-          </Accordion.Header>
-          <Accordion.Content>
-            <Heading size="xsmall">
-              KEV (Known Exploited Vulnerabilities)
-            </Heading>
-            <BodyShort style={{ marginBottom: accordionItemSpacing }}>
-              KEV er en liste fra CISA (Cybersecurity and Infrastructure
-              Security Agency) over sårbarheter som er aktivt utnyttet i
-              naturen. Sårbarheter med KEV-oppføring får høyere risikoskåre
-              fordi de representerer en reell, dokumentert trussel.
-            </BodyShort>
-
-            <Heading size="xsmall">
-              EPSS (Exploit Prediction Scoring System)
-            </Heading>
-            <BodyShort style={{ marginBottom: accordionItemSpacing }}>
-              EPSS er et datastyrt system som predikerer sannsynligheten for at
-              en sårbarhet vil bli utnyttet de neste 30 dagene. Høyere
-              EPSS-skåre indikerer større sannsynlighet for aktiv utnyttelse, og
-              øker derfor risikoskåren.
-            </BodyShort>
-
-            <Heading size="xsmall">Ingress Types</Heading>
-            <BodyShort spacing>
-              <strong>External:</strong> Applikasjonen er eksponert mot
-              internett uten autentisering. Dette gir høyest angrepsflate og
-              påvirker risikoskåren mest.
-            </BodyShort>
-            <BodyShort spacing>
-              <strong>Authenticated:</strong> Applikasjonen er eksponert mot
-              internett, men krever autentisering. Dette gir moderat økt risiko.
-            </BodyShort>
-            <BodyShort spacing>
-              <strong>Internal:</strong> Applikasjonen er kun tilgjengelig
-              internt i nettverket. Dette gir normal/baseline risiko.
-            </BodyShort>
-            <BodyShort style={{ marginBottom: accordionItemSpacing }}>
-              <strong>Unknown/None:</strong> Ingen ingress er konfigurert. Dette
-              betyr at applikasjonen ikke er tilgjengelig eksternt eller internt
-              og får redusert risikoskåre.
-            </BodyShort>
-
-            <Heading size="xsmall">Risk Score</Heading>
-            <BodyShort>
-              Risikoskåren beregnes ved å ta hensyn til flere faktorer inkludert
-              CVE severity, KEV-status, EPSS-skåre, ingress type,
-              produksjonsmiljø og byggets alder. Høyere skåre betyr høyere
-              prioritet for utbedring.
-            </BodyShort>
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion>
+      <WorkloadAccordion />
 
       <Heading size="medium" spacing>
         Sårbarheter ({workloadData.vulnerabilities.length})
