@@ -48,12 +48,28 @@ const VulnerabilitiesTable = ({
       riskScore: number;
     }> = [];
 
+    // Check if any filters are active
+    const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
+    const hasApplicationFilters = Object.values(applicationFilters).some(
+      (v) => v === true
+    );
+    const hasCveFilters = Object.values(cveFilters).some((v) => v === true);
+
     data?.teams.forEach((team) => {
-      if (teamFilters[team.team] === true) {
+      // Show team if no team filters OR team is selected
+      if (!hasTeamFilters || teamFilters[team.team] === true) {
         team.workloads.forEach((workload) => {
-          if (applicationFilters[workload.name] === true) {
+          // Show workload if no application filters OR workload is selected
+          if (
+            !hasApplicationFilters ||
+            applicationFilters[workload.name] === true
+          ) {
             workload.vulnerabilities.forEach((vulnerability) => {
-              if (cveFilters[vulnerability.identifier] === true) {
+              // Show CVE if no CVE filters OR CVE is selected
+              if (
+                !hasCveFilters ||
+                cveFilters[vulnerability.identifier] === true
+              ) {
                 rows.push({
                   team: team.team,
                   workload: workload.name,
@@ -91,13 +107,25 @@ const VulnerabilitiesTable = ({
   }, [tableRows, sort]);
 
   return (
-    <Table zebraStripes sort={sort} onSortChange={(sortKey) => handleSort(sortKey as SortColumn)}>
+    <Table
+      zebraStripes
+      sort={sort}
+      onSortChange={(sortKey) => handleSort(sortKey as SortColumn)}
+    >
       <Table.Header>
         <Table.Row>
-          <Table.ColumnHeader sortKey="team" sortable>Team</Table.ColumnHeader>
-          <Table.ColumnHeader sortKey="workload" sortable>Applikasjon</Table.ColumnHeader>
-          <Table.ColumnHeader sortKey="vulnerability" sortable>Sårbarhet</Table.ColumnHeader>
-          <Table.ColumnHeader sortKey="riskScore" sortable>Risikoscore</Table.ColumnHeader>
+          <Table.ColumnHeader sortKey="team" sortable>
+            Team
+          </Table.ColumnHeader>
+          <Table.ColumnHeader sortKey="workload" sortable>
+            Applikasjon
+          </Table.ColumnHeader>
+          <Table.ColumnHeader sortKey="vulnerability" sortable>
+            Sårbarhet
+          </Table.ColumnHeader>
+          <Table.ColumnHeader sortKey="riskScore" sortable>
+            Risikoscore
+          </Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -113,14 +141,7 @@ const VulnerabilitiesTable = ({
                 {row.team}
               </Link>
             </Table.DataCell>
-            <Table.DataCell>
-              <Link
-                as={NextLink}
-                href={`/workload/${row.workloadId}`}
-              >
-                {row.workload}
-              </Link>
-            </Table.DataCell>
+            <Table.DataCell>{row.workload}</Table.DataCell>
             <Table.DataCell>{row.vulnerability}</Table.DataCell>
             <Table.DataCell>{Math.round(row.riskScore)}</Table.DataCell>
           </Table.Row>
