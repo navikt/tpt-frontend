@@ -52,9 +52,9 @@ const WorkloadRiskScoreCell = ({
         placement="right"
       >
         <Popover.Content>
-          <Heading size="xsmall" spacing>
-            Risk Score Multipliers
-          </Heading>
+          <BodyShort spacing size="small">
+            <b>Risk Score Multipliers</b>
+          </BodyShort>
           {vuln.riskScoreMultipliers ? (
             <div style={{ fontSize: "0.875rem" }}>
               <BodyShort size="small">

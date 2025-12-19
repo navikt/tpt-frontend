@@ -11,6 +11,8 @@ export interface RiskScoreMultipliers {
 export interface Vulnerability {
   identifier: string;
   packageName: string;
+  description?: string;
+  vulnerabilityDetailsLink?: string;
   riskScore: number;
   riskScoreMultipliers?: RiskScoreMultipliers;
 }

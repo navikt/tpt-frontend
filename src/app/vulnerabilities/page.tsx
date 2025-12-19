@@ -8,8 +8,8 @@ export default function Page() {
         <div className={styles.intro}>
           <h1>Sårbarheter</h1>
           <p>
-            Tabellen her er basert på alle applikasjoner som har generert en
-            SBOM for Naisconsole, og som er i et namespace du tilhører.
+            Tabellen er basert på alle applikasjoner som har generert en SBOM
+            for nais console, og som er i et namespace du tilhører.
           </p>
           <Vulnerabilities />
         </div>

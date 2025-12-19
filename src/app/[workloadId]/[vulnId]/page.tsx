@@ -1,7 +1,7 @@
 "use client";
 import { useVulnerabilities } from "../../hooks/useVulnerabilities";
 import { useParams } from "next/navigation";
-import { Table, Heading, BodyShort, Link as DSLink } from "@navikt/ds-react";
+import { Heading, BodyShort, Link as DSLink } from "@navikt/ds-react";
 import WorkloadAccordion from "../../components/workload/WorkloadAccordion";
 import WorkloadRiskScoreCell from "../../components/workload/WorkloadRiskScoreCell";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function WorkloadDetailPage() {
   const params = useParams();
   const workloadId = params.workloadId as string;
+  const vulnId = params.vulnId as string;
   const { data, isLoading } = useVulnerabilities();
 
   const workloadData = data?.teams
@@ -20,9 +21,15 @@ export default function WorkloadDetailPage() {
     )
     .find((w) => w.id === workloadId);
 
+  const vulnerabilityData = workloadData?.vulnerabilities.find(
+    (v) => v.identifier === vulnId
+  );
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  console.log("vulnId:", vulnerabilityData);
 
   if (!workloadData) {
     return (
@@ -75,40 +82,24 @@ export default function WorkloadDetailPage() {
           <b>Ingress Types:</b>{" "}
           {workloadData.ingressTypes?.join(", ") || "None"}
         </BodyShort>
+        <div style={{ marginBottom: "1rem" }}>
+          <b>Risk score:</b> <WorkloadRiskScoreCell vuln={vulnerabilityData!} />
+        </div>
       </div>
 
+      <BodyShort spacing>
+        <b>{vulnerabilityData?.identifier}</b>: {vulnerabilityData?.description}
+      </BodyShort>
+      <DSLink
+        style={{ marginBottom: "2rem" }}
+        href={vulnerabilityData?.vulnerabilityDetailsLink}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Les mer om sårbarheten her
+      </DSLink>
+
       <WorkloadAccordion />
-
-      <Heading size="medium" spacing>
-        Sårbarheter ({workloadData.vulnerabilities.length})
-      </Heading>
-
-      {workloadData.vulnerabilities.length === 0 ? (
-        <BodyShort>Ingen sårbarheter funnet.</BodyShort>
-      ) : (
-        <Table>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>CVE ID</Table.HeaderCell>
-              <Table.HeaderCell>Package</Table.HeaderCell>
-              <Table.HeaderCell>Risk Score</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {[...workloadData.vulnerabilities]
-              .sort((a, b) => b.riskScore - a.riskScore)
-              .map((vuln, index) => (
-                <Table.Row key={`${vuln.identifier}-${index}`}>
-                  <Table.DataCell>{vuln.identifier}</Table.DataCell>
-                  <Table.DataCell>{vuln.packageName}</Table.DataCell>
-                  <Table.DataCell>
-                    <WorkloadRiskScoreCell vuln={vuln} />
-                  </Table.DataCell>
-                </Table.Row>
-              ))}
-          </Table.Body>
-        </Table>
-      )}
     </div>
   );
 }

@@ -14,6 +14,10 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0001",
               packageName: "express",
+              description:
+                "A buffer overflow vulnerability in the X.509 certificate parser could allow remote code execution",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0001",
               riskScore: 200,
               riskScoreMultipliers: {
                 base_high: 70,
@@ -28,6 +32,10 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0002",
               packageName: "lodash",
+              description:
+                "Prototype pollution vulnerability allowing arbitrary property injection",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0002",
               riskScore: 45,
               riskScoreMultipliers: {
                 base_high: 50,
@@ -52,6 +60,10 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0003",
               packageName: "log4j-core",
+              description:
+                "Remote code execution via JNDI lookup in log messages",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0003",
               riskScore: 98,
               riskScoreMultipliers: {
                 base_high: 90,
@@ -76,6 +88,10 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0003",
               packageName: "log4j-core",
+              description:
+                "Remote code execution via JNDI lookup in log messages",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0003",
               riskScore: 98,
               riskScoreMultipliers: {
                 base_high: 90,
@@ -105,6 +121,9 @@ export const mockVulnerabilitiesPayload = {
             {
               identifier: "CVE-2025-0004",
               packageName: "spring-core",
+              description: "SQL injection vulnerability in parameter binding",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0004",
               riskScore: 20,
               riskScoreMultipliers: {
                 base_high: 30,
