@@ -15,9 +15,10 @@ TPT analyserer og rangerer sårbarheter basert på flere faktorer som KEV (Known
 
 ```bash
 # Installer avhengigheter
-npm install
+npm ci
 
 # Kjør utviklingsserver
+export MOCKS_ENABLED="true" # For standalone kjøring
 npm run dev
 
 # Bygg for produksjon
