@@ -14,7 +14,7 @@ const WorkloadAccordion = () => {
           <Heading size="xsmall">KEV (Known Exploited Vulnerabilities)</Heading>
           <BodyShort style={{ marginBottom: accordionItemSpacing }}>
             KEV er en liste fra CISA (Cybersecurity and Infrastructure Security
-            Agency) over sårbarheter som er aktivt utnyttet i naturen.
+            Agency) over sårbarheter som er aktivt utnyttet på nettet.
             KEV-oppføringer representerer en reell, dokumentert trussel.
           </BodyShort>
 
@@ -22,8 +22,8 @@ const WorkloadAccordion = () => {
             EPSS (Exploit Prediction Scoring System)
           </Heading>
           <BodyShort style={{ marginBottom: accordionItemSpacing }}>
-            EPSS er et datastyrt system som predikerer sannsynligheten for at en
-            sårbarhet vil bli utnyttet de neste 30 dagene. Høyere EPSS-skåre
+            EPSS er et datastyrt system som beregner sannsynligheten for at en
+            sårbarhet vil bli utnyttet de neste 30 dagene. Høyere EPSS-verdi
             indikerer større sannsynlighet for aktiv utnyttelse.
           </BodyShort>
 
@@ -49,7 +49,7 @@ const WorkloadAccordion = () => {
           <BodyShort>
             Risikoskåren beregnes ved å ta hensyn til flere faktorer inkludert
             CVE severity, KEV-status, EPSS-skåre, ingress type, produksjonsmiljø
-            og byggets alder. Høyere skåre betyr høyere prioritet for utbedring.
+            og byggets alder. Høyere verdi betyr at det haster mer.
           </BodyShort>
         </Accordion.Content>
       </Accordion.Item>
