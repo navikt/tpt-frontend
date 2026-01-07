@@ -28,7 +28,6 @@ export async function GET(request: NextRequest) {
     },
     request: {
       url: request.url,
-      headers: Object.fromEntries(request.headers.entries()),
     },
     response: null as any,
     error: null as string | null,
