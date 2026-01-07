@@ -75,8 +75,6 @@ export async function GET(request: NextRequest) {
     // Fetch from multiple endpoints for comprehensive debug info
     const endpoints = [
       { name: "vulnerabilities", path: "/vulnerabilities/user" },
-      { name: "config", path: "/config" },
-      { name: "user", path: "/user" },
     ];
 
     const responses = await Promise.allSettled(
@@ -95,7 +93,6 @@ export async function GET(request: NextRequest) {
           url: `${tptBackendUrl}${endpoint.path}`,
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
           data: data,
           success: response.ok,
         };
