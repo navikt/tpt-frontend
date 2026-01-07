@@ -1,5 +1,5 @@
 "use client";
-import { VulnerabilitiesResponse } from "../../../types/vulnerabilities";
+import { VulnerabilitiesResponse } from "@/app/types/vulnerabilities";
 import { Table, Link } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
 import NextLink from "next/link";
@@ -43,37 +43,38 @@ const VulnerabilitiesTable = ({
       team: string;
       workload: string;
       workloadId: string;
+      vulnerabilityId: string;
       ingressTypes: string[] | undefined;
       vulnerability: string;
       riskScore: number;
     }> = [];
 
     // Check if any filters are active
-    const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
     const hasApplicationFilters = Object.values(applicationFilters).some(
-      (v) => v === true
+      (v) => v
     );
-    const hasCveFilters = Object.values(cveFilters).some((v) => v === true);
+    const hasCveFilters = Object.values(cveFilters).some((v) => v);
 
     data?.teams.forEach((team) => {
       // Show team if no team filters OR team is selected
-      if (!hasTeamFilters || teamFilters[team.team] === true) {
+      if (teamFilters[team.team]) {
         team.workloads.forEach((workload) => {
           // Show workload if no application filters OR workload is selected
           if (
             !hasApplicationFilters ||
-            applicationFilters[workload.name] === true
+            applicationFilters[workload.name]
           ) {
             workload.vulnerabilities.forEach((vulnerability) => {
               // Show CVE if no CVE filters OR CVE is selected
               if (
                 !hasCveFilters ||
-                cveFilters[vulnerability.identifier] === true
+                cveFilters[vulnerability.identifier]
               ) {
                 rows.push({
                   team: team.team,
                   workload: workload.name,
                   workloadId: workload.id,
+                  vulnerabilityId: vulnerability.identifier,
                   ingressTypes: workload.ingressTypes,
                   vulnerability: vulnerability.identifier,
                   riskScore: vulnerability.riskScore,
@@ -95,7 +96,7 @@ const VulnerabilitiesTable = ({
       const aValue = a[sort.orderBy];
       const bValue = b[sort.orderBy];
 
-      let comparison = 0;
+      let comparison;
       if (typeof aValue === "number" && typeof bValue === "number") {
         comparison = aValue - bValue;
       } else {
@@ -126,6 +127,9 @@ const VulnerabilitiesTable = ({
           <Table.ColumnHeader sortKey="riskScore" sortable>
             Risikoscore
           </Table.ColumnHeader>
+          <Table.ColumnHeader>
+            Lenker
+          </Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -143,7 +147,16 @@ const VulnerabilitiesTable = ({
             </Table.DataCell>
             <Table.DataCell>{row.workload}</Table.DataCell>
             <Table.DataCell>{row.vulnerability}</Table.DataCell>
-            <Table.DataCell>{Math.round(row.riskScore)}</Table.DataCell>
+            <Table.DataCell>
+              {Math.round(row.riskScore)}
+            </Table.DataCell>
+            <Table.DataCell>
+              <Link
+                  href={`/${row.workloadId}/${row.vulnerabilityId}`}
+              >
+                Detaljer
+              </Link>
+            </Table.DataCell>
           </Table.Row>
         ))}
       </Table.Body>
