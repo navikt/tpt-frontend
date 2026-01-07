@@ -31,7 +31,7 @@ const WorkloadRiskScoreTags = ({vuln, ingressTypes}: {
     return (
         <>
             {vuln.riskScoreMultipliers ? (
-                <div className="riskScoreTags">
+                <div>
                     {vuln.riskScoreMultipliers.exposure > 1.0 ? (
                         <RiskScoreTag variant={exposureTagVariant} text={"Ingress " + exposureIngress} />): ("")}
                     {vuln.riskScoreMultipliers.kev > 1.0 ? (
