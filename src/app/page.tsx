@@ -1,4 +1,4 @@
-import Criticals from "./components/criticals/Criticals";
+import VulnerabilitiesToLookAt from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitiesToLookAt";
 import Link from "next/link";
 import { BodyShort } from "@navikt/ds-react";
 
@@ -25,7 +25,7 @@ export default function Home() {
             <Link href="/vulnerabilities">sårbarhetssiden.</Link>
           </BodyShort>
         </div>
-        <Criticals />
+        <VulnerabilitiesToLookAt />
       </main>
     </div>
   );
