@@ -54,33 +54,36 @@ const WorkloadRiskScoreCell = ({vuln}: {
                         <b>Risk score utregning</b>
                     </BodyShort>
                     {vuln.riskScoreMultipliers ? (
-                            <table style={{fontSize: "0.875rem"}}>
-                                <tr>
-                                    <td>Fra CVE:</td>
-                                    <td>{vuln.riskScoreMultipliers.base_high}</td>
-                                </tr>
-                                <tr>
-                                    <td>Eksponert ingress:</td>
-                                    <td>{vuln.riskScoreMultipliers.exposure}x</td>
-                                </tr>
-                                <tr>
-                                    <td>KEV:</td>
-                                    <td>{vuln.riskScoreMultipliers.kev}x</td>
-                                </tr>
-                                <tr>
-                                    <td>EPSS:</td>
-                                    <td>{vuln.riskScoreMultipliers.epss}x</td>
-                                </tr>
-                                <tr>
-                                    <td>I produksjon:</td>
-                                    <td>{vuln.riskScoreMultipliers.production}x</td>
-                                </tr>
-                                <tr>
-                                    <td>Gammelt bygg:</td>
-                                    <td>{vuln.riskScoreMultipliers.old_build}x{" "}
-                                    (Dager siden sist bygg:{" "}{vuln.riskScoreMultipliers.old_build_days})</td>
-                                </tr>
-                            </table>
+                        <table style={{fontSize: "0.875rem"}}>
+                            <tbody>
+                            <tr>
+                                <td>Fra CVE:</td>
+                                <td>{vuln.riskScoreMultipliers.base_high}</td>
+                            </tr>
+                            <tr>
+                                <td>Eksponert ingress:</td>
+                                <td>{vuln.riskScoreMultipliers.exposure}x</td>
+                            </tr>
+                            <tr>
+                                <td>KEV:</td>
+                                <td>{vuln.riskScoreMultipliers.kev}x</td>
+                            </tr>
+                            <tr>
+                                <td>EPSS:</td>
+                                <td>{vuln.riskScoreMultipliers.epss}x</td>
+                            </tr>
+                            <tr>
+                                <td>I produksjon:</td>
+                                <td>{vuln.riskScoreMultipliers.production}x</td>
+                            </tr>
+                            <tr>
+                                <td>Gammelt bygg:</td>
+                                <td>{vuln.riskScoreMultipliers.old_build}x{" "}
+                                    (Dager siden sist bygg:{" "}{vuln.riskScoreMultipliers.old_build_days})
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     ) : (
                         <BodyShort size="small">Beregningsdata ikke tilgjengelig</BodyShort>
                     )}
