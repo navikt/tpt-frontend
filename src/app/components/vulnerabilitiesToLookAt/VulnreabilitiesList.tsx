@@ -1,5 +1,6 @@
 import {RiskScoreMultipliers, VulnerabilitiesResponse, Workload} from "@/app/types/vulnerabilities";
 import {Accordion, Link, LinkCard, Tag} from "@navikt/ds-react";
+import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
 
 interface CompleteVulnerability {
     identifier: string;
@@ -83,7 +84,7 @@ const VulnerableList = ({
                                 </LinkCard.Title>
 
                                 <LinkCard.Description>
-                                    {vuln.packageName} har {vulnerabilitiesName} sårbarhet {vuln.identifier}.
+                                    {vuln.packageName} har sårbarhet {vuln.identifier}.
                                     {vuln.workload.repository && (
                                         <>
                                             <br/>
@@ -107,9 +108,11 @@ const VulnerableList = ({
                                                 ? "success"
                                                 : "info"
                                         }
+                                        style={{marginRight:"2em"}}
                                     >
                                         {vuln.workload.environment}
                                     </Tag>
+                                    <WorkloadRiskScoreTags vuln={vuln} ingressTypes={vuln.workload.ingressTypes}/>
                                 </LinkCard.Footer>
                             </LinkCard>
                         ))}
