@@ -50,6 +50,7 @@ const VulnerabilitiesTable = ({
     }> = [];
 
     // Check if any filters are active
+    const hasTeamFilters = Object.values(teamFilters).some((v) => v);
     const hasApplicationFilters = Object.values(applicationFilters).some(
       (v) => v
     );
@@ -57,7 +58,7 @@ const VulnerabilitiesTable = ({
 
     data?.teams.forEach((team) => {
       // Show team if no team filters OR team is selected
-      if (teamFilters[team.team]) {
+      if (!hasTeamFilters || teamFilters[team.team]) {
         team.workloads.forEach((workload) => {
           // Show workload if no application filters OR workload is selected
           if (
