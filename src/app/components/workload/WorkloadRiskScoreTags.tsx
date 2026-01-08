@@ -21,13 +21,11 @@ const WorkloadRiskScoreTags = ({vuln, ingressTypes}: {
     const exposureTagVariant =
         ingressTypes?.indexOf("external") != -1 ? "error" :
             ingressTypes?.indexOf("login") != -1 ? "warning" :
-                ingressTypes?.indexOf("internal") != -1 ? "info" :
-                 "success"
+                ingressTypes?.indexOf("internal") != -1 ? "info" : "success"
     const exposureIngress =
         ingressTypes?.indexOf("external") != -1 ? "ekstern" :
             ingressTypes?.indexOf("authenticated") != -1 ? "autentisert" :
-                ingressTypes?.indexOf("internal") != -1 ? "intern" :
-                 "none"
+                ingressTypes?.indexOf("internal") != -1 ? "intern" : "none"
     return (
         <>
             {vuln.riskScoreMultipliers ? (

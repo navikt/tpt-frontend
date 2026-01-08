@@ -101,17 +101,19 @@ const VulnerableList = ({
                                 </LinkCard.Description>
 
                                 <LinkCard.Footer>
-                                    <Tag
-                                        size="small"
-                                        variant={
-                                            vuln.workload.environment?.includes("prod")
-                                                ? "success"
-                                                : "info"
-                                        }
-                                        style={{marginRight:"2em"}}
-                                    >
-                                        {vuln.workload.environment}
-                                    </Tag>
+                                    {vuln.workload.environment != null ? (
+                                        <Tag
+                                            size="small"
+                                            variant={
+                                                vuln.workload.environment?.includes("prod")
+                                                    ? "success"
+                                                    : "info"
+                                            }
+                                            style={{marginRight: "2em"}}
+                                        >
+                                            {vuln.workload.environment}
+                                        </Tag>
+                                    ) : ""}
                                     <WorkloadRiskScoreTags vuln={vuln} ingressTypes={vuln.workload.ingressTypes}/>
                                 </LinkCard.Footer>
                             </LinkCard>
