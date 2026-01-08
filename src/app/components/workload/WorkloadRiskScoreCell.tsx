@@ -1,5 +1,5 @@
 "use client";
-import {Tag, BodyShort, Popover, Button} from "@navikt/ds-react";
+import {Tag, BodyShort, Popover, Button, Table} from "@navikt/ds-react";
 import {useState} from "react";
 
 interface VulnerabilityWithMultipliers {
@@ -54,36 +54,36 @@ const WorkloadRiskScoreCell = ({vuln}: {
                         <b>Risk score utregning</b>
                     </BodyShort>
                     {vuln.riskScoreMultipliers ? (
-                        <table style={{fontSize: "0.875rem"}}>
-                            <tbody>
-                            <tr>
-                                <td>Fra CVE:</td>
-                                <td>{vuln.riskScoreMultipliers.base_high}</td>
-                            </tr>
-                            <tr>
-                                <td>Eksponert ingress:</td>
-                                <td>{vuln.riskScoreMultipliers.exposure}x</td>
-                            </tr>
-                            <tr>
-                                <td>KEV:</td>
-                                <td>{vuln.riskScoreMultipliers.kev}x</td>
-                            </tr>
-                            <tr>
-                                <td>EPSS:</td>
-                                <td>{vuln.riskScoreMultipliers.epss}x</td>
-                            </tr>
-                            <tr>
-                                <td>I produksjon:</td>
-                                <td>{vuln.riskScoreMultipliers.production}x</td>
-                            </tr>
-                            <tr>
-                                <td>Gammelt bygg:</td>
-                                <td>{vuln.riskScoreMultipliers.old_build}x{" "}
+                        <Table style={{fontSize: "0.875rem"}}>
+                            <Table.Body>
+                            <Table.Row>
+                                <Table.DataCell>Fra CVE:</Table.DataCell>
+                                <Table.DataCell>{vuln.riskScoreMultipliers.base_high}</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.DataCell>Eksponert ingress:</Table.DataCell>
+                                <Table.DataCell>{vuln.riskScoreMultipliers.exposure}x</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.DataCell>KEV:</Table.DataCell>
+                                <Table.DataCell>{vuln.riskScoreMultipliers.kev}x</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.DataCell>EPSS:</Table.DataCell>
+                                <Table.DataCell>{vuln.riskScoreMultipliers.epss}x</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.DataCell>I produksjon:</Table.DataCell>
+                                <Table.DataCell>{vuln.riskScoreMultipliers.production}x</Table.DataCell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.DataCell>Gammelt bygg:</Table.DataCell>
+                                <Table.DataCell>{vuln.riskScoreMultipliers.old_build}x{" "}
                                     (Dager siden sist bygg:{" "}{vuln.riskScoreMultipliers.old_build_days})
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                </Table.DataCell>
+                            </Table.Row>
+                            </Table.Body>
+                        </Table>
                     ) : (
                         <BodyShort size="small">Beregningsdata ikke tilgjengelig</BodyShort>
                     )}
