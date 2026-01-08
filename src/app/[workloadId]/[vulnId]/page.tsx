@@ -2,8 +2,8 @@
 import {useVulnerabilities} from "../../hooks/useVulnerabilities";
 import {useParams} from "next/navigation";
 import {Heading, BodyShort, Link as DSLink} from "@navikt/ds-react";
-import WorkloadAccordion from "../../components/workload/WorkloadAccordion";
-import WorkloadRiskScoreCell from "../../components/workload/WorkloadRiskScoreCell";
+import WorkloadExplanationCard from "../../components/workload/WorkloadExplanationCard";
+import WorkloadRiskScoreValue from "../../components/workload/WorkloadRiskScoreValue";
 import Link from "next/link";
 import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
 
@@ -83,12 +83,8 @@ export default function WorkloadDetailPage() {
                     <b>Ingress Types:</b>{" "}
                     {workloadData.ingressTypes?.join(", ") || "None"}
                 </BodyShort>
-                <BodyShort style={{marginBottom: "1rem"}}>
-                    <b>Risk score:</b> <WorkloadRiskScoreCell vuln={vulnerabilityData!}/>
-                </BodyShort>
-                <BodyShort>
-                    <WorkloadRiskScoreTags vuln={vulnerabilityData!} ingressTypes={workloadData.ingressTypes}/>
-                </BodyShort>
+                <WorkloadRiskScoreValue vuln={vulnerabilityData!}/>
+                <WorkloadRiskScoreTags vuln={vulnerabilityData!} ingressTypes={workloadData.ingressTypes}/>
             </div>
 
             <BodyShort spacing>
@@ -103,7 +99,7 @@ export default function WorkloadDetailPage() {
                 Les mer om sårbarheten her
             </DSLink>
 
-            <WorkloadAccordion/>
+            <WorkloadExplanationCard/>
         </div>
     );
 }
