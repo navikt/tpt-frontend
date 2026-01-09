@@ -90,7 +90,7 @@ const lowThreshold = config?.thresholds.low ?? 30;
 
 The UI is in Norwegian (Bokmål). Key terms:
 - Sårbarhet/Sårbarheter = Vulnerability/Vulnerabilities
-- Superkritiske = Super critical
+- Høy prio = High priority
 - Lurt å ta unna = Smart to clear out
 - Når du har tid = When you have time
 - Lav prioritet = Low priority
