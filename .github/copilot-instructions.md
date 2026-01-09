@@ -13,12 +13,12 @@
 
 ### 2. Bucket-Based Prioritization
 Vulnerabilities are categorized into buckets based on risk scores:
-- **Superkritiske** (≥ asapThreshold): Must be handled immediately
-- **Lurt å ta unna** (≥ whenTimeThreshold, < asapThreshold): Should be prioritized
-- **Når du har tid** (≥ ifBoredThreshold, < whenTimeThreshold): Handle when convenient
-- **Lav prioritet** (< ifBoredThreshold): Can wait indefinitely
+- **Høy prio** (≥ highThreshold): Should be handled immediately
+- **Lurt å ta unna** (≥ mediumThreshold, < highThreshold): Should be prioritized
+- **Når du har tid** (≥ lowThreshold, < mediumThreshold): Handle when convenient
+- **Lav prioritet** (< lowThreshold): Can wait
 
-The **Superkritiske** bucket should always be visually emphasized - larger, more prominent, full opacity. Other buckets should appear secondary.
+The **Høy prio** bucket should always be visually emphasized - larger, more prominent, full opacity. Other buckets should appear secondary.
 
 ### 3. Group by Workload
 When displaying vulnerabilities, group them by workload to help users understand the scope of work per application.
@@ -64,11 +64,11 @@ interface Workload {
 ```
 
 ### Threshold Configuration
-Thresholds are fetched from `/api/config` and have sensible defaults:
+Thresholds are fetched from `/api/config` (which proxies to the backend) and have sensible defaults:
 ```typescript
-const asapThreshold = config?.thresholds.asap ?? 100;
-const whenTimeThreshold = config?.thresholds.whenTime ?? 50;
-const ifBoredThreshold = config?.thresholds.ifBored ?? 25;
+const highThreshold = config?.thresholds.high ?? 150;
+const mediumThreshold = config?.thresholds.medium ?? 75;
+const lowThreshold = config?.thresholds.low ?? 30;
 ```
 
 ## UX Guidelines

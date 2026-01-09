@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 
 interface ThresholdConfig {
   thresholds: {
-    asap: number;
-    whenTime: number;
-    ifBored: number;
+    high: number;
+    medium: number;
+    low: number;
   };
 }
 

@@ -1,24 +1,47 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  const asapThreshold = parseInt(
-    process.env.RISK_SCORE_THRESHOLD_ASAP || "100",
-    10
-  );
-  const whenTimeThreshold = parseInt(
-    process.env.RISK_SCORE_THRESHOLD_WHEN_TIME || "50",
-    10
-  );
-  const ifBoredThreshold = parseInt(
-    process.env.RISK_SCORE_THRESHOLD_IF_BORED || "25",
-    10
-  );
+// Hardcoded fallback values
+const FALLBACK_THRESHOLDS = {
+  high: 150,
+  medium: 75,
+  low: 30,
+};
 
+export async function GET() {
+  const tptBackendUrl = process.env.TPT_BACKEND_URL;
+
+  // Try to fetch from backend first
+  if (tptBackendUrl) {
+    try {
+      const response = await fetch(`${tptBackendUrl}/config`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return NextResponse.json({
+          thresholds: {
+            high: data.thresholds.high,
+            medium: data.thresholds.medium,
+            low: data.thresholds.low,
+          },
+        });
+      } else {
+        console.warn(
+          `Failed to fetch config from backend: ${response.status} ${response.statusText}. Using fallback values.`
+        );
+      }
+    } catch (error) {
+      console.warn("Error fetching config from backend, using fallback values:", error);
+    }
+  } else {
+    console.warn("TPT_BACKEND_URL not configured, using fallback threshold values.");
+  }
+
+  // Fallback to hardcoded values
   return NextResponse.json({
-    thresholds: {
-      asap: asapThreshold,
-      whenTime: whenTimeThreshold,
-      ifBored: ifBoredThreshold,
-    },
+    thresholds: FALLBACK_THRESHOLDS,
   });
 }
