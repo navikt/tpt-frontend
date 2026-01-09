@@ -21,7 +21,7 @@ export default function RootLayout({
               href="/vulnerabilities"
               style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
             >
-              Sårbarheter
+              Alle sårbarheter
             </InternalHeader.Title>
             <Spacer />
             {!isLoading && user && (

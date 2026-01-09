@@ -1,8 +1,19 @@
+"use client";
+import { useState } from "react";
 import VulnerabilitiesToLookAt from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitiesToLookAt";
+import VulnerabilitySummary, { BucketThreshold } from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitySummary";
 import Link from "next/link";
 import { BodyShort } from "@navikt/ds-react";
 
+const DEFAULT_BUCKET: BucketThreshold = {
+  name: "Superkritiske",
+  minThreshold: 100,
+  maxThreshold: Number.MAX_VALUE,
+};
+
 export default function Home() {
+  const [selectedBucket, setSelectedBucket] = useState<BucketThreshold>(DEFAULT_BUCKET);
+
   return (
     <div style={{ marginTop: "2rem" }}>
       <main>
@@ -17,15 +28,18 @@ export default function Home() {
           <BodyShort spacing>
             Ikke alle sårbarheter er født like og vi har gjort jobben for med
             deg å analysere og rangere de mest kritiske sårbarhetene i teamene
-            du tilhører. Sårbarhetslisten hentes fra SBOM som ligger hos nais
-            Console.
-          </BodyShort>
-          <BodyShort>
-            For en komplett oversikt over alle tilgjengelige sårbarheter, se{" "}
-            <Link href="/vulnerabilities">sårbarhetssiden.</Link>
+            du tilhører. Sårbarhetslisten hentes fra Nais API.
           </BodyShort>
         </div>
-        <VulnerabilitiesToLookAt />
+        <VulnerabilitySummary 
+          selectedBucket={selectedBucket} 
+          onBucketSelect={setSelectedBucket} 
+        />
+        <VulnerabilitiesToLookAt 
+          bucketName={selectedBucket.name}
+          minThreshold={selectedBucket.minThreshold}
+          maxThreshold={selectedBucket.maxThreshold}
+        />
       </main>
     </div>
   );
