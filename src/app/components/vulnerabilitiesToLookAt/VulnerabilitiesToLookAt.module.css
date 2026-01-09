@@ -1,0 +1,53 @@
+.accordionWrapper {
+    background: var(--a-surface-subtle);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.accordionWrapper :global(.navds-accordion) {
+    border: none !important;
+    --ac-accordion-header-border: none;
+    --ac-accordion-content-border: none;
+}
+
+.accordionWrapper :global(.navds-accordion__item) {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+.accordionWrapper :global(.navds-accordion__item--open) {
+    border: none !important;
+}
+
+.accordionWrapper :global(.navds-accordion__header) {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+.accordionWrapper :global(.navds-accordion__header-button) {
+    border: none !important;
+    padding: 0.75rem 1rem !important;
+}
+
+.accordionWrapper :global(.navds-accordion__content) {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    padding: 0 1rem 0.75rem 1rem !important;
+}
+
+.accordionWrapper :global(.navds-accordion__item:first-child) {
+    border-top: none !important;
+}
+
+.accordionWrapper :global(.navds-accordion__item:last-child) {
+    border-bottom: none !important;
+}
+
+.githubLink {
+    font-size: inherit;
+    padding: 0.25rem 0.75rem;
+    font-weight: inherit;
+}
