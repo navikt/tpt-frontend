@@ -14,9 +14,10 @@ interface VulnerabilityWithMultipliers {
     };
 }
 
-const WorkloadRiskScoreTags = ({vuln, ingressTypes}: {
+const WorkloadRiskScoreTags = ({vuln, ingressTypes, environment}: {
     vuln: VulnerabilityWithMultipliers,
-    ingressTypes?: string[]
+    ingressTypes?: string[],
+    environment?: string
 }) => {
     const exposureTagVariant =
         ingressTypes?.indexOf("external") != -1 ? "error" :
@@ -26,6 +27,17 @@ const WorkloadRiskScoreTags = ({vuln, ingressTypes}: {
         ingressTypes?.indexOf("external") != -1 ? "ekstern" :
             ingressTypes?.indexOf("authenticated") != -1 ? "autentisert" :
                 ingressTypes?.indexOf("internal") != -1 ? "intern" : "none"
+    
+    // Determine environment tag based on environment prefix
+    const getEnvironmentTag = () => {
+        if (!environment) return null;
+        if (environment.startsWith("prod-")) {
+            return <RiskScoreTag variant={"warning"} text={"Prod"} />;
+        } else if (environment.startsWith("dev-")) {
+            return <RiskScoreTag variant={"info"} text={"Dev"} />;
+        }
+        return null;
+    };
     return (
         <>
             {vuln.riskScoreMultipliers ? (
@@ -36,8 +48,8 @@ const WorkloadRiskScoreTags = ({vuln, ingressTypes}: {
                         <RiskScoreTag variant={"error"} text={"KEV"} />): ("")}
                     {vuln.riskScoreMultipliers.epss > 1.0 ? (
                         <RiskScoreTag variant={"warning"} text={"EPSS"} />): ("")}
-                    {vuln.riskScoreMultipliers.production > 1.0 ? (
-                        <RiskScoreTag variant={"warning"} text={"Prod"} />): ("")}
+                    {/* Show environment tag instead of production multiplier tag to avoid duplication */}
+                    {getEnvironmentTag()}
                     {vuln.riskScoreMultipliers.old_build > 1.0 ? (
                         <RiskScoreTag variant={"warning"} text={"Gammelt bygg"} />): ("")}
                 </div>

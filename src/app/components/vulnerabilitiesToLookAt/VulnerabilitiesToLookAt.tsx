@@ -1,8 +1,10 @@
 "use client";
+import { useState } from "react";
 import { useVulnerabilities } from "../../hooks/useVulnerabilities";
 import { Vulnerability, Workload } from "@/app/types/vulnerabilities";
-import { Link, LinkCard, Heading, BodyShort, HStack, Accordion } from "@navikt/ds-react";
+import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
+import { MenuElipsisVerticalIcon, ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
 
 interface WorkloadWithVulns {
@@ -19,6 +21,29 @@ interface VulnerabilitiesToLookAtProps {
 
 const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: VulnerabilitiesToLookAtProps) => {
     const { data, isLoading } = useVulnerabilities();
+    const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+
+    const toggleAll = () => {
+        const allIds = workloadsWithVulns.map(w => w.workload.id);
+        const hasAnyOpen = allIds.some(id => expandedItems[id]);
+        
+        if (hasAnyOpen) {
+            // Close all
+            setExpandedItems({});
+        } else {
+            // Open all
+            const newExpanded: Record<string, boolean> = {};
+            allIds.forEach(id => newExpanded[id] = true);
+            setExpandedItems(newExpanded);
+        }
+    };
+
+    const toggleItem = (workloadId: string) => {
+        setExpandedItems(prev => ({
+            ...prev,
+            [workloadId]: !prev[workloadId]
+        }));
+    };
 
     // Group vulnerabilities by workload
     const workloadsWithVulns: WorkloadWithVulns[] = (
@@ -65,9 +90,19 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
 
     return (
         <div style={{ marginTop: "1.5rem" }}>
-            <Heading size="small" spacing>
-                {bucketName} ({totalVulnCount} i {workloadsWithVulns.length} applikasjoner)
-            </Heading>
+            <HStack justify="space-between" align="center" style={{ marginBottom: "1rem" }}>
+                <Heading size="small">
+                    {bucketName} ({totalVulnCount} i {workloadsWithVulns.length} applikasjoner)
+                </Heading>
+                <Button
+                    variant="tertiary"
+                    size="small"
+                    icon={Object.values(expandedItems).some(Boolean) ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+                    onClick={toggleAll}
+                >
+                    {Object.values(expandedItems).some(Boolean) ? "Lukk alle" : "Åpne alle"}
+                </Button>
+            </HStack>
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {workloadsWithVulns.map((workloadGroup, index) => {
                     const totalRisk = workloadGroup.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
@@ -77,7 +112,10 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                             className={styles.accordionWrapper}
                         >
                             <Accordion>
-                                <Accordion.Item defaultOpen={index === 0}>
+                                <Accordion.Item 
+                                    open={expandedItems[workloadGroup.workload.id] || false}
+                                    onOpenChange={() => toggleItem(workloadGroup.workload.id)}
+                                >
                                     <Accordion.Header>
                                         <HStack gap="2" align="center" justify="space-between" style={{ width: "100%" }}>
                                             <span>
@@ -118,7 +156,8 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                                                             </LinkCard.Anchor>
                                                             <WorkloadRiskScoreTags 
                                                                 vuln={vuln} 
-                                                                ingressTypes={workloadGroup.workload.ingressTypes} 
+                                                                ingressTypes={workloadGroup.workload.ingressTypes}
+                                                                environment={workloadGroup.workload.environment}
                                                             />
                                                         </HStack>
                                                     </LinkCard.Title>
