@@ -26,6 +26,10 @@ export async function GET(request: NextRequest) {
   try {
     const { tptBackendUrl, tptBackendScope } = getServerEnv();
 
+    // Check for bypassCache query parameter
+    const { searchParams } = new URL(request.url);
+    const bypassCache = searchParams.get("bypassCache") === "true";
+
     const accessToken = getToken(request);
     if (!accessToken) {
       return NextResponse.json(
@@ -42,7 +46,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${tptBackendUrl}/vulnerabilities/user`, {
+    const backendUrl = bypassCache
+      ? `${tptBackendUrl}/vulnerabilities/user?bypassCache=true`
+      : `${tptBackendUrl}/vulnerabilities/user`;
+
+    const response = await fetch(backendUrl, {
       headers: {
         Authorization: `Bearer ${oboResult.token}`,
         "Content-Type": "application/json",
