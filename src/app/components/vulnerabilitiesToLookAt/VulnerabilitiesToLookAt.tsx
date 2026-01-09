@@ -100,9 +100,9 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                                         {workloadGroup.vulnerabilities.map((vuln, vulnIndex) => {
                                             const maxDescriptionLength = 150;
                                             const description = vuln.description 
-                                                ? (vuln.description.length > maxDescriptionLength 
-                                                    ? vuln.description.substring(0, maxDescriptionLength) + "..." 
-                                                    : vuln.description)
+                                                ? (vuln.description.replace(/\n/g, " ").length > maxDescriptionLength 
+                                                    ? vuln.description.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
+                                                    : vuln.description.replace(/\n/g, " "))
                                                 : null;
                                             return (
                                                 <LinkCard
@@ -124,7 +124,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                                                     </LinkCard.Title>
 
                                                     {description && (
-                                                        <LinkCard.Description style={{ whiteSpace: "pre-wrap" }}>
+                                                        <LinkCard.Description>
                                                             {description}
                                                         </LinkCard.Description>
                                                     )}
