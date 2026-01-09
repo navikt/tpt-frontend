@@ -4,7 +4,7 @@ import {Tag, BodyShort,} from "@navikt/ds-react";
 interface VulnerabilityWithMultipliers {
     riskScore: number;
     riskScoreMultipliers?: {
-        base_high: number;
+        severity: number;
         exposure: number;
         kev: number;
         epss: number;

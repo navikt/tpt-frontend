@@ -5,7 +5,7 @@ import {useState} from "react";
 interface VulnerabilityWithMultipliers {
     riskScore: number;
     riskScoreMultipliers?: {
-        base_high: number;
+        severity: number;
         exposure: number;
         kev: number;
         epss: number;
@@ -57,7 +57,7 @@ const WorkloadRiskScoreValue = ({vuln}: {
                             <Table.Body>
                                 <Table.Row>
                                     <Table.DataCell>Fra CVE:</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.base_high}</Table.DataCell>
+                                    <Table.DataCell>{vuln.riskScoreMultipliers.severity}</Table.DataCell>
                                 </Table.Row>
                                 <Table.Row>
                                     <Table.DataCell>Eksponert ingress:</Table.DataCell>

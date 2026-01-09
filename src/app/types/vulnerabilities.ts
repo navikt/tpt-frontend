@@ -1,5 +1,5 @@
 export interface RiskScoreMultipliers {
-  base_high: number;
+  severity: number;
   exposure: number;
   kev: number;
   epss: number;
