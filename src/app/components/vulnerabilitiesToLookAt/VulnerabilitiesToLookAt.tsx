@@ -124,7 +124,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                                                     </LinkCard.Title>
 
                                                     {description && (
-                                                        <LinkCard.Description>
+                                                        <LinkCard.Description style={{ whiteSpace: "pre-wrap" }}>
                                                             {description}
                                                         </LinkCard.Description>
                                                     )}

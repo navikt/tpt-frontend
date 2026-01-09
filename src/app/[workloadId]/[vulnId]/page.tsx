@@ -30,7 +30,7 @@ interface RiskFactor {
     multiplier: number;
     isActive: boolean;
     icon: React.ReactNode;
-    severity: "high" | "medium" | "low";
+    severity: "high" | "medium" | "low" | "info";
 }
 
 function getRiskFactors(
@@ -57,7 +57,7 @@ function getRiskFactors(
             multiplier: multipliers.severity,
             isActive: true,
             icon: <BugIcon aria-hidden fontSize="1.5rem" />,
-            severity: multipliers.severity >= 7 ? "high" : multipliers.severity >= 4 ? "medium" : "low",
+            severity: "info",
         },
         {
             name: "Eksponering",
@@ -102,7 +102,7 @@ function getRiskFactors(
     ];
 }
 
-function getSeverityColor(severity: "high" | "medium" | "low"): string {
+function getSeverityColor(severity: "high" | "medium" | "low" | "info"): string {
     switch (severity) {
         case "high":
             return "var(--a-surface-danger-subtle)";
@@ -110,10 +110,12 @@ function getSeverityColor(severity: "high" | "medium" | "low"): string {
             return "var(--a-surface-warning-subtle)";
         case "low":
             return "var(--a-surface-success-subtle)";
+        case "info":
+            return "var(--a-surface-info-subtle)";
     }
 }
 
-function getSeverityIconColor(severity: "high" | "medium" | "low"): string {
+function getSeverityIconColor(severity: "high" | "medium" | "low" | "info"): string {
     switch (severity) {
         case "high":
             return "var(--a-icon-danger)";
@@ -121,6 +123,8 @@ function getSeverityIconColor(severity: "high" | "medium" | "low"): string {
             return "var(--a-icon-warning)";
         case "low":
             return "var(--a-icon-success)";
+        case "info":
+            return "var(--a-icon-info)";
     }
 }
 
@@ -198,7 +202,9 @@ export default function WorkloadDetailPage() {
                     )}
 
                     {vulnerabilityData.description && (
-                        <BodyShort>{vulnerabilityData.description}</BodyShort>
+                        <BodyShort style={{ whiteSpace: "pre-wrap" }}>
+                            {vulnerabilityData.description}
+                        </BodyShort>
                     )}
 
                     <HStack gap="4" wrap>
@@ -260,7 +266,7 @@ export default function WorkloadDetailPage() {
                 <VStack gap="3" style={{ marginBottom: "1.5rem" }}>
                     {activeFactors
                         .sort((a, b) => {
-                            const severityOrder = { high: 0, medium: 1, low: 2 };
+                            const severityOrder = { high: 0, medium: 1, low: 2, info: 3 };
                             return severityOrder[a.severity] - severityOrder[b.severity];
                         })
                         .map((factor, index) => (
@@ -286,7 +292,9 @@ export default function WorkloadDetailPage() {
                                                         ? "error"
                                                         : factor.severity === "medium"
                                                             ? "warning"
-                                                            : "success"
+                                                            : factor.severity === "info"
+                                                                ? "info"
+                                                                : "success"
                                                 }
                                                 size="xsmall"
                                             >
