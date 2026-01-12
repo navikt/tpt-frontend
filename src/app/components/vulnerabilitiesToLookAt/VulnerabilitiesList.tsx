@@ -116,8 +116,6 @@ const VulnerableList = ({
                                     ) : ""}
                                     <WorkloadRiskScoreTags 
                                         vuln={vuln} 
-                                        ingressTypes={vuln.workload.ingressTypes}
-                                        environment={vuln.workload.environment}
                                     />
                                 </LinkCard.Footer>
                             </LinkCard>
