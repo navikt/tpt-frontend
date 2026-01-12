@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useVulnerabilities } from "../../hooks/useVulnerabilities";
 import { Vulnerability, Workload } from "@/app/types/vulnerabilities";
-import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button } from "@navikt/ds-react";
+import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
 import { MenuElipsisVerticalIcon, ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
@@ -11,6 +11,7 @@ interface WorkloadWithVulns {
     workload: Workload;
     team: string;
     vulnerabilities: Vulnerability[];
+    environments: string[]; // Track all environments for merged workloads
 }
 
 interface VulnerabilitiesToLookAtProps {
@@ -45,25 +46,55 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
         }));
     };
 
-    // Group vulnerabilities by workload
-    const workloadsWithVulns: WorkloadWithVulns[] = (
-        data?.teams.flatMap((team) =>
-            team.workloads
-                .map((workload) => ({
-                    workload,
-                    team: team.team,
-                    vulnerabilities: workload.vulnerabilities.filter(
-                        (vuln) => vuln.riskScore >= minThreshold && vuln.riskScore < maxThreshold
-                    ),
-                }))
-                .filter((w) => w.vulnerabilities.length > 0)
-        ) || []
-    ).sort((a, b) => {
-        // Sort by total risk score descending
-        const totalRiskA = a.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
-        const totalRiskB = b.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
-        return totalRiskB - totalRiskA;
-    });
+    // Group vulnerabilities by workload, merging identical workloads from different environments
+    const workloadsWithVulns: WorkloadWithVulns[] = (() => {
+        const workloadMap = new Map<string, WorkloadWithVulns>();
+        
+        data?.teams.forEach((team) => {
+            team.workloads.forEach((workload) => {
+                const filteredVulns = workload.vulnerabilities.filter(
+                    (vuln) => vuln.riskScore >= minThreshold && vuln.riskScore < maxThreshold
+                );
+                
+                if (filteredVulns.length === 0) return;
+                
+                // Use workload name as the key for merging
+                const key = workload.name;
+                
+                if (workloadMap.has(key)) {
+                    // Merge with existing workload
+                    const existing = workloadMap.get(key)!;
+                    
+                    // Add environment if not already present
+                    if (workload.environment && !existing.environments.includes(workload.environment)) {
+                        existing.environments.push(workload.environment);
+                    }
+                    
+                    // Merge vulnerabilities (deduplicate by identifier)
+                    filteredVulns.forEach(vuln => {
+                        if (!existing.vulnerabilities.some(v => v.identifier === vuln.identifier)) {
+                            existing.vulnerabilities.push(vuln);
+                        }
+                    });
+                } else {
+                    // Create new entry
+                    workloadMap.set(key, {
+                        workload,
+                        team: team.team,
+                        vulnerabilities: filteredVulns,
+                        environments: workload.environment ? [workload.environment] : [],
+                    });
+                }
+            });
+        });
+        
+        return Array.from(workloadMap.values()).sort((a, b) => {
+            // Sort by total risk score descending
+            const totalRiskA = a.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
+            const totalRiskB = b.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
+            return totalRiskB - totalRiskA;
+        });
+    })();
 
     const totalVulnCount = workloadsWithVulns.reduce(
         (sum, w) => sum + w.vulnerabilities.length,
@@ -121,55 +152,83 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                                             <span>
                                                 {workloadGroup.workload.name} ({workloadGroup.vulnerabilities.length} sårbarheter)
                                             </span>
-                                            {workloadGroup.workload.repository && (
-                                                <a
-                                                    href={`https://www.github.com/${workloadGroup.workload.repository}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className={styles.githubLink}
-                                                >
-                                                    GitHub
-                                                </a>
-                                            )}
-                                </HStack>
+                                            <HStack gap="2" align="center">
+                                                {workloadGroup.workload.repository && (
+                                                    <a
+                                                        href={`https://www.github.com/${workloadGroup.workload.repository}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className={styles.githubLink}
+                                                    >
+                                                        GitHub
+                                                    </a>
+                                                )}
+                                                {workloadGroup.environments.map((env) => (
+                                                    <Tag
+                                                        key={env}
+                                                        variant={env.startsWith("prod-") ? "warning" : "info"}
+                                                        size="xsmall"
+                                                    >
+                                                        {env}
+                                                    </Tag>
+                                                ))}
+                                            </HStack>
+                                        </HStack>
                                     </Accordion.Header>
                                     <Accordion.Content>
-                                        {workloadGroup.vulnerabilities.map((vuln, vulnIndex) => {
-                                            const maxDescriptionLength = 150;
-                                            const description = vuln.description 
-                                                ? (vuln.description.replace(/\n/g, " ").length > maxDescriptionLength 
-                                                    ? vuln.description.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
-                                                    : vuln.description.replace(/\n/g, " "))
-                                                : null;
-                                            return (
-                                                <LinkCard
-                                                    key={`${vuln.identifier}-${vulnIndex}`}
-                                                    style={{ marginBottom: "0.5rem" }}
-                                                >
-                                                    <LinkCard.Title>
-                                                        <HStack gap="2" align="center" justify="space-between" wrap>
-                                                            <LinkCard.Anchor asChild>
-                                                                <Link href={`/${workloadGroup.workload.id}/${vuln.identifier}`}>
-                                                                    {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
-                                                                </Link>
-                                                            </LinkCard.Anchor>
-                                                            <WorkloadRiskScoreTags 
-                                                                vuln={vuln} 
-                                                                ingressTypes={workloadGroup.workload.ingressTypes}
-                                                                environment={workloadGroup.workload.environment}
-                                                            />
-                                                        </HStack>
-                                                    </LinkCard.Title>
+                                        {/* Group vulnerabilities by package name */}
+                                        {Object.entries(
+                                            workloadGroup.vulnerabilities.reduce((acc, vuln) => {
+                                                const packageName = vuln.packageName;
+                                                if (!acc[packageName]) {
+                                                    acc[packageName] = [];
+                                                }
+                                                acc[packageName].push(vuln);
+                                                return acc;
+                                            }, {} as Record<string, Vulnerability[]>)
+                                        )
+                                        .sort((a, b) => b[1].length - a[1].length) // Sort by vulnerability count descending
+                                        .map(([packageName, vulnerabilities]) => (
+                                            <div key={packageName} style={{ marginBottom: "1rem" }}>
+                                                <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
+                                                    {packageName} ({vulnerabilities.length} sårbarheter)
+                                                </BodyShort>
+                                                {vulnerabilities.map((vuln, vulnIndex) => {
+                                                    const maxDescriptionLength = 200;
+                                                    const description = vuln.description 
+                                                        ? (vuln.description.replace(/\n/g, " ").length > maxDescriptionLength 
+                                                            ? vuln.description.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
+                                                            : vuln.description.replace(/\n/g, " "))
+                                                        : null;
+                                                    return (
+                                                        <LinkCard
+                                                            key={`${vuln.identifier}-${vulnIndex}`}
+                                                            style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
+                                                        >
+                                                            <LinkCard.Title>
+                                                                <HStack gap="2" align="center" justify="space-between" wrap>
+                                                                    <LinkCard.Anchor asChild>
+                                                                        <Link href={`/${workloadGroup.workload.id}/${vuln.identifier}`}>
+                                                                            {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
+                                                                        </Link>
+                                                                    </LinkCard.Anchor>
+                                                                    <WorkloadRiskScoreTags 
+                                                                        vuln={vuln}
+                                                                    />
+                                                                </HStack>
+                                                            </LinkCard.Title>
 
-                                                    {description && (
-                                                        <LinkCard.Description>
-                                                            {description}
-                                                        </LinkCard.Description>
-                                                    )}
-                                                </LinkCard>
-                                            );
-                                        })}
+                                                            {description && (
+                                                                <LinkCard.Description>
+                                                                    {description}
+                                                                </LinkCard.Description>
+                                                            )}
+                                                        </LinkCard>
+                                                    );
+                                                })}
+                                            </div>
+                                        ))}
                                     </Accordion.Content>
                                 </Accordion.Item>
                             </Accordion>

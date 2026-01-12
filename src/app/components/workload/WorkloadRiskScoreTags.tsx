@@ -1,57 +1,51 @@
 "use client";
 import {Tag, BodyShort,} from "@navikt/ds-react";
+import { getRiskFactors, getTagVariantFromSeverity } from "@/app/utils/riskFactors";
+import type { Vulnerability } from "@/app/types/vulnerabilities";
 
-interface VulnerabilityWithMultipliers {
-    riskScore: number;
-    riskScoreMultipliers?: {
-        severity: number;
-        exposure: number;
-        kev: number;
-        epss: number;
-        production: number;
-        old_build_days: number;
-        old_build: number;
-    };
-}
-
-const WorkloadRiskScoreTags = ({vuln, ingressTypes, environment}: {
-    vuln: VulnerabilityWithMultipliers,
-    ingressTypes?: string[],
-    environment?: string
+const WorkloadRiskScoreTags = ({vuln}: {
+    vuln: Vulnerability
 }) => {
-    const exposureTagVariant =
-        ingressTypes?.indexOf("external") != -1 ? "error" :
-            ingressTypes?.indexOf("login") != -1 ? "warning" :
-                ingressTypes?.indexOf("internal") != -1 ? "info" : "success"
-    const exposureIngress =
-        ingressTypes?.indexOf("external") != -1 ? "ekstern" :
-            ingressTypes?.indexOf("authenticated") != -1 ? "autentisert" :
-                ingressTypes?.indexOf("internal") != -1 ? "intern" : "none"
+    const MAX_TAGS = 4;
     
-    // Determine environment tag based on environment prefix
-    const getEnvironmentTag = () => {
-        if (!environment) return null;
-        if (environment.startsWith("prod-")) {
-            return <RiskScoreTag variant={"warning"} text={"Prod"} />;
-        } else if (environment.startsWith("dev-")) {
-            return <RiskScoreTag variant={"info"} text={"Dev"} />;
-        }
-        return null;
-    };
+    const riskFactors = getRiskFactors(vuln);
+    
     return (
         <>
-            {vuln.riskScoreMultipliers ? (
+            {riskFactors.length > 0 ? (
                 <div>
-                    {vuln.riskScoreMultipliers.exposure > 1.0 ? (
-                        <RiskScoreTag variant={exposureTagVariant} text={"Ingress " + exposureIngress} />): ("")}
-                    {vuln.riskScoreMultipliers.kev > 1.0 ? (
-                        <RiskScoreTag variant={"error"} text={"KEV"} />): ("")}
-                    {vuln.riskScoreMultipliers.epss > 1.0 ? (
-                        <RiskScoreTag variant={"warning"} text={"EPSS"} />): ("")}
-                    {/* Show environment tag instead of production multiplier tag to avoid duplication */}
-                    {getEnvironmentTag()}
-                    {vuln.riskScoreMultipliers.old_build > 1.0 ? (
-                        <RiskScoreTag variant={"warning"} text={"Gammelt bygg"} />): ("")}
+                    {(() => {
+                        const criticalAndHighFactors = riskFactors
+                            .filter(factor => factor.impact === "HIGH" || factor.impact === "CRITICAL")
+                            .sort((a, b) => {
+                                // Sort CRITICAL before HIGH
+                                if (a.impact === "CRITICAL" && b.impact !== "CRITICAL") return -1;
+                                if (b.impact === "CRITICAL" && a.impact !== "CRITICAL") return 1;
+                                // Then sort by contribution descending
+                                return b.contribution - a.contribution;
+                            });
+                        
+                        const tagsToShow = criticalAndHighFactors.slice(0, MAX_TAGS);
+                        const remainingCount = criticalAndHighFactors.length - MAX_TAGS;
+                        
+                        return (
+                            <>
+                                {tagsToShow.map((factor, index) => (
+                                    <RiskScoreTag 
+                                        key={`${factor.name}-${index}`}
+                                        variant={getTagVariantFromSeverity(factor.severity)} 
+                                        text={factor.name}
+                                    />
+                                ))}
+                                {remainingCount > 0 && (
+                                    <RiskScoreTag 
+                                        variant="info"
+                                        text={`+${remainingCount} flere`}
+                                    />
+                                )}
+                            </>
+                        );
+                    })()}
                 </div>
             ) : (
                 <BodyShort size="small">Beregningsdata ikke tilgjengelig</BodyShort>

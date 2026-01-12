@@ -23,108 +23,29 @@ import {
     BugIcon,
 } from "@navikt/aksel-icons";
 import type { Vulnerability, Workload } from "../../types/vulnerabilities";
+import { 
+    getRiskFactors, 
+    getSeverityColor, 
+    getSeverityIconColor,
+    type RiskFactor 
+} from "../../utils/riskFactors";
 
-interface RiskFactor {
-    name: string;
-    description: string;
-    multiplier: number;
-    isActive: boolean;
-    icon: React.ReactNode;
-    severity: "high" | "medium" | "low" | "info";
-}
-
-function getRiskFactors(
-    vuln: Vulnerability,
-    workload: Workload & { team: string }
-): RiskFactor[] {
-    const multipliers = vuln.riskScoreMultipliers;
-    if (!multipliers) return [];
-
-    const ingressTypes = workload.ingressTypes || [];
-    const exposureType =
-        ingressTypes.includes("external")
-            ? "ekstern (internett)"
-            : ingressTypes.includes("authenticated")
-                ? "autentisert"
-                : ingressTypes.includes("internal")
-                    ? "intern"
-                    : "ingen";
-
-    return [
-        {
-            name: "Grunnrisiko fra CVE",
-            description: `Sårbarheten har en grunnrisiko på ${multipliers.severity} basert på CVSS-score.`,
-            multiplier: multipliers.severity,
-            isActive: true,
-            icon: <BugIcon aria-hidden fontSize="1.5rem" />,
-            severity: "info",
-        },
-        {
-            name: "Eksponering",
-            description: `Applikasjonen har ${exposureType} ingress, noe som ${multipliers.exposure > 1 ? "øker" : "ikke øker"} risikoen.`,
-            multiplier: multipliers.exposure,
-            isActive: multipliers.exposure > 1,
-            icon: <GlobeIcon aria-hidden fontSize="1.5rem" />,
-            severity: multipliers.exposure >= 1.5 ? "high" : multipliers.exposure > 1 ? "medium" : "low",
-        },
-        {
-            name: "KEV (Known Exploited Vulnerability)",
-            description: "Sårbarheten er aktivt utnyttet i naturen og er oppført i CISAs KEV-katalog.",
-            multiplier: multipliers.kev,
-            isActive: multipliers.kev > 1,
-            icon: <XMarkOctagonFillIcon aria-hidden fontSize="1.5rem" />,
-            severity: "high",
-        },
-        {
-            name: "EPSS (Exploit Prediction)",
-            description: `Høy sannsynlighet (${Math.round((multipliers.epss - 1) * 100)}% økning) for at sårbarheten utnyttes de neste 30 dagene.`,
-            multiplier: multipliers.epss,
-            isActive: multipliers.epss > 1,
-            icon: <ExclamationmarkTriangleFillIcon aria-hidden fontSize="1.5rem" />,
-            severity: multipliers.epss >= 1.5 ? "high" : "medium",
-        },
-        {
-            name: "Produksjonsmiljø",
-            description: "Sårbarheten finnes i et produksjonsmiljø, noe som øker konsekvensene ved utnyttelse.",
-            multiplier: multipliers.production,
-            isActive: multipliers.production > 1,
-            icon: <CloudIcon aria-hidden fontSize="1.5rem" />,
-            severity: "medium",
-        },
-        {
-            name: "Gammelt bygg",
-            description: `Bygget er ${multipliers.old_build_days} dager gammelt. Eldre bygg kan mangle sikkerhetsoppdateringer.`,
-            multiplier: multipliers.old_build,
-            isActive: multipliers.old_build > 1,
-            icon: <ClockIcon aria-hidden fontSize="1.5rem" />,
-            severity: multipliers.old_build >= 1.3 ? "medium" : "low",
-        },
-    ];
-}
-
-function getSeverityColor(severity: "high" | "medium" | "low" | "info"): string {
-    switch (severity) {
-        case "high":
-            return "var(--a-surface-danger-subtle)";
-        case "medium":
-            return "var(--a-surface-warning-subtle)";
-        case "low":
-            return "var(--a-surface-success-subtle)";
-        case "info":
-            return "var(--a-surface-info-subtle)";
-    }
-}
-
-function getSeverityIconColor(severity: "high" | "medium" | "low" | "info"): string {
-    switch (severity) {
-        case "high":
-            return "var(--a-icon-danger)";
-        case "medium":
-            return "var(--a-icon-warning)";
-        case "low":
-            return "var(--a-icon-success)";
-        case "info":
-            return "var(--a-icon-info)";
+function getIconForFactor(iconName: string): React.ReactNode {
+    switch (iconName) {
+        case "bug":
+            return <BugIcon aria-hidden fontSize="1.5rem" />;
+        case "globe":
+            return <GlobeIcon aria-hidden fontSize="1.5rem" />;
+        case "xmark-octagon":
+            return <XMarkOctagonFillIcon aria-hidden fontSize="1.5rem" />;
+        case "exclamation-triangle":
+            return <ExclamationmarkTriangleFillIcon aria-hidden fontSize="1.5rem" />;
+        case "cloud":
+            return <CloudIcon aria-hidden fontSize="1.5rem" />;
+        case "clock":
+            return <ClockIcon aria-hidden fontSize="1.5rem" />;
+        default:
+            return <CheckmarkCircleFillIcon aria-hidden fontSize="1.5rem" />;
     }
 }
 
@@ -164,8 +85,7 @@ export default function WorkloadDetailPage() {
         );
     }
 
-    const riskFactors = getRiskFactors(vulnerabilityData, workloadData);
-    const activeFactors = riskFactors.filter((f) => f.isActive);
+    const riskFactors = getRiskFactors(vulnerabilityData);
 
     return (
         <div style={{ marginTop: "2rem", maxWidth: "800px" }}>
@@ -261,10 +181,38 @@ export default function WorkloadDetailPage() {
             <Heading size="medium" spacing>
                 Hvorfor denne risikoscoren?
             </Heading>
+            <Alert variant="info" style={{ marginBottom: "1rem" }}>
+                Risikoscoren beregnes fra en grunnrisiko (base score) basert på CVE-alvorligheten. 
+                Alle faktorer nedenfor påvirker deretter denne scoren. Faktorer med multiplikator ≥ 1.0 øker risikoen, 
+                mens faktorer med multiplikator &lt; 1.0 reduserer den.
+            </Alert>
 
-            {activeFactors.length > 0 ? (
+            {/* Base Score Box */}
+            {vulnerabilityData.riskScoreBreakdown && (
+                <Box
+                    padding="4"
+                    borderRadius="medium"
+                    style={{
+                        backgroundColor: "var(--a-surface-info-subtle)",
+                        border: "2px solid var(--a-border-info)",
+                        marginBottom: "1rem",
+                    }}
+                >
+                    <HStack gap="4" align="center" justify="space-between">
+                        <VStack gap="1">
+                            <BodyShort weight="semibold" size="large">Grunnrisiko (Base Score)</BodyShort>
+                            <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
+                                Basert på CVE-alvorlighetsgrad (CVSS)
+                            </BodyShort>
+                        </VStack>
+                        <Heading size="large" level="3">{Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
+                    </HStack>
+                </Box>
+            )}
+
+            {riskFactors.length > 0 ? (
                 <VStack gap="3" style={{ marginBottom: "1.5rem" }}>
-                    {activeFactors
+                    {riskFactors
                         .sort((a, b) => {
                             const severityOrder = { high: 0, medium: 1, low: 2, info: 3 };
                             return severityOrder[a.severity] - severityOrder[b.severity];
@@ -281,26 +229,42 @@ export default function WorkloadDetailPage() {
                             >
                                 <HStack gap="4" align="start">
                                     <div style={{ color: getSeverityIconColor(factor.severity) }}>
-                                        {factor.icon}
+                                        {getIconForFactor(factor.iconName)}
                                     </div>
                                     <VStack gap="1" style={{ flex: 1 }}>
                                         <HStack gap="2" align="center" justify="space-between">
                                             <BodyShort weight="semibold">{factor.name}</BodyShort>
                                             <Tag
                                                 variant={
-                                                    factor.severity === "high"
-                                                        ? "error"
-                                                        : factor.severity === "medium"
-                                                            ? "warning"
-                                                            : factor.severity === "info"
-                                                                ? "info"
-                                                                : "success"
+                                                    !factor.isNegative
+                                                        ? "success" // Reducing risk
+                                                        : factor.severity === "high"
+                                                            ? "error" // High negative impact
+                                                            : factor.severity === "medium"
+                                                                ? "warning" // Medium negative impact
+                                                                : "info"
                                                 }
                                                 size="xsmall"
                                             >
-                                                {factor.multiplier > 1
-                                                    ? `${factor.multiplier}x`
-                                                    : `${factor.multiplier}`}
+                                                {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
+                                            </Tag>
+                                            <Tag
+                                                variant="info"
+                                                size="xsmall"
+                                            >
+                                                {factor.multiplier}x
+                                            </Tag>
+                                            <Tag
+                                                variant={
+                                                    factor.percentage >= 30
+                                                        ? "warning"
+                                                        : factor.percentage >= 15
+                                                            ? "info"
+                                                            : "success"
+                                                }
+                                                size="xsmall"
+                                            >
+                                                {Math.round(factor.percentage)}%
                                             </Tag>
                                         </HStack>
                                         <BodyShort size="small">{factor.description}</BodyShort>
@@ -315,29 +279,6 @@ export default function WorkloadDetailPage() {
                 </Alert>
             )}
 
-            {/* Inactive factors (not contributing to score) */}
-            {riskFactors.filter((f) => !f.isActive && f.name !== "Grunnrisiko fra CVE").length > 0 && (
-                <>
-                    <Heading size="small" spacing>
-                        Faktorer som ikke bidrar til økt risiko
-                    </Heading>
-                    <VStack gap="2" style={{ marginBottom: "1.5rem" }}>
-                        {riskFactors
-                            .filter((f) => !f.isActive && f.name !== "Grunnrisiko fra CVE")
-                            .map((factor, index) => (
-                                <HStack key={index} gap="2" align="center">
-                                    <CheckmarkCircleFillIcon
-                                        aria-hidden
-                                        style={{ color: "var(--a-icon-success)" }}
-                                    />
-                                    <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                                        {factor.name}
-                                    </BodyShort>
-                                </HStack>
-                            ))}
-                    </VStack>
-                </>
-            )}
         </div>
     );
 }
