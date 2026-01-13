@@ -4,7 +4,7 @@ import { useVulnerabilities } from "../../hooks/useVulnerabilities";
 import { Vulnerability, Workload } from "@/app/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
-import { MenuElipsisVerticalIcon, ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
 
 interface WorkloadWithVulns {
@@ -135,8 +135,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
                 </Button>
             </HStack>
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {workloadsWithVulns.map((workloadGroup, index) => {
-                    const totalRisk = workloadGroup.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
+                {workloadsWithVulns.map((workloadGroup) => {
                     return (
                         <div
                             key={workloadGroup.workload.id}

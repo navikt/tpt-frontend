@@ -22,12 +22,10 @@ import {
     CloudIcon,
     BugIcon,
 } from "@navikt/aksel-icons";
-import type { Vulnerability, Workload } from "../../types/vulnerabilities";
 import { 
     getRiskFactors, 
     getSeverityColor, 
-    getSeverityIconColor,
-    type RiskFactor 
+    getSeverityIconColor
 } from "../../utils/riskFactors";
 
 function getIconForFactor(iconName: string): React.ReactNode {

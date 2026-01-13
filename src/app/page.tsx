@@ -1,28 +1,30 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import VulnerabilitiesToLookAt from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitiesToLookAt";
 import VulnerabilitySummary, { BucketThreshold } from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitySummary";
 import { useConfig } from "@/app/hooks/useConfig";
-import { BodyShort, Loader, Box, VStack } from "@navikt/ds-react";
+import { BodyShort, Loader, Box } from "@navikt/ds-react";
 
 export default function Home() {
   const { config, isLoading } = useConfig();
+  
+  // Create default bucket from config
+  const defaultBucket = useMemo<BucketThreshold | null>(() => {
+    if (!config) return null;
+    return {
+      name: "Superkritiske",
+      minThreshold: config.thresholds.high,
+      maxThreshold: Number.MAX_VALUE,
+    };
+  }, [config]);
+
   const [selectedBucket, setSelectedBucket] = useState<BucketThreshold | null>(null);
 
-  // Set default bucket when config loads
-  useEffect(() => {
-    if (config && !selectedBucket) {
-      const defaultBucket: BucketThreshold = {
-        name: "Superkritiske",
-        minThreshold: config.thresholds.high,
-        maxThreshold: Number.MAX_VALUE,
-      };
-      setSelectedBucket(defaultBucket);
-    }
-  }, [config, selectedBucket]);
+  // Use defaultBucket if no bucket is selected
+  const activeBucket = selectedBucket || defaultBucket;
 
   // Show loading state while config is loading
-  if (isLoading || !selectedBucket) {
+  if (isLoading || !activeBucket) {
     return (
       <div style={{ marginTop: "2rem" }}>
         <main>
@@ -71,13 +73,13 @@ export default function Home() {
           </BodyShort>
         </div>
         <VulnerabilitySummary 
-          selectedBucket={selectedBucket} 
+          selectedBucket={activeBucket} 
           onBucketSelect={setSelectedBucket} 
         />
         <VulnerabilitiesToLookAt 
-          bucketName={selectedBucket.name}
-          minThreshold={selectedBucket.minThreshold}
-          maxThreshold={selectedBucket.maxThreshold}
+          bucketName={activeBucket.name}
+          minThreshold={activeBucket.minThreshold}
+          maxThreshold={activeBucket.maxThreshold}
         />
       </main>
     </div>

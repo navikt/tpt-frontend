@@ -29,6 +29,15 @@ npm start
 
 # Kjør linter
 npm run lint
+
+# Kjør tester
+npm test
+
+# Kjør tester i watch-modus
+npm run test:watch
+
+# Kjør tester med coverage
+npm run test:coverage
 ```
 
 Åpne [http://localhost:3000](http://localhost:3000) i nettleseren.
@@ -50,6 +59,13 @@ I lokal utviklingsmodus:
 
 Du kan endre `LOCAL_DEV_EMAIL` til en annen e-postadresse hvis du vil simulere en annen bruker.
 
+### Pre-commit Hooks
+
+Prosjektet bruker Husky for å kjøre automatiske sjekker før hver commit:
+- Linter kjører på alle filer
+- Tester kjører på filer som er endret
+
+Dette sikrer kodekvalitet før kode pushes til repository.
 
 ## Henvendelser
 
