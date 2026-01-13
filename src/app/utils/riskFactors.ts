@@ -1,4 +1,4 @@
-import type { Vulnerability, RiskScoreFactor, RiskScoreMultipliers } from "../types/vulnerabilities";
+import type { Vulnerability, RiskScoreFactor } from "../types/vulnerabilities";
 
 export interface RiskFactor {
     name: string;
@@ -13,82 +13,20 @@ export interface RiskFactor {
     severity: "high" | "medium" | "low" | "info";
 }
 
-interface FactorConfig {
-    displayName: string;
-    iconName: string;
-    getMultiplier: (m: RiskScoreMultipliers) => number;
-}
-
-const FACTOR_REGISTRY: Record<string, FactorConfig> = {
-    severity: {
-        displayName: "Alvorlighetsgrad",
-        iconName: "bug",
-        getMultiplier: (m) => m.severity ?? 1.0, // Default to 1.0 since it's the base score
-    },
-    exposure: {
-        displayName: "Eksponering",
-        iconName: "globe",
-        getMultiplier: (m) => m.exposure,
-    },
-    kev: {
-        displayName: "KEV (Known Exploited)",
-        iconName: "xmark-octagon",
-        getMultiplier: (m) => m.kev,
-    },
-    epss: {
-        displayName: "EPSS (Exploit Prediction)",
-        iconName: "exclamation-triangle",
-        getMultiplier: (m) => m.epss,
-    },
-    production: {
-        displayName: "Produksjonsmiljø",
-        iconName: "cloud",
-        getMultiplier: (m) => m.production,
-    },
-    old_build: {
-        displayName: "Gammelt bygg",
-        iconName: "clock",
-        getMultiplier: (m) => m.old_build,
-    },
-};
-
-export function getSeverityFromImpactAndMultiplier(
-    impact: string,
-    multiplier: number
-): "high" | "medium" | "low" | "info" {
-    // If reducing risk (multiplier < 1.0), always show as info/positive
-    if (multiplier < 1.0) return "info";
-    
-    // If increasing risk, use impact level
-    switch (impact) {
-        case "CRITICAL":
-            return "high";
-        case "HIGH":
-            return "high";
-        case "MEDIUM":
-            return "medium";
-        case "LOW":
-            return "low";
-        default:
-            return "info";
-    }
-}
-
 export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
     const breakdown = vuln.riskScoreBreakdown;
 
     if (!breakdown?.factors) return [];
 
     return breakdown.factors.map((factor: RiskScoreFactor) => {
-        const config = FACTOR_REGISTRY[factor.name];
-        
+
         // Severity is the base score, not a multiplier
         const isSeverity = factor.name === "severity";
         const isNegative = factor.multiplier >= 1.0;
         const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
 
         return {
-            name: config?.displayName || factor.name.charAt(0).toUpperCase() + factor.name.slice(1).replace(/_/g, " "),
+            name: getNorskNavn(factor.name),
             description: factor.explanation,
             contribution: factor.contribution,
             percentage: factor.percentage,
@@ -98,7 +36,7 @@ export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
             // Other factors: significant if (increasing risk AND high/critical impact) OR (reducing risk with any impact)
             isSignificant: isSeverity || (isNegative && isHighOrCritical) || (!isNegative),
             isNegative: isNegative,
-            iconName: config?.iconName || "checkmark-circle",
+            iconName: getIcon(factor.name),
             severity: getSeverityFromImpactAndMultiplier(factor.impact, factor.multiplier),
         };
     });
@@ -142,3 +80,67 @@ export function getTagVariantFromSeverity(severity: "high" | "medium" | "low" | 
             return "info";
     }
 }
+export function getSeverityFromImpactAndMultiplier(
+    impact: string,
+    multiplier: number
+): "high" | "medium" | "low" | "info" {
+    // If reducing risk (multiplier < 1.0), always show as info/positive
+    if (multiplier < 1.0) return "info";
+
+    // If increasing risk, use impact level
+    switch (impact) {
+        case "CRITICAL":
+            return "high";
+        case "HIGH":
+            return "high";
+        case "MEDIUM":
+            return "medium";
+        case "LOW":
+            return "low";
+        default:
+            return "info";
+    }
+}
+
+function getIcon(name: string) {
+    switch (name) {
+        case "severity":
+            return "bug";
+        case "exposure":
+            return "globe";
+        case "kev":
+            return "xmark-octagon";
+        case "epss":
+            return "exclamation-triangle";
+        case "environment":
+            return "cloud";
+        case "patch_available":
+            return "clock";
+        case "Gammelt bygg":
+            return "clock";
+        default:
+            return "checkmark-circle";
+    }
+}
+
+function getNorskNavn(name: string) {
+    switch (name) {
+        case "severity":
+            return "Alvorlighetsgrad";
+        case "exposure":
+            return "Eksponering";
+        case "kev":
+            return "KEV (Known Exploited)";
+        case "epss":
+            return "EPSS (Exploit Prediction)";
+        case "environment":
+            return "Produksjonsmiljø";
+        case "patch_available":
+            return "Patch er tilgjengelig";
+        case "Gammelt bygg":
+            return "Customize Toolbar…";
+        default:
+            return name;
+    }
+}
+
