@@ -76,8 +76,7 @@ export function getSeverityFromImpactAndMultiplier(
 
 export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
     const breakdown = vuln.riskScoreBreakdown;
-    const multipliers = vuln.riskScoreMultipliers;
-    
+
     if (!breakdown?.factors) return [];
 
     return breakdown.factors.map((factor: RiskScoreFactor) => {
@@ -85,26 +84,22 @@ export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
         
         // Severity is the base score, not a multiplier
         const isSeverity = factor.name === "severity";
-        const multiplier = isSeverity 
-            ? 1.0 
-            : (multipliers && config ? config.getMultiplier(multipliers) : 1.0);
-        
-        const isNegative = multiplier >= 1.0;
+        const isNegative = factor.multiplier >= 1.0;
         const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
-        
+
         return {
             name: config?.displayName || factor.name.charAt(0).toUpperCase() + factor.name.slice(1).replace(/_/g, " "),
             description: factor.explanation,
             contribution: factor.contribution,
             percentage: factor.percentage,
-            multiplier: multiplier,
+            multiplier: factor.multiplier,
             impact: factor.impact,
             // Severity is always significant (it's the base score)
             // Other factors: significant if (increasing risk AND high/critical impact) OR (reducing risk with any impact)
             isSignificant: isSeverity || (isNegative && isHighOrCritical) || (!isNegative),
             isNegative: isNegative,
             iconName: config?.iconName || "checkmark-circle",
-            severity: getSeverityFromImpactAndMultiplier(factor.impact, multiplier),
+            severity: getSeverityFromImpactAndMultiplier(factor.impact, factor.multiplier),
         };
     });
 }

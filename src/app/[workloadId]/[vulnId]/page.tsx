@@ -252,18 +252,6 @@ export default function WorkloadDetailPage() {
                                             >
                                                 {factor.multiplier}x
                                             </Tag>
-                                            <Tag
-                                                variant={
-                                                    factor.percentage >= 30
-                                                        ? "warning"
-                                                        : factor.percentage >= 15
-                                                            ? "info"
-                                                            : "success"
-                                                }
-                                                size="xsmall"
-                                            >
-                                                {Math.round(factor.percentage)}%
-                                            </Tag>
                                         </HStack>
                                         <BodyShort size="small">{factor.description}</BodyShort>
                                     </VStack>

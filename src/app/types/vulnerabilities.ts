@@ -12,6 +12,7 @@ export interface RiskScoreFactor {
   name: string;
   contribution: number;
   percentage: number;
+  multiplier: number;
   explanation: string;
   impact: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }
