@@ -87,7 +87,7 @@ export default function WorkloadDetailPage() {
 
     return (
         <div style={{marginTop: "2rem", maxWidth: "800px"}}>
-            <Link href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
+            <Link onClick={()=>history.back()} href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
                 ← Tilbake
             </Link>
 
