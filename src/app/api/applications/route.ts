@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
+import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 
 // Environment validation helper
 function getServerEnv() {
@@ -11,7 +12,7 @@ function getServerEnv() {
     throw new Error("TPT_BACKEND_URL not configured");
   }
 
-  if (!tptBackendScope) {
+  if (!isLocalDev() && !tptBackendScope) {
     throw new Error("TPT_BACKEND_SCOPE not configured");
   }
 
@@ -24,26 +25,36 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(mockVulnerabilitiesPayload);
   }
   try {
-    const { tptBackendUrl, tptBackendScope } = getServerEnv();
+    const { tptBackendUrl } = getServerEnv();
 
     // Check for bypassCache query parameter
     const { searchParams } = new URL(request.url);
     const bypassCache = searchParams.get("bypassCache") === "true";
 
-    const accessToken = getToken(request);
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
+    let backendToken: string;
 
-    const oboResult = await requestOboToken(accessToken, tptBackendScope);
-    if (!oboResult.ok) {
-      return NextResponse.json(
-        { error: "Authentication failed" },
-        { status: 401 }
-      );
+    // In local dev mode, create a mock token instead of using OBO flow
+    if (isLocalDev()) {
+      console.log("Local dev mode enabled - using mock token");
+      backendToken = createLocalDevToken();
+    } else {
+      const accessToken = getToken(request);
+      if (!accessToken) {
+        return NextResponse.json(
+          { error: "Authentication required" },
+          { status: 401 }
+        );
+      }
+
+      const { tptBackendScope } = getServerEnv();
+      const oboResult = await requestOboToken(accessToken, tptBackendScope!);
+      if (!oboResult.ok) {
+        return NextResponse.json(
+          { error: "Authentication failed" },
+          { status: 401 }
+        );
+      }
+      backendToken = oboResult.token;
     }
 
     const backendUrl = bypassCache
@@ -52,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(backendUrl, {
       headers: {
-        Authorization: `Bearer ${oboResult.token}`,
+        Authorization: `Bearer ${backendToken}`,
         "Content-Type": "application/json",
       },
     });

@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
+import { isLocalDev, getLocalDevEmail } from "@/app/utils/localDevAuth";
 
 export async function GET(request: Request) {
+  // In local dev mode, return the configured local dev email
+  if (isLocalDev()) {
+    const email = getLocalDevEmail();
+    console.log("Local dev mode - returning email:", email);
+    return NextResponse.json({ email });
+  }
+
   try {
     const authHeader = request.headers.get("authorization");
 

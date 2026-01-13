@@ -18,7 +18,7 @@ TPT analyserer og rangerer sårbarheter basert på flere faktorer som KEV (Known
 npm ci
 
 # Kjør utviklingsserver
-export MOCKS_ENABLED="true" # For standalone kjøring
+export MOCKS_ENABLED="true" # For standalone kjøring med mock data
 npm run dev
 
 # Bygg for produksjon
@@ -33,19 +33,23 @@ npm run lint
 
 Åpne [http://localhost:3000](http://localhost:3000) i nettleseren.
 
-### Konfigurasjon
+### Lokal utvikling mot backend
 
-#### Risk Score Thresholds
+For å kjøre frontend mot en lokal backend (f.eks. `http://localhost:8080`):
 
-Applikasjonen bruker tre konfigurerbare terskelverdier for risikoskåre:
+1. Start utviklingsserveren:
 
-- **RISK_SCORE_THRESHOLD_ASAP** (default: 100) - "FIX ASAP" - Vises på forsiden som prioriterte sårbarheter
-- **RISK_SCORE_THRESHOLD_WHEN_TIME** (default: 50) - "Fix when you have time" 
-- **RISK_SCORE_THRESHOLD_IF_BORED** (default: 25) - "Fix if bored"
+```bash
+npm run dev
+```
 
-Disse kan konfigureres via miljøvariabler i `.nais/nais.yaml` eller lokalt i miljøet ditt.
+I lokal utviklingsmodus:
+- Autentisering med TokenX/OBO blir hoppet over
+- En mock JWT token genereres automatisk med `lokal.utvikler@nav.no` som bruker
+- API-kall går direkte til den konfigurerte backend-URLen
 
----
+Du kan endre `LOCAL_DEV_EMAIL` til en annen e-postadresse hvis du vil simulere en annen bruker.
+
 
 ## Henvendelser
 

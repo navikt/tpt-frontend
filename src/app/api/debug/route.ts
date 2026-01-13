@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
+import { isLocalDev, createLocalDevToken, getLocalDevEmail } from "@/app/utils/localDevAuth";
 
 // Environment validation helper
 function getServerEnv() {
@@ -11,7 +12,7 @@ function getServerEnv() {
     throw new Error("TPT_BACKEND_URL not configured");
   }
 
-  if (!tptBackendScope) {
+  if (!isLocalDev() && !tptBackendScope) {
     throw new Error("TPT_BACKEND_SCOPE not configured");
   }
 
@@ -23,6 +24,8 @@ export async function GET(request: NextRequest) {
     timestamp: new Date().toISOString(),
     environment: {
       mocksEnabled: process.env.MOCKS_ENABLED === "true",
+      localDev: isLocalDev(),
+      localDevEmail: isLocalDev() ? getLocalDevEmail() : undefined,
       tptBackendUrl: process.env.TPT_BACKEND_URL,
       tptBackendScope: process.env.TPT_BACKEND_SCOPE,
     },
@@ -45,31 +48,99 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { tptBackendUrl, tptBackendScope } = getServerEnv();
+    const { tptBackendUrl } = getServerEnv();
 
-    const accessToken = getToken(request);
-    if (!accessToken) {
-      debugInfo.error = "No access token found";
-      return NextResponse.json(
-        {
-          debug: debugInfo,
-          message: "Debug endpoint - authentication required",
-        },
-        { status: 401 }
-      );
+    let backendToken: string;
+
+    // In local dev mode, create a mock token instead of using OBO flow
+    if (isLocalDev()) {
+      backendToken = createLocalDevToken();
+      debugInfo.response = {
+        authMode: "local-dev",
+        message: "Using mock token for local development",
+      };
+    } else {
+      const accessToken = getToken(request);
+      if (!accessToken) {
+        debugInfo.error = "No access token found";
+        return NextResponse.json(
+          {
+            debug: debugInfo,
+            message: "Debug endpoint - authentication required",
+          },
+          { status: 401 }
+        );
+      }
+
+      const { tptBackendScope } = getServerEnv();
+      const oboResult = await requestOboToken(accessToken, tptBackendScope!);
+      if (!oboResult.ok) {
+        debugInfo.error = "OBO token request failed";
+        return NextResponse.json(
+          {
+            debug: debugInfo,
+            message: "Debug endpoint - authentication failed",
+          },
+          { status: 401 }
+        );
+      }
+      backendToken = oboResult.token;
     }
 
-    const oboResult = await requestOboToken(accessToken, tptBackendScope);
-    if (!oboResult.ok) {
-      debugInfo.error = "OBO token request failed";
-      return NextResponse.json(
-        {
-          debug: debugInfo,
-          message: "Debug endpoint - authentication failed",
-        },
-        { status: 401 }
-      );
-    }
+    // Fetch from multiple endpoints for comprehensive debug info
+    const endpoints = [
+      { name: "vulnerabilities", path: "/vulnerabilities/user" },
+    ];
+
+    const responses = await Promise.allSettled(
+      endpoints.map(async (endpoint) => {
+        const response = await fetch(`${tptBackendUrl}${endpoint.path}`, {
+          headers: {
+            Authorization: `Bearer ${backendToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = response.ok ? await response.json() : null;
+        
+        return {
+          endpoint: endpoint.name,
+          url: `${tptBackendUrl}${endpoint.path}`,
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          success: response.ok,
+        };
+      })
+    );
+
+    debugInfo.response = {
+      source: "backend",
+      endpoints: responses.map((result) => 
+        result.status === "fulfilled" 
+          ? result.value 
+          : { error: result.reason?.message || "Unknown error" }
+      ),
+    };
+
+    return NextResponse.json({
+      debug: debugInfo,
+      message: "Debug endpoint - backend responses",
+    });
+
+  } catch (error) {
+    debugInfo.error = error instanceof Error ? error.message : "Unknown error";
+    console.error("Debug endpoint error:", error);
+    
+    return NextResponse.json(
+      {
+        debug: debugInfo,
+        message: "Debug endpoint - internal server error",
+      },
+      { status: 500 }
+    );
+  }
+}
 
     // Fetch from multiple endpoints for comprehensive debug info
     const endpoints = [
