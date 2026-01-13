@@ -179,11 +179,6 @@ export default function WorkloadDetailPage() {
             <Heading size="medium" spacing>
                 Hvorfor denne risikoscoren?
             </Heading>
-            <Alert variant="info" style={{marginBottom: "1rem"}}>
-                Risikoscoren beregnes fra en grunnrisiko (base score) basert på CVE-alvorligheten.
-                Alle faktorer nedenfor påvirker deretter denne scoren. Faktorer med multiplikator ≥ 1.0 øker risikoen,
-                mens faktorer med multiplikator &lt; 1.0 reduserer den.
-            </Alert>
 
             {/* Base Score Box */}
             {vulnerabilityData.riskScoreBreakdown && (

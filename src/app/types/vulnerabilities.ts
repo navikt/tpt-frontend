@@ -1,13 +1,3 @@
-export interface RiskScoreMultipliers {
-  severity?: number; // Optional: now comes from riskScoreBreakdown
-  exposure: number;
-  kev: number;
-  epss: number;
-  production: number;
-  old_build_days: number;
-  old_build: number;
-}
-
 export interface RiskScoreFactor {
   name: string;
   contribution: number;
@@ -30,7 +20,6 @@ export interface Vulnerability {
   description?: string;
   vulnerabilityDetailsLink?: string;
   riskScore: number;
-  riskScoreMultipliers?: RiskScoreMultipliers;
   riskScoreBreakdown?: RiskScoreBreakdown;
 }
 
