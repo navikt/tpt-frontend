@@ -1,4 +1,4 @@
-import {RiskScoreMultipliers, VulnerabilitiesResponse, Workload} from "@/app/types/vulnerabilities";
+import {VulnerabilitiesResponse, Workload} from "@/app/types/vulnerabilities";
 import {Accordion, Link, LinkCard, Tag} from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
 
@@ -8,7 +8,6 @@ interface CompleteVulnerability {
     description?: string;
     vulnerabilityDetailsLink?: string;
     riskScore: number;
-    riskScoreMultipliers?: RiskScoreMultipliers;
     workload: Workload;
     team: string;
 }
@@ -42,7 +41,6 @@ const VulnerableList = ({
                             description: vuln.description,
                             vulnerabilityDetailsLink: vuln.vulnerabilityDetailsLink,
                             riskScore: vuln.riskScore,
-                            riskScoreMultipliers: vuln.riskScoreMultipliers,
                             workload: workload,
                             team: team.team,
                         }

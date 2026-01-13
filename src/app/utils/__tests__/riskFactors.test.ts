@@ -5,7 +5,7 @@ import {
   getTagVariantFromSeverity,
   getRiskFactors,
 } from '../riskFactors';
-import type { Vulnerability, RiskScoreMultipliers } from '../../types/vulnerabilities';
+import type { Vulnerability } from '../../types/vulnerabilities';
 
 describe('riskFactors utils', () => {
   describe('getSeverityFromImpactAndMultiplier', () => {
@@ -73,20 +73,10 @@ describe('riskFactors utils', () => {
     });
 
     it('should return risk factors when breakdown exists', () => {
-      const multipliers: RiskScoreMultipliers = {
-        exposure: 1.5,
-        kev: 1.0,
-        epss: 1.2,
-        production: 1.3,
-        old_build_days: 0,
-        old_build: 1.0,
-      };
-
       const vuln: Vulnerability = {
         identifier: 'CVE-2024-1234',
         packageName: 'test-package',
         riskScore: 180,
-        riskScoreMultipliers: multipliers,
         riskScoreBreakdown: {
           baseScore: 100,
           totalScore: 180,
