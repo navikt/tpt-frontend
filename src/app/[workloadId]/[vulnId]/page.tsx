@@ -1,6 +1,6 @@
 "use client";
-import { useVulnerabilities } from "../../hooks/useVulnerabilities";
-import { useParams } from "next/navigation";
+import {useVulnerabilities} from "../../hooks/useVulnerabilities";
+import {useParams} from "next/navigation";
 import {
     Heading,
     BodyShort,
@@ -22,28 +22,28 @@ import {
     CloudIcon,
     BugIcon,
 } from "@navikt/aksel-icons";
-import { 
-    getRiskFactors, 
-    getSeverityColor, 
+import {
+    getRiskFactors,
+    getSeverityColor,
     getSeverityIconColor
 } from "../../utils/riskFactors";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
         case "bug":
-            return <BugIcon aria-hidden fontSize="1.5rem" />;
+            return <BugIcon aria-hidden fontSize="1.5rem"/>;
         case "globe":
-            return <GlobeIcon aria-hidden fontSize="1.5rem" />;
+            return <GlobeIcon aria-hidden fontSize="1.5rem"/>;
         case "xmark-octagon":
-            return <XMarkOctagonFillIcon aria-hidden fontSize="1.5rem" />;
+            return <XMarkOctagonFillIcon aria-hidden fontSize="1.5rem"/>;
         case "exclamation-triangle":
-            return <ExclamationmarkTriangleFillIcon aria-hidden fontSize="1.5rem" />;
+            return <ExclamationmarkTriangleFillIcon aria-hidden fontSize="1.5rem"/>;
         case "cloud":
-            return <CloudIcon aria-hidden fontSize="1.5rem" />;
+            return <CloudIcon aria-hidden fontSize="1.5rem"/>;
         case "clock":
-            return <ClockIcon aria-hidden fontSize="1.5rem" />;
+            return <ClockIcon aria-hidden fontSize="1.5rem"/>;
         default:
-            return <CheckmarkCircleFillIcon aria-hidden fontSize="1.5rem" />;
+            return <CheckmarkCircleFillIcon aria-hidden fontSize="1.5rem"/>;
     }
 }
 
@@ -51,7 +51,7 @@ export default function WorkloadDetailPage() {
     const params = useParams();
     const workloadId = params.workloadId as string;
     const vulnId = params.vulnId as string;
-    const { data, isLoading } = useVulnerabilities();
+    const {data, isLoading} = useVulnerabilities();
 
     const workloadData = data?.teams
         .flatMap((team) =>
@@ -72,7 +72,7 @@ export default function WorkloadDetailPage() {
 
     if (!workloadData || !vulnerabilityData) {
         return (
-            <div style={{ marginTop: "2rem" }}>
+            <div style={{marginTop: "2rem"}}>
                 <Heading size="large" spacing>
                     {!workloadData ? "Workload ikke funnet" : "Sårbarhet ikke funnet"}
                 </Heading>
@@ -86,8 +86,8 @@ export default function WorkloadDetailPage() {
     const riskFactors = getRiskFactors(vulnerabilityData);
 
     return (
-        <div style={{ marginTop: "2rem", maxWidth: "800px" }}>
-            <Link href="/" style={{ marginBottom: "1rem", display: "inline-block" }}>
+        <div style={{marginTop: "2rem", maxWidth: "800px"}}>
+            <Link href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
                 ← Tilbake
             </Link>
 
@@ -96,7 +96,7 @@ export default function WorkloadDetailPage() {
                 padding="6"
                 borderRadius="medium"
                 background="surface-subtle"
-                style={{ marginBottom: "1.5rem" }}
+                style={{marginBottom: "1.5rem"}}
             >
                 <VStack gap="4">
                     <HStack gap="4" align="center" justify="space-between" wrap>
@@ -120,7 +120,7 @@ export default function WorkloadDetailPage() {
                     )}
 
                     {vulnerabilityData.description && (
-                        <BodyShort style={{ whiteSpace: "pre-wrap" }}>
+                        <BodyShort style={{whiteSpace: "pre-wrap"}}>
                             {vulnerabilityData.description}
                         </BodyShort>
                     )}
@@ -147,7 +147,7 @@ export default function WorkloadDetailPage() {
                 padding="4"
                 borderRadius="medium"
                 background="surface-subtle"
-                style={{ marginBottom: "1.5rem" }}
+                style={{marginBottom: "1.5rem"}}
             >
                 <HStack gap="6" wrap>
                     <BodyShort size="small">
@@ -164,10 +164,10 @@ export default function WorkloadDetailPage() {
                             href={`https://github.com/${workloadData.repository}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ fontSize: "0.875rem" }}
+                            style={{fontSize: "0.875rem"}}
                         >
                             <HStack gap="1" align="center">
-                                <BranchingIcon aria-hidden />
+                                <BranchingIcon aria-hidden/>
                                 GitHub
                             </HStack>
                         </DSLink>
@@ -179,9 +179,9 @@ export default function WorkloadDetailPage() {
             <Heading size="medium" spacing>
                 Hvorfor denne risikoscoren?
             </Heading>
-            <Alert variant="info" style={{ marginBottom: "1rem" }}>
-                Risikoscoren beregnes fra en grunnrisiko (base score) basert på CVE-alvorligheten. 
-                Alle faktorer nedenfor påvirker deretter denne scoren. Faktorer med multiplikator ≥ 1.0 øker risikoen, 
+            <Alert variant="info" style={{marginBottom: "1rem"}}>
+                Risikoscoren beregnes fra en grunnrisiko (base score) basert på CVE-alvorligheten.
+                Alle faktorer nedenfor påvirker deretter denne scoren. Faktorer med multiplikator ≥ 1.0 øker risikoen,
                 mens faktorer med multiplikator &lt; 1.0 reduserer den.
             </Alert>
 
@@ -199,20 +199,21 @@ export default function WorkloadDetailPage() {
                     <HStack gap="4" align="center" justify="space-between">
                         <VStack gap="1">
                             <BodyShort weight="semibold" size="large">Grunnrisiko (Base Score)</BodyShort>
-                            <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
+                            <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
                                 Basert på CVE-alvorlighetsgrad (CVSS)
                             </BodyShort>
                         </VStack>
-                        <Heading size="large" level="3">{Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
+                        <Heading size="large" level="3">
+                            {Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
                     </HStack>
                 </Box>
             )}
 
             {riskFactors.length > 0 ? (
-                <VStack gap="3" style={{ marginBottom: "1.5rem" }}>
+                <VStack gap="3" style={{marginBottom: "1.5rem"}}>
                     {riskFactors
                         .sort((a, b) => {
-                            const severityOrder = { high: 0, medium: 1, low: 2, info: 3 };
+                            const severityOrder = {high: 0, medium: 1, low: 2, info: 3};
                             return severityOrder[a.severity] - severityOrder[b.severity];
                         })
                         .map((factor, index) => (
@@ -226,12 +227,12 @@ export default function WorkloadDetailPage() {
                                 }}
                             >
                                 <HStack gap="4" align="start">
-                                    <div style={{ color: getSeverityIconColor(factor.severity) }}>
+                                    <div style={{color: getSeverityIconColor(factor.severity)}}>
                                         {getIconForFactor(factor.iconName)}
                                     </div>
-                                    <VStack gap="1" style={{ flex: 1 }}>
-                                        <HStack gap="2" align="center" justify="space-between">
-                                            <BodyShort weight="semibold">{factor.name}</BodyShort>
+                                    <VStack gap="1" style={{flex: 1}}>
+                                        <HStack gap="2" align="end">
+                                            <BodyShort weight="semibold" style={{flexGrow: 1}}>{factor.name}</BodyShort>
                                             <Tag
                                                 variant={
                                                     !factor.isNegative
@@ -243,12 +244,14 @@ export default function WorkloadDetailPage() {
                                                                 : "info"
                                                 }
                                                 size="xsmall"
+                                                style={{width:"4em"}}
                                             >
                                                 {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
                                             </Tag>
                                             <Tag
                                                 variant="info"
                                                 size="xsmall"
+                                                style={{width:"4em"}}
                                             >
                                                 {factor.multiplier}x
                                             </Tag>
@@ -260,7 +263,7 @@ export default function WorkloadDetailPage() {
                         ))}
                 </VStack>
             ) : (
-                <Alert variant="info" style={{ marginBottom: "1.5rem" }}>
+                <Alert variant="info" style={{marginBottom: "1.5rem"}}>
                     Ingen risikofaktorer er identifisert for denne sårbarheten.
                 </Alert>
             )}
