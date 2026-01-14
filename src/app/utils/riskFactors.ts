@@ -98,6 +98,7 @@ export function getSeverityFromImpactAndMultiplier(
         case "LOW":
             return "low";
         default:
+            console.warn("getSeverityFromImpactAndMultiplier() unknown impact: " + impact)
             return "info";
     }
 }
@@ -116,9 +117,10 @@ function getIcon(name: string) {
             return "cloud";
         case "patch_available":
             return "clock";
-        case "Gammelt bygg":
+        case "build_age":
             return "clock";
         default:
+            console.warn("getIcon() unknown name: " + name)
             return "checkmark-circle";
     }
 }
@@ -137,9 +139,10 @@ function getNorskNavn(name: string) {
             return "Produksjonsmiljø";
         case "patch_available":
             return "Patch er tilgjengelig";
-        case "Gammelt bygg":
-            return "Customize Toolbar…";
+        case "build_age":
+            return "Gammelt bygg";
         default:
+            console.error("getNorskNavn() unknown name: " + name)
             return name;
     }
 }
