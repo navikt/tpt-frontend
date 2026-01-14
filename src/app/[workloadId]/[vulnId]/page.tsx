@@ -85,6 +85,12 @@ export default function WorkloadDetailPage() {
 
     const riskFactors = getRiskFactors(vulnerabilityData);
 
+    const riscSumColorVariant = vulnerabilityData.riskScore >= 100
+        ? "danger"
+        : vulnerabilityData.riskScore >= 50
+            ? "warning"
+            : "success";
+
     return (
         <div style={{marginTop: "2rem", maxWidth: "800px"}}>
             <Link onClick={()=>history.back()} href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
@@ -182,85 +188,107 @@ export default function WorkloadDetailPage() {
 
             {/* Base Score Box */}
             {vulnerabilityData.riskScoreBreakdown && (
-                <Box
-                    padding="4"
-                    borderRadius="medium"
-                    style={{
-                        backgroundColor: "var(--a-surface-info-subtle)",
-                        border: "2px solid var(--a-border-info)",
-                        marginBottom: "1rem",
-                    }}
-                >
-                    <HStack gap="4" align="center" justify="space-between">
-                        <VStack gap="1">
-                            <BodyShort weight="semibold" size="large">Grunnrisiko (Base Score)</BodyShort>
-                            <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
-                                Basert på CVE-alvorlighetsgrad (CVSS)
-                            </BodyShort>
-                        </VStack>
-                        <Heading size="large" level="3">
-                            {Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
-                    </HStack>
-                </Box>
-            )}
+                <>
+                    <Box
+                        padding="4"
+                        borderRadius="medium"
+                        style={{
+                            backgroundColor: "var(--a-surface-info-subtle)",
+                            border: "2px solid var(--a-border-info)",
+                            marginBottom: "1rem",
+                        }}
+                    >
+                        <HStack gap="4" align="center" justify="space-between">
+                            <VStack gap="1">
+                                <BodyShort weight="semibold" size="large">Grunnrisiko (Base Score)</BodyShort>
+                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                    Basert på CVE-alvorlighetsgrad (CVSS)
+                                </BodyShort>
+                            </VStack>
+                            <Heading size="large" level="3">
+                                {Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
+                        </HStack>
+                    </Box>
 
-            {riskFactors.length > 0 ? (
-                <VStack gap="3" style={{marginBottom: "1.5rem"}}>
-                    {riskFactors
-                        .sort((a, b) => {
-                            const severityOrder = {high: 0, medium: 1, low: 2, info: 3};
-                            return severityOrder[a.severity] - severityOrder[b.severity];
-                        })
-                        .map((factor, index) => (
-                            <Box
-                                key={index}
-                                padding="4"
-                                borderRadius="medium"
-                                style={{
-                                    backgroundColor: getSeverityColor(factor.severity),
-                                    border: "1px solid var(--a-border-subtle)",
-                                }}
-                            >
-                                <HStack gap="4" align="start">
-                                    <div style={{color: getSeverityIconColor(factor.severity)}}>
-                                        {getIconForFactor(factor.iconName)}
-                                    </div>
-                                    <VStack gap="1" style={{flex: 1}}>
-                                        <HStack gap="2" align="end">
-                                            <BodyShort weight="semibold" style={{flexGrow: 1}}>{factor.name}</BodyShort>
-                                            <Tag
-                                                variant={
-                                                    !factor.isNegative
-                                                        ? "success" // Reducing risk
-                                                        : factor.severity === "high"
-                                                            ? "error" // High negative impact
-                                                            : factor.severity === "medium"
-                                                                ? "warning" // Medium negative impact
-                                                                : "info"
-                                                }
-                                                size="xsmall"
-                                                style={{width:"4em"}}
-                                            >
-                                                {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
-                                            </Tag>
-                                            <Tag
-                                                variant="info"
-                                                size="xsmall"
-                                                style={{width:"4em"}}
-                                            >
-                                                {factor.multiplier}x
-                                            </Tag>
+                    {riskFactors.length > 0 ? (
+                        <VStack gap="3" style={{marginBottom: "1.5rem"}}>
+                            {riskFactors
+                                .sort((a, b) => {
+                                    const severityOrder = {high: 0, medium: 1, low: 2, info: 3};
+                                    return severityOrder[a.severity] - severityOrder[b.severity];
+                                })
+                                .map((factor, index) => (
+                                    <Box
+                                        key={index}
+                                        padding="4"
+                                        borderRadius="medium"
+                                        style={{
+                                            backgroundColor: getSeverityColor(factor.severity),
+                                            border: "1px solid var(--a-border-subtle)",
+                                        }}
+                                    >
+                                        <HStack gap="4" align="start">
+                                            <div style={{color: getSeverityIconColor(factor.severity)}}>
+                                                {getIconForFactor(factor.iconName)}
+                                            </div>
+                                            <VStack gap="1" style={{flex: 1}}>
+                                                <HStack gap="2" align="end">
+                                                    <BodyShort weight="semibold" style={{flexGrow: 1}}>{factor.name}</BodyShort>
+                                                    <Tag
+                                                        variant={
+                                                            !factor.isNegative
+                                                                ? "success" // Reducing risk
+                                                                : factor.severity === "high"
+                                                                    ? "error" // High negative impact
+                                                                    : factor.severity === "medium"
+                                                                        ? "warning" // Medium negative impact
+                                                                        : "info"
+                                                        }
+                                                        size="xsmall"
+                                                        style={{width: "4em"}}
+                                                    >
+                                                        {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
+                                                    </Tag>
+                                                    <Tag
+                                                        variant="info"
+                                                        size="xsmall"
+                                                        style={{width: "4em"}}
+                                                    >
+                                                        {factor.multiplier}x
+                                                    </Tag>
+                                                </HStack>
+                                                <BodyShort size="small">{factor.description}</BodyShort>
+                                            </VStack>
                                         </HStack>
-                                        <BodyShort size="small">{factor.description}</BodyShort>
-                                    </VStack>
-                                </HStack>
-                            </Box>
-                        ))}
-                </VStack>
-            ) : (
-                <Alert variant="info" style={{marginBottom: "1.5rem"}}>
-                    Ingen risikofaktorer er identifisert for denne sårbarheten.
-                </Alert>
+                                    </Box>
+                                ))}
+                        </VStack>
+                    ) : (
+                        <Alert variant="info" style={{marginBottom: "1.5rem"}}>
+                            Ingen risikofaktorer er identifisert for denne sårbarheten.
+                        </Alert>
+                    )}
+                    <Box
+                        padding="4"
+                        borderRadius="medium"
+                        style={{
+                            backgroundColor: "var(--a-surface-" + riscSumColorVariant + "-subtle)",
+                            border: "2px solid var(--a-border-" + riscSumColorVariant + ")",
+                            marginBottom: "1rem",
+                        }}
+                    >
+                        <HStack gap="4" align="center" justify="space-between">
+                            <VStack gap="1">
+                                <BodyShort weight="semibold" size="large">Risikoscore:</BodyShort>
+                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                    Summert opp
+                                </BodyShort>
+                            </VStack>
+                            <Heading size="large" level="3">
+                                {Math.round(vulnerabilityData.riskScore)}</Heading>
+                        </HStack>
+                    </Box>
+                </>
             )}
 
         </div>
