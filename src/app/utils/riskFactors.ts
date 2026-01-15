@@ -1,4 +1,4 @@
-import type { Vulnerability, RiskScoreFactor } from "../types/vulnerabilities";
+import type {Vulnerability, RiskScoreFactor} from "../types/vulnerabilities";
 
 export interface RiskFactor {
     name: string;
@@ -18,28 +18,28 @@ export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
 
     if (!breakdown?.factors) return [];
 
-    return breakdown.factors.map((factor: RiskScoreFactor) => {
+    return breakdown.factors
+        .filter((factor: RiskScoreFactor) => { return factor.name != "severity" })
+        .map((factor: RiskScoreFactor) => {
 
-        // Severity is the base score, not a multiplier
-        const isSeverity = factor.name === "severity";
-        const isNegative = factor.multiplier >= 1.0;
-        const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
+            // Severity is the base score, not a multiplier
+            const isNegative = factor.multiplier >= 1.0;
+            const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
 
-        return {
-            name: getNorskNavn(factor.name),
-            description: factor.explanation,
-            contribution: factor.contribution,
-            percentage: factor.percentage,
-            multiplier: factor.multiplier,
-            impact: factor.impact,
-            // Severity is always significant (it's the base score)
-            // Other factors: significant if (increasing risk AND high/critical impact) OR (reducing risk with any impact)
-            isSignificant: isSeverity || (isNegative && isHighOrCritical) || (!isNegative),
-            isNegative: isNegative,
-            iconName: getIcon(factor.name),
-            severity: getSeverityFromImpactAndMultiplier(factor.impact, factor.multiplier),
-        };
-    });
+            return {
+                name: getNorskNavn(factor.name),
+                description: factor.explanation,
+                contribution: factor.contribution,
+                percentage: factor.percentage,
+                multiplier: factor.multiplier,
+                impact: factor.impact,
+                // Other factors: significant if (increasing risk AND high/critical impact) OR (reducing risk with any impact)
+                isSignificant: (isNegative && isHighOrCritical) || (!isNegative),
+                isNegative: isNegative,
+                iconName: getIcon(factor.name),
+                severity: getSeverityFromImpactAndMultiplier(factor.impact, factor.multiplier),
+            };
+        });
 }
 
 export function getSeverityColor(severity: "high" | "medium" | "low" | "info"): string {
@@ -80,6 +80,7 @@ export function getTagVariantFromSeverity(severity: "high" | "medium" | "low" | 
             return "info";
     }
 }
+
 export function getSeverityFromImpactAndMultiplier(
     impact: string,
     multiplier: number
@@ -113,6 +114,8 @@ function getIcon(name: string) {
             return "xmark-octagon";
         case "epss":
             return "exclamation-triangle";
+        case "exploit_reference":
+            return "exclamation-triangle";
         case "environment":
             return "cloud";
         case "patch_available":
@@ -135,6 +138,8 @@ function getNorskNavn(name: string) {
             return "KEV (Known Exploited)";
         case "epss":
             return "EPSS (Exploit Prediction)";
+        case "exploit_reference":
+            return "Kode for utnyttelse er offentlig kjent";
         case "environment":
             return "Produksjonsmiljø";
         case "patch_available":
