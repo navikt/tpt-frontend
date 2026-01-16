@@ -10,6 +10,7 @@ import {
     HStack,
     Tag,
     Alert,
+    ReadMore,
 } from "@navikt/ds-react";
 import Link from "next/link";
 import {
@@ -127,7 +128,17 @@ export default function WorkloadDetailPage() {
 
                     {vulnerabilityData.description && (
                         <BodyShort style={{whiteSpace: "pre-wrap"}}>
-                            {vulnerabilityData.description}
+                            {vulnerabilityData.description.matchAll(/\n/g).toArray().length < 12
+                                ? (
+                                    vulnerabilityData.description
+                                ) : (
+                                    <>
+                                        {vulnerabilityData.description.split("\n", 8).join("\n")}
+                                        <ReadMore header="Se resten av beskrivelsen...">
+                                            {vulnerabilityData.description.split("\n").slice(8).join("\n")}
+                                        </ReadMore>
+                                    </>
+                                )}
                         </BodyShort>
                     )}
 
@@ -141,7 +152,7 @@ export default function WorkloadDetailPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Les mer om sårbarheten →
+                                Lenke til CVEen →
                             </DSLink>
                         )}
                     </HStack>
@@ -233,7 +244,9 @@ export default function WorkloadDetailPage() {
                                             </div>
                                             <VStack gap="1" style={{flex: 1}}>
                                                 <HStack gap="2" align="end">
-                                                    <BodyShort weight="semibold" style={{flexGrow: 1}}>{factor.name}</BodyShort>
+                                                    <BodyShort weight="semibold" style={{flexGrow: 1}}>
+                                                        {factor.name}
+                                                    </BodyShort>
                                                     <Tag
                                                         variant={
                                                             !factor.isNegative
