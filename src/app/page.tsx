@@ -3,10 +3,14 @@ import { useState, useMemo } from "react";
 import VulnerabilitiesToLookAt from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitiesToLookAt";
 import VulnerabilitySummary, { BucketThreshold } from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitySummary";
 import { useConfig } from "@/app/hooks/useConfig";
+import { useVulnerabilities } from "@/app/hooks/useVulnerabilities";
 import { BodyShort, Loader, Box } from "@navikt/ds-react";
 
 export default function Home() {
   const { config, isLoading } = useConfig();
+  const [selectedTeams, setSelectedTeams] = useState<string[] | undefined>(undefined);
+  const { data: vulnData } = useVulnerabilities();
+  const effectiveSelectedTeams: string[] = selectedTeams ?? (vulnData?.teams ? Array.from(new Set(vulnData.teams.map((t) => t.team))) : []);
   
   // Create default bucket from config
   const defaultBucket = useMemo<BucketThreshold | null>(() => {
@@ -74,12 +78,15 @@ export default function Home() {
         </div>
         <VulnerabilitySummary 
           selectedBucket={activeBucket} 
-          onBucketSelect={setSelectedBucket} 
+          onBucketSelect={setSelectedBucket}
+          selectedTeams={effectiveSelectedTeams}
+          onTeamsChange={setSelectedTeams}
         />
         <VulnerabilitiesToLookAt 
           bucketName={activeBucket.name}
           minThreshold={activeBucket.minThreshold}
           maxThreshold={activeBucket.maxThreshold}
+          selectedTeams={effectiveSelectedTeams}
         />
       </main>
     </div>

@@ -18,9 +18,10 @@ interface VulnerabilitiesToLookAtProps {
     bucketName: string;
     minThreshold: number;
     maxThreshold: number;
+    selectedTeams: string[];
 }
 
-const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: VulnerabilitiesToLookAtProps) => {
+const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams }: VulnerabilitiesToLookAtProps) => {
     const { data, isLoading } = useVulnerabilities();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
@@ -51,6 +52,11 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold }: Vul
         const workloadMap = new Map<string, WorkloadWithVulns>();
         
         data?.teams.forEach((team) => {
+            // Skip teams that are not selected (empty selection => show none)
+            if (!selectedTeams.includes(team.team)) {
+                return;
+            }
+
             team.workloads.forEach((workload) => {
                 const filteredVulns = workload.vulnerabilities.filter(
                     (vuln) => vuln.riskScore >= minThreshold && vuln.riskScore < maxThreshold
