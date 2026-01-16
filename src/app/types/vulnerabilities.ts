@@ -26,6 +26,7 @@ export interface Vulnerability {
 export interface Workload {
   id: string;
   name: string;
+  workloadType?: string;
   environment: string;
   repository?: string;
   ingressTypes?: string[];

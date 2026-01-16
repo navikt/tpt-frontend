@@ -189,6 +189,19 @@ export default function WorkloadDetailPage() {
                             </HStack>
                         </DSLink>
                     )}
+                    {workloadData.workloadType && (
+                        <DSLink
+                            href={`https://console.nav.cloud.nais.io/team/${workloadData.team}/${workloadData.environment}/${workloadData.workloadType}/${workloadData.name}/vulnerabilities`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{fontSize: "0.875rem"}}
+                        >
+                            <HStack gap="1" align="center">
+                                <CloudIcon aria-hidden/>
+                                Nais Console
+                            </HStack>
+                        </DSLink>
+                    )}
                 </HStack>
             </Box>
 
