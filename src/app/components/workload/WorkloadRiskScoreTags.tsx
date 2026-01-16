@@ -1,14 +1,18 @@
 "use client";
 import {Tag, BodyShort,} from "@navikt/ds-react";
-import { getRiskFactors, getTagVariantFromSeverity } from "@/app/utils/riskFactors";
-import type { Vulnerability } from "@/app/types/vulnerabilities";
+import {
+    getRiskFactors,
+    getTagVariantFromSeverity,
+    RiskFactor
+} from "@/app/utils/riskFactors";
+import type {Vulnerability} from "@/app/types/vulnerabilities";
 
 const WorkloadRiskScoreTags = ({vuln}: {
     vuln: Vulnerability
 }) => {
     const MAX_TAGS = 4;
     
-    const riskFactors = getRiskFactors(vuln);
+    const riskFactors = getRiskFactors(vuln).filter((factor: RiskFactor) => { return factor.name != "severity" });
     
     return (
         <>
