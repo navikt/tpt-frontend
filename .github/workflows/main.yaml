@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.docker-push.outputs.image }}
     permissions:
       contents: write
       id-token: write
