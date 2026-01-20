@@ -35,6 +35,17 @@
     "fetchNewData": "Fetch new data from backend",
     "wait": "Wait"
   },
+  "github": {
+    "tab": "GitHub",
+    "repositories": "Repositories",
+    "filterRepository": "Filter repositories",
+    "noRepositories": "No repositories found",
+    "pageDescription": "This page shows vulnerabilities detected by GitHub in your repositories. GitHub analyzes your dependencies for known security issues and reports them here. The data is fetched from GitHub's dependency scanning.",
+    "metadata": {
+      "teams": "Teams",
+      "repositories": "Repositories"
+    }
+  },
   "list": {
     "loadingVulnerabilities": "Loading {name} vulnerabilities...",
     "noVulnerabilities": "🙌 No vulnerabilities in this category! 🙌",

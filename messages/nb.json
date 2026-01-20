@@ -35,6 +35,17 @@
     "fetchNewData": "Hent nye data fra backend",
     "wait": "Vent"
   },
+  "github": {
+    "tab": "GitHub",
+    "repositories": "Repositories",
+    "filterRepository": "Filtrer repository",
+    "noRepositories": "Ingen repositories funnet",
+    "pageDescription": "Denne siden viser sårbarheter oppdaget av GitHub i dine repositories. GitHub analyserer avhengighetene dine for kjente sikkerhetshull og rapporterer dem her. Dataene er hentet fra GitHub's avhengighetstjekk.",
+    "metadata": {
+      "teams": "Teams",
+      "repositories": "Repositories"
+    }
+  },
   "list": {
     "loadingVulnerabilities": "Laster {name} sårbarheter...",
     "noVulnerabilities": "🙌 Ingen sårbarheter i denne kategorien! 🙌",

@@ -2,11 +2,6 @@ name: Build and deploy main
 
 on:
   workflow_dispatch:
-    inputs:
-      cachekey:
-        required: false
-        default: 'nope'
-        type: string
   push:
     branches:
       - main
@@ -15,13 +10,14 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
+      security-events: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version: '24'
           registry-url: 'https://npm.pkg.github.com/'
@@ -31,14 +27,30 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
-      - uses: nais/docker-build-push@v0
+      - uses: nais/docker-build-push@87f920b0411b987d9a1fd4113aa384e1e3b54f2c
         id: docker-push
         with:
           team: appsec
           build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
-          build_args: CACHE_BUST=${{ inputs.cachekey }}
-      - uses: nais/deploy/actions/deploy@v2
+      - uses: nais/deploy/actions/deploy@fa754451577294aae42872a69b888b3470478ec1
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
+  trivy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # for dependency graph & sarif
+      security-events: write # push sarif to github security
+    needs: build-and-push
+    steps:
+      - name: Scan docker image for secrets
+        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5
+        with:
+          image-ref: '${{ needs.build-and-push.outputs.image }}'
+          format: 'sarif'
+          scanners: 'secret'
+          output: 'trivy.sarif'
+      - uses: github/codeql-action/upload-sarif@ff0a06e83cb2de871e5a09832bc6a81e7276941f
+        with:
+          sarif_file: 'trivy.sarif'

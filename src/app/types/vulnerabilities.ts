@@ -34,9 +34,15 @@ export interface Workload {
   vulnerabilities: Vulnerability[];
 }
 
+export interface Repository {
+  name: string;
+  vulnerabilities: Vulnerability[];
+}
+
 export interface Team {
   team: string;
   workloads: Workload[];
+  repositories?: Repository[];
 }
 
 export interface VulnerabilitiesResponse {
