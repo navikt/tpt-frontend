@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Modal,
   Button,
@@ -10,6 +10,7 @@ import {
   Loader,
 } from "@navikt/ds-react";
 import { useVulnerabilities } from "../../hooks/useVulnerabilities";
+import { useTranslations } from "next-intl";
 
 interface TeamFilterModalProps {
   open: boolean;
@@ -24,6 +25,7 @@ const TeamFilterModal = ({
   selectedTeams,
   onTeamsChange,
 }: TeamFilterModalProps) => {
+  const t = useTranslations("teamFilter");
   const { data, isLoading } = useVulnerabilities();
   const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(selectedTeams);
 
@@ -54,20 +56,20 @@ const TeamFilterModal = ({
       open={open}
       onClose={onClose}
       header={{
-        heading: "Filter etter team",
+        heading: t("title"),
         closeButton: true,
       }}
     >
       <Modal.Body>
         {isLoading ? (
           <div style={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
-            <Loader size="medium" title="Laster team..." />
+            <Loader size="medium" title={t("loadingTeams")} />
           </div>
         ) : (
           <VStack gap="6">
             <div>
               <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                Velg hvilke team du vil se sårbarheter for. Bare valgte team vil vises på hovedsiden.
+                {t("description")}
               </BodyShort>
             </div>
 
@@ -92,7 +94,7 @@ const TeamFilterModal = ({
             )}
 
             {uniqueTeams.length === 0 && (
-              <BodyShort>Ingen team funnet</BodyShort>
+              <BodyShort>{t("noTeams")}</BodyShort>
             )}
           </VStack>
         )}
@@ -101,10 +103,10 @@ const TeamFilterModal = ({
       <Modal.Footer>
         <HStack gap="4">
           <Button variant="secondary" onClick={onClose}>
-            Avbryt
+            {t("cancel")}
           </Button>
           <Button onClick={handleApply}>
-            Bruk filter
+            {t("apply")}
           </Button>
         </HStack>
       </Modal.Footer>

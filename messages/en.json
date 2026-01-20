@@ -1,0 +1,60 @@
+{
+  "common": {
+    "appTitle": "Titt På Ting",
+    "vulnerabilities": "vulnerabilities",
+    "vulnerability": "vulnerability",
+    "loading": "Loading",
+    "applications": "applications",
+    "application": "application",
+    "in": "in"
+  },
+  "header": {
+    "allVulnerabilities": "All vulnerabilities",
+    "language": "Language"
+  },
+  "banner": {
+    "underDevelopment": "TPT is under active development. Things can break suddenly! 🚧"
+  },
+  "home": {
+    "title": "Vulnerability prioritization that makes <i>sense</i>",
+    "description1": "Titt På Ting is a prioritization tool meant to filter out noise and uncertainty.",
+    "description2": "Not all vulnerabilities are created equal and we've done the work for you to analyze and rank the most critical vulnerabilities in the teams you belong to. The vulnerability list is fetched from the Nais API.",
+    "loadingVulnerabilities": "Fetching vulnerabilities..."
+  },
+  "buckets": {
+    "highPriority": "High priority",
+    "important": "Important",
+    "whenTime": "When you have time",
+    "lowPriority": "Low priority"
+  },
+  "summary": {
+    "priorityWarning": "Prioritization is based on available information. A vulnerability can be critical even if it's prioritized low, for example if it hasn't been analyzed yet.",
+    "filterTeam": "Filter teams",
+    "settings": "Settings",
+    "refresh": "Refresh",
+    "fetchNewData": "Fetch new data from backend",
+    "wait": "Wait"
+  },
+  "list": {
+    "loadingVulnerabilities": "Loading {name} vulnerabilities...",
+    "noVulnerabilities": "🙌 No vulnerabilities in this category! 🙌",
+    "noVulnerabilitiesSpecific": "🙌 We see no {name} vulnerabilities you need to fix. 🙌",
+    "vulnerabilitiesCount": "({count} in {appCount} {appCount, plural, one {application} other {applications}})",
+    "openAll": "Open all",
+    "closeAll": "Close all",
+    "vulnerabilitiesInWorkload": "({count} {count, plural, one {vulnerability} other {vulnerabilities}})",
+    "vulnerabilitiesInPackage": "({count} {count, plural, one {vulnerability} other {vulnerabilities}})"
+  },
+  "teamFilter": {
+    "title": "Filter by team",
+    "loadingTeams": "Loading teams...",
+    "description": "Select which teams you want to see vulnerabilities for. Only selected teams will be shown on the main page.",
+    "noTeams": "No teams found",
+    "cancel": "Cancel",
+    "apply": "Apply filter"
+  },
+  "vulnerabilitiesPage": {
+    "title": "Vulnerabilities",
+    "description": "The table is based on all applications that have generated an SBOM for nais console, and are in a namespace you belong to."
+  }
+}
