@@ -23,7 +23,6 @@ import {
   ClockIcon,
   BugIcon,
 } from "@navikt/aksel-icons";
-import { Vulnerability } from "@/app/types/vulnerabilities";
 import {
   getRiskFactors,
   getSeverityColor,
