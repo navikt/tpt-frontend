@@ -28,6 +28,7 @@ import {
     getSeverityColor,
     getSeverityIconColor
 } from "../../../utils/riskFactors";
+import {useTranslations} from "next-intl";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -49,6 +50,7 @@ function getIconForFactor(iconName: string): React.ReactNode {
 }
 
 export default function WorkloadDetailPage() {
+    const t = useTranslations();
     const params = useParams();
     const workloadId = params.workloadId as string;
     const vulnId = params.vulnId as string;
@@ -68,23 +70,25 @@ export default function WorkloadDetailPage() {
     );
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <div>{t("common.loading")}...</div>;
     }
 
     if (!workloadData || !vulnerabilityData) {
         return (
             <div style={{marginTop: "2rem"}}>
                 <Heading size="large" spacing>
-                    {!workloadData ? "Workload ikke funnet" : "Sårbarhet ikke funnet"}
+                    {!workloadData
+                        ? t("vulnerabilityDetail.workloadNotFound")
+                        : t("vulnerabilityDetail.vulnerabilityNotFound")}
                 </Heading>
                 <BodyShort>
-                    <Link href="/">Tilbake til forsiden</Link>
+                    <Link href="/">{t("vulnerabilityDetail.backToHome")}</Link>
                 </BodyShort>
             </div>
         );
     }
 
-    const riskFactors = getRiskFactors(vulnerabilityData);
+    const riskFactors = getRiskFactors(vulnerabilityData, (key: string) => t(key));
 
     const riscSumColorVariant = vulnerabilityData.riskScore >= 100
         ? "danger"
@@ -95,7 +99,7 @@ export default function WorkloadDetailPage() {
     return (
         <div style={{marginTop: "2rem", maxWidth: "800px"}}>
             <Link onClick={() => history.back()} href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
-                ← Tilbake
+                {t("vulnerabilityDetail.back")}
             </Link>
 
             {/* Vulnerability Header */}
@@ -118,7 +122,7 @@ export default function WorkloadDetailPage() {
                             }
                             size="medium"
                         >
-                            Risikoscore: {Math.round(vulnerabilityData.riskScore)}
+                            {t("vulnerabilityDetail.riskScoreLabel")} {Math.round(vulnerabilityData.riskScore)}
                         </Tag>
                     </HStack>
 
@@ -134,7 +138,7 @@ export default function WorkloadDetailPage() {
                                 ) : (
                                     <>
                                         {vulnerabilityData.description.split("\n", 8).join("\n")}
-                                        <ReadMore header="Se resten av beskrivelsen...">
+                                            <ReadMore header={t("vulnerabilityDetail.descriptionShowMore")}>
                                             {vulnerabilityData.description.split("\n").slice(8).join("\n")}
                                         </ReadMore>
                                     </>
@@ -144,7 +148,7 @@ export default function WorkloadDetailPage() {
 
                     <HStack gap="4" wrap>
                         <BodyShort size="small">
-                            <b>Pakke:</b> {vulnerabilityData.packageName}
+                            <b>{t("vulnerabilityDetail.package")}</b> {vulnerabilityData.packageName}
                         </BodyShort>
                         {vulnerabilityData.vulnerabilityDetailsLink && (
                             <DSLink
@@ -152,7 +156,7 @@ export default function WorkloadDetailPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Lenke til CVEen →
+                                {t("vulnerabilityDetail.cveLink")}
                             </DSLink>
                         )}
                     </HStack>
@@ -168,13 +172,13 @@ export default function WorkloadDetailPage() {
             >
                 <HStack gap="6" wrap>
                     <BodyShort size="small">
-                        <b>Applikasjon:</b> {workloadData.name}
+                        <b>{t("vulnerabilityDetail.application")}</b> {workloadData.name}
                     </BodyShort>
                     <BodyShort size="small">
-                        <b>Team:</b> {workloadData.team}
+                        <b>{t("vulnerabilityDetail.team")}</b> {workloadData.team}
                     </BodyShort>
                     <BodyShort size="small">
-                        <b>Miljø:</b> {workloadData.environment}
+                        <b>{t("vulnerabilityDetail.environment")}</b> {workloadData.environment}
                     </BodyShort>
                     {workloadData.repository && (
                         <DSLink
@@ -185,7 +189,7 @@ export default function WorkloadDetailPage() {
                         >
                             <HStack gap="1" align="center">
                                 <BranchingIcon aria-hidden/>
-                                GitHub
+                                {t("vulnerabilityDetail.github")}
                             </HStack>
                         </DSLink>
                     )}
@@ -198,7 +202,7 @@ export default function WorkloadDetailPage() {
                         >
                             <HStack gap="1" align="center">
                                 <CloudIcon aria-hidden/>
-                                Nais Console
+                                {t("vulnerabilityDetail.naisConsole")}
                             </HStack>
                         </DSLink>
                     )}
@@ -207,7 +211,7 @@ export default function WorkloadDetailPage() {
 
             {/* Risk Score Explanation */}
             <Heading size="medium" spacing>
-                Hvorfor denne risikoscoren?
+                {t("vulnerabilityDetail.riskScoreWhy")}
             </Heading>
 
             {/* Base Score Box */}
@@ -224,9 +228,9 @@ export default function WorkloadDetailPage() {
                     >
                         <HStack gap="4" align="center" justify="space-between">
                             <VStack gap="1">
-                                <BodyShort weight="semibold" size="large">Grunnrisiko (Base Score)</BodyShort>
+                                <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.baseScoreTitle")}</BodyShort>
                                 <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
-                                    Basert på CVE-alvorlighetsgrad (CVSS)
+                                    {t("vulnerabilityDetail.baseScoreDescription")}
                                 </BodyShort>
                             </VStack>
                             <Heading size="large" level="3">
@@ -291,7 +295,7 @@ export default function WorkloadDetailPage() {
                         </VStack>
                     ) : (
                         <Alert variant="info" style={{marginBottom: "1.5rem"}}>
-                            Ingen risikofaktorer er identifisert for denne sårbarheten.
+                            {t("vulnerabilityDetail.noRiskFactors")}
                         </Alert>
                     )}
                     <Box
@@ -305,9 +309,9 @@ export default function WorkloadDetailPage() {
                     >
                         <HStack gap="4" align="center" justify="space-between">
                             <VStack gap="1">
-                                <BodyShort weight="semibold" size="large">Risikoscore:</BodyShort>
+                                <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.riskScoreLabel")}</BodyShort>
                                 <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
-                                    Summert opp
+                                    {t("vulnerabilityDetail.riskScoreSummaryDescription")}
                                 </BodyShort>
                             </VStack>
                             <Heading size="large" level="3">

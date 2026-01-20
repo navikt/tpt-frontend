@@ -99,6 +99,26 @@
     "riskScoreHeading": "Risk Score",
     "riskScoreDescription": "Risikoskåren beregnes ved å ta hensyn til flere faktorer inkludert CVE severity, KEV-status, EPSS-skåre, ingress type, produksjonsmiljø og byggets alder. Høyere verdi betyr at det haster mer."
   },
+  "vulnerabilityDetail": {
+    "back": "← Tilbake",
+    "backToHome": "Tilbake til forsiden",
+    "workloadNotFound": "Workload ikke funnet",
+    "vulnerabilityNotFound": "Sårbarhet ikke funnet",
+    "riskScoreLabel": "Risikoskår:",
+    "riskScoreWhy": "Hvorfor denne risikoskåren?",
+    "baseScoreTitle": "Grunnrisiko (Base Score)",
+    "baseScoreDescription": "Basert på CVE-alvorlighetsgrad (CVSS)",
+    "riskScoreSummaryDescription": "Summert opp",
+    "package": "Pakke:",
+    "cveLink": "Lenke til CVE-en →",
+    "application": "Applikasjon:",
+    "team": "Team:",
+    "environment": "Miljø:",
+    "github": "GitHub",
+    "naisConsole": "Nais Console",
+    "descriptionShowMore": "Se resten av beskrivelsen...",
+    "noRiskFactors": "Ingen risikofaktorer er identifisert for denne sårbarheten."
+  },
   "vulnerabilitiesTable": {
     "team": "Team",
     "application": "Applikasjon",

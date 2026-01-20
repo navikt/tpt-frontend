@@ -99,6 +99,26 @@
     "riskScoreHeading": "Risk Score",
     "riskScoreDescription": "The risk score is calculated by taking into account multiple factors including CVE severity, KEV status, EPSS score, ingress type, production environment, and build age. Higher value means it's more urgent."
   },
+  "vulnerabilityDetail": {
+    "back": "← Back",
+    "backToHome": "Back to the front page",
+    "workloadNotFound": "Workload not found",
+    "vulnerabilityNotFound": "Vulnerability not found",
+    "riskScoreLabel": "Risk score:",
+    "riskScoreWhy": "Why this risk score?",
+    "baseScoreTitle": "Base Score",
+    "baseScoreDescription": "Based on CVE severity (CVSS)",
+    "riskScoreSummaryDescription": "Summarized",
+    "package": "Package:",
+    "cveLink": "Link to the CVE →",
+    "application": "Application:",
+    "team": "Team:",
+    "environment": "Environment:",
+    "github": "GitHub",
+    "naisConsole": "Nais Console",
+    "descriptionShowMore": "See the rest of the description...",
+    "noRiskFactors": "No risk factors are identified for this vulnerability."
+  },
   "vulnerabilitiesTable": {
     "team": "Team",
     "application": "Application",
