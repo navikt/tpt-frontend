@@ -10,6 +10,7 @@ RUN npm ci
 
 COPY next.config.ts tsconfig.json ./
 COPY src/ ./src/
+COPY messages/ ./messages/
 COPY public/ ./public/
 
 RUN npm run build
