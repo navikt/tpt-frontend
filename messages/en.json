@@ -24,7 +24,7 @@
   "buckets": {
     "highPriority": "High priority",
     "important": "Important",
-    "whenTime": "When you have time",
+    "whenTime": "When time permits",
     "lowPriority": "Low priority"
   },
   "summary": {

@@ -152,7 +152,7 @@ function getFactorName(name: string, translate?: (key: string) => string): strin
         case "build_age":
             return "Gammelt bygg";
         default:
-            console.error("getFactorName() unknown name: " + name)
+            console.error("getFactorName() unknown name: " + name);
             return name;
     }
 }
