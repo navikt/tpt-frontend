@@ -22,6 +22,12 @@ export default function LocaleLayout({
         >
           {t("header.allVulnerabilities")}
         </InternalHeader.Title>
+        <InternalHeader.Title
+          href="/github"
+          style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
+        >
+          {t("github.tab")}
+        </InternalHeader.Title>
         <Spacer />
         <LanguageSwitcher />
         {!isLoading && user && (

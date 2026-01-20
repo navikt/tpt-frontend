@@ -21,17 +21,23 @@ function getServerEnv() {
 
 export async function GET(request: NextRequest) {
   if (process.env.MOCKS_ENABLED === "true") {
+    console.log("mocks enabled - returning mock data for GitHub");
+    // For now, return the same mock data structure
+    // In production, this would be different data from the GitHub endpoint
     return NextResponse.json(mockVulnerabilitiesPayload);
   }
-
   try {
     const { tptBackendUrl } = getServerEnv();
+
+    // Check for bypassCache query parameter
     const { searchParams } = new URL(request.url);
-    const endpoint = searchParams.get("endpoint") || "vulnerabilities";
+    const bypassCache = searchParams.get("bypassCache") === "true";
 
     let backendToken: string;
 
+    // In local dev mode, create a mock token instead of using OBO flow
     if (isLocalDev()) {
+      console.log("Local dev mode enabled - using mock token");
       backendToken = createLocalDevToken();
     } else {
       const accessToken = getToken(request);
@@ -53,10 +59,9 @@ export async function GET(request: NextRequest) {
       backendToken = oboResult.token;
     }
 
-    // Support different endpoints via query parameter
-    const backendUrl = endpoint === "github" 
-      ? `${tptBackendUrl}/vulnerabilities/github/user`
-      : `${tptBackendUrl}/vulnerabilities/user`;
+    const backendUrl = bypassCache
+      ? `${tptBackendUrl}/vulnerabilities/github/user?bypassCache=true`
+      : `${tptBackendUrl}/vulnerabilities/github/user`;
 
     const response = await fetch(backendUrl, {
       headers: {
@@ -67,16 +72,15 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: "Failed to fetch from backend" },
+        { error: "Failed to fetch GitHub repositories" },
         { status: response.status }
       );
     }
 
     const data = await response.json();
     return NextResponse.json(data);
-
   } catch (error) {
-    console.error("Debug endpoint error:", error);
+    console.error("Internal server error: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

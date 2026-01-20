@@ -1,5 +1,5 @@
 "use client";
-import {Tag, BodyShort,} from "@navikt/ds-react";
+import {Tag} from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import {
     getRiskFactors,
@@ -11,11 +11,12 @@ import type {Vulnerability} from "@/app/types/vulnerabilities";
 const WorkloadRiskScoreTags = ({vuln}: {
     vuln: Vulnerability
 }) => {
-    const t = useTranslations();
+    const t = useTranslations("workload");
+    const rootT = useTranslations(); // Root-level translations for riskFactors
     const MAX_TAGS = 4;
     
     const riskFactors = getRiskFactors(vuln, (key: string) => {
-        return t(key);
+        return rootT(key);
     }).filter((factor: RiskFactor) => { return factor.name != "severity" });
     
     return (
@@ -55,9 +56,7 @@ const WorkloadRiskScoreTags = ({vuln}: {
                         );
                     })()}
                 </div>
-            ) : (
-                <BodyShort size="small">{t("calculationDataUnavailable")}</BodyShort>
-            )}
+            ) : null}
         </>
     );
 };
