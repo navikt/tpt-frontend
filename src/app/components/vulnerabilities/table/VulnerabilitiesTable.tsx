@@ -2,6 +2,7 @@
 import { VulnerabilitiesResponse } from "@/app/types/vulnerabilities";
 import { Table, Link } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import NextLink from "next/link";
 
 interface VulnerabilitiesTableProps {
@@ -20,6 +21,7 @@ const VulnerabilitiesTable = ({
   applicationFilters,
   cveFilters,
 }: VulnerabilitiesTableProps) => {
+  const t = useTranslations();
   const [sort, setSort] = useState<{
     orderBy: SortColumn;
     direction: SortDirection;
@@ -117,19 +119,19 @@ const VulnerabilitiesTable = ({
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader sortKey="team" sortable>
-            Team
+            {t("vulnerabilitiesTable.team")}
           </Table.ColumnHeader>
           <Table.ColumnHeader sortKey="workload" sortable>
-            Applikasjon
+            {t("vulnerabilitiesTable.application")}
           </Table.ColumnHeader>
           <Table.ColumnHeader sortKey="vulnerability" sortable>
-            Sårbarhet
+            {t("vulnerabilitiesTable.vulnerability")}
           </Table.ColumnHeader>
           <Table.ColumnHeader sortKey="riskScore" sortable>
-            Risikoscore
+            {t("vulnerabilitiesTable.riskScore")}
           </Table.ColumnHeader>
           <Table.ColumnHeader>
-            Lenker
+            {t("vulnerabilitiesTable.links")}
           </Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
@@ -155,7 +157,7 @@ const VulnerabilitiesTable = ({
               <Link
                   href={`/${row.workloadId}/${row.vulnerabilityId}`}
               >
-                Detaljer
+                {t("vulnerabilitiesTable.details")}
               </Link>
             </Table.DataCell>
           </Table.Row>

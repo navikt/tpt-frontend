@@ -2,6 +2,7 @@
 import { ActionMenu, Button, TextField } from "@navikt/ds-react";
 import { ChevronDownIcon } from "@navikt/aksel-icons";
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 type FilterActionMenuProps = {
   filterName: string;
@@ -19,6 +20,7 @@ const FilterActionMenu = ({
   style,
 }: FilterActionMenuProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const t = useTranslations("filter");
 
   const filteredOptions = useMemo(() => {
     if (!searchQuery) return filterOptions;
@@ -55,7 +57,7 @@ const FilterActionMenu = ({
               label=""
               hideLabel
               size="small"
-              placeholder={`Søk ${filterName.toLowerCase()}...`}
+              placeholder={t("searchPlaceholder", { filterName: filterName.toLowerCase() })}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -73,7 +75,7 @@ const FilterActionMenu = ({
               ))
             ) : (
               <div style={{ padding: "0.5rem", color: "#888" }}>
-                Ingen resultater
+                {t("noResults")}
               </div>
             )}
           </ActionMenu.Group>

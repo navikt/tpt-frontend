@@ -56,5 +56,58 @@
   "vulnerabilitiesPage": {
     "title": "Vulnerabilities",
     "description": "The table is based on all applications that have generated an SBOM for nais console, and are in a namespace you belong to."
+  },
+  "workload": {
+    "riskScore": "Risk score:",
+    "riskScoreCalculation": "Risk score calculation",
+    "fromCVE": "From CVE:",
+    "exposedIngress": "Exposed ingress:",
+    "kev": "KEV:",
+    "epss": "EPSS:",
+    "production": "In production:",
+    "oldBuild": "Old build:",
+    "daysSinceLastBuild": "Days since last build:",
+    "calculationDataUnavailable": "Calculation data not available",
+    "moreFactors": "+{count} more",
+    "explanationTitle": "Explanation of terms and risk scoring",
+    "kev": {
+      "heading": "KEV (Known Exploited Vulnerabilities)",
+      "description": "KEV is a list from CISA (Cybersecurity and Infrastructure Security Agency) of vulnerabilities that are actively exploited on the internet. KEV entries represent a real, documented threat."
+    },
+    "epss": {
+      "heading": "EPSS (Exploit Prediction Scoring System)",
+      "description": "EPSS is a data-driven system that calculates the probability that a vulnerability will be exploited within the next 30 days. A higher EPSS score indicates greater likelihood of active exploitation."
+    },
+    "ingressTypes": {
+      "heading": "Ingress Types",
+      "external": "External: The application is exposed to the internet without authentication. This provides the largest attack surface.",
+      "authenticated": "Authenticated: The application is exposed to the internet but requires authentication. This provides moderate increased risk.",
+      "internal": "Internal: The application is only available internally in the network. This provides normal risk.",
+      "unknown": "Unknown/None: No ingress is configured. This means the application is only available via service discovery."
+    },
+    "riskScoreHeading": "Risk Score",
+    "riskScoreDescription": "The risk score is calculated by taking into account multiple factors including CVE severity, KEV status, EPSS score, ingress type, production environment, and build age. Higher value means it's more urgent."
+  },
+  "vulnerabilitiesTable": {
+    "team": "Team",
+    "application": "Application",
+    "vulnerability": "Vulnerability",
+    "riskScore": "Risk Score",
+    "links": "Links",
+    "details": "Details"
+  },
+  "filter": {
+    "searchPlaceholder": "Search {filterName}...",
+    "noResults": "No results"
+  },
+  "riskFactors": {
+    "severity": "Severity",
+    "exposure": "Exposure",
+    "kev": "KEV (Known Exploited)",
+    "epss": "EPSS (Exploit Prediction)",
+    "exploit_reference": "Exploit code is publicly available",
+    "environment": "Production environment",
+    "patch_available": "Patch is available",
+    "build_age": "Old build"
   }
 }

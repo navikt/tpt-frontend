@@ -56,5 +56,58 @@
   "vulnerabilitiesPage": {
     "title": "Sårbarheter",
     "description": "Tabellen er basert på alle applikasjoner som har generert en SBOM for nais console, og som er i et namespace du tilhører."
+  },
+  "workload": {
+    "riskScore": "Risikoskår:",
+    "riskScoreCalculation": "Risk score utregning",
+    "fromCVE": "Fra CVE:",
+    "exposedIngress": "Eksponert ingress:",
+    "kev": "KEV:",
+    "epss": "EPSS:",
+    "production": "I produksjon:",
+    "oldBuild": "Gammelt bygg:",
+    "daysSinceLastBuild": "Dager siden sist bygg:",
+    "calculationDataUnavailable": "Beregningsdata ikke tilgjengelig",
+    "moreFactors": "+{count} flere",
+    "explanationTitle": "Forklaring av termer og risikoskåring",
+    "kev": {
+      "heading": "KEV (Known Exploited Vulnerabilities)",
+      "description": "KEV er en liste fra CISA (Cybersecurity and Infrastructure Security Agency) over sårbarheter som er aktivt utnyttet på nettet. KEV-oppføringer representerer en reell, dokumentert trussel."
+    },
+    "epss": {
+      "heading": "EPSS (Exploit Prediction Scoring System)",
+      "description": "EPSS er et datastyrt system som beregner sannsynligheten for at en sårbarhet vil bli utnyttet de neste 30 dagene. Høyere EPSS-verdi indikerer større sannsynlighet for aktiv utnyttelse."
+    },
+    "ingressTypes": {
+      "heading": "Ingress Types",
+      "external": "External: Applikasjonen er eksponert mot internett uten autentisering. Dette gir størst angrepsflate.",
+      "authenticated": "Authenticated: Applikasjonen er eksponert mot internett, men krever autentisering. Dette gir moderat økt risiko.",
+      "internal": "Internal: Applikasjonen er kun tilgjengelig internt i nettverket. Dette gir normal risiko.",
+      "unknown": "Unknown/None: Ingen ingress er konfigurert. Dette betyr at applikasjonen kun er tiljengelig via service discovery."
+    },
+    "riskScoreHeading": "Risk Score",
+    "riskScoreDescription": "Risikoskåren beregnes ved å ta hensyn til flere faktorer inkludert CVE severity, KEV-status, EPSS-skåre, ingress type, produksjonsmiljø og byggets alder. Høyere verdi betyr at det haster mer."
+  },
+  "vulnerabilitiesTable": {
+    "team": "Team",
+    "application": "Applikasjon",
+    "vulnerability": "Sårbarhet",
+    "riskScore": "Risikoskår",
+    "links": "Lenker",
+    "details": "Detaljer"
+  },
+  "filter": {
+    "searchPlaceholder": "Søk {filterName}...",
+    "noResults": "Ingen resultater"
+  },
+  "riskFactors": {
+    "severity": "Alvorlighetsgrad",
+    "exposure": "Eksponering",
+    "kev": "KEV (Known Exploited)",
+    "epss": "EPSS (Exploit Prediction)",
+    "exploit_reference": "Kode for utnyttelse er offentlig kjent",
+    "environment": "Produksjonsmiljø",
+    "patch_available": "Patch er tilgjengelig",
+    "build_age": "Gammelt bygg"
   }
 }

@@ -2,6 +2,25 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import WorkloadRiskScoreValue from '../WorkloadRiskScoreValue';
 
+// Mock next-intl to avoid ESM import issues in Jest
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      'riskScore': 'Risk score:',
+      'riskScoreCalculation': 'Risk score calculation',
+      'fromCVE': 'From CVE:',
+      'exposedIngress': 'Exposed ingress:',
+      'kev': 'KEV:',
+      'epss': 'EPSS:',
+      'production': 'In production:',
+      'oldBuild': 'Old build:',
+      'daysSinceLastBuild': 'Days since last build:',
+      'calculationDataUnavailable': 'Calculation data not available',
+    };
+    return translations[key] || key;
+  },
+}));
+
 describe('WorkloadRiskScoreValue', () => {
   const mockVulnHigh = {
     riskScore: 150,
@@ -57,9 +76,9 @@ describe('WorkloadRiskScoreValue', () => {
     await user.click(button);
 
     // Check that multiplier details are visible
-    expect(screen.getByText('Risk score utregning')).toBeInTheDocument();
-    expect(screen.getByText('Fra CVE:')).toBeInTheDocument();
-    expect(screen.getByText('Eksponert ingress:')).toBeInTheDocument();
+    expect(screen.getByText('Risk score calculation')).toBeInTheDocument();
+    expect(screen.getByText('From CVE:')).toBeInTheDocument();
+    expect(screen.getByText('Exposed ingress:')).toBeInTheDocument();
   });
 
   it('should handle missing multipliers gracefully', () => {

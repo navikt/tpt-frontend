@@ -1,5 +1,6 @@
 "use client";
 import { useRouter, usePathname } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { Select } from "@navikt/ds-react";
 import { useTransition } from "react";
@@ -16,10 +17,39 @@ export default function LanguageSwitcher() {
     { code: "en", flag: "🇬🇧", name: "English" },
   ];
 
+  const toLocalePath = (path: string, targetLocale: "nb" | "en") => {
+    const defaultLocale = routing.defaultLocale as "nb" | "en";
+
+    // Normalize path (ensure leading slash)
+    let normalized = path.startsWith("/") ? path : `/${path}`;
+
+    // Strip any existing locale prefix
+    for (const loc of routing.locales) {
+      const prefix = `/${loc}`;
+      if (normalized === prefix) {
+        normalized = "/";
+        break;
+      }
+      if (normalized.startsWith(`${prefix}/`)) {
+        normalized = normalized.slice(prefix.length);
+        break;
+      }
+    }
+
+    // Add new prefix unless default locale with "as-needed"
+    if (targetLocale === defaultLocale) {
+      return normalized;
+    }
+    return normalized === "/" ? `/${targetLocale}` : `/${targetLocale}${normalized}`;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = e.target.value as "nb" | "en";
+    const currentPath = typeof window !== "undefined" ? window.location.pathname : pathname;
+    const target = toLocalePath(currentPath, newLocale);
+
     startTransition(() => {
-      router.replace(pathname, { locale: newLocale });
+      router.replace(target);
     });
   };
 
