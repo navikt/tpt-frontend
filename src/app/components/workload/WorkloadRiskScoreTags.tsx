@@ -1,5 +1,6 @@
 "use client";
 import {Tag, BodyShort,} from "@navikt/ds-react";
+import { useTranslations } from "next-intl";
 import {
     getRiskFactors,
     getTagVariantFromSeverity,
@@ -10,9 +11,12 @@ import type {Vulnerability} from "@/app/types/vulnerabilities";
 const WorkloadRiskScoreTags = ({vuln}: {
     vuln: Vulnerability
 }) => {
+    const t = useTranslations();
     const MAX_TAGS = 4;
     
-    const riskFactors = getRiskFactors(vuln).filter((factor: RiskFactor) => { return factor.name != "severity" });
+    const riskFactors = getRiskFactors(vuln, (key: string) => {
+        return t(key);
+    }).filter((factor: RiskFactor) => { return factor.name != "severity" });
     
     return (
         <>
@@ -44,7 +48,7 @@ const WorkloadRiskScoreTags = ({vuln}: {
                                 {remainingCount > 0 && (
                                     <RiskScoreTag 
                                         variant="info"
-                                        text={`+${remainingCount} flere`}
+                                        text={t("moreFactors", { count: remainingCount })}
                                     />
                                 )}
                             </>
@@ -52,7 +56,7 @@ const WorkloadRiskScoreTags = ({vuln}: {
                     })()}
                 </div>
             ) : (
-                <BodyShort size="small">Beregningsdata ikke tilgjengelig</BodyShort>
+                <BodyShort size="small">{t("calculationDataUnavailable")}</BodyShort>
             )}
         </>
     );

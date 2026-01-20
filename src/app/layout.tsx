@@ -1,44 +1,21 @@
-"use client";
 import "./globals.css";
-import { Page } from "@navikt/ds-react";
-import { InternalHeader, GlobalAlert, Spacer } from "@navikt/ds-react";
-import { useUser } from "./hooks/useUser";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getLocale } from "next-intl/server";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, isLoading } = useUser();
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
-        <Page>
-          <InternalHeader>
-            <InternalHeader.Title href="/">Titt på Ting</InternalHeader.Title>
-            <InternalHeader.Title
-              href="/vulnerabilities"
-              style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
-            >
-              Alle sårbarheter
-            </InternalHeader.Title>
-            <Spacer />
-            {!isLoading && user && (
-              <InternalHeader.User name={user.email} description="" />
-            )}
-          </InternalHeader>
-          <GlobalAlert status="announcement">
-            <GlobalAlert.Header>
-              <GlobalAlert.Title>
-                TPT er under aktiv utvikling. Ting kan brekke plutselig! 🚧
-              </GlobalAlert.Title>
-            </GlobalAlert.Header>
-          </GlobalAlert>
-          <Page.Block as="main" width="lg" gutters>
-            {children}
-          </Page.Block>
-        </Page>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

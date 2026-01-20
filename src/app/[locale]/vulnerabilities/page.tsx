@@ -1,15 +1,18 @@
+"use client";
 import styles from "../page.module.css";
-import Vulnerabilities from "../components/vulnerabilities/Vulnerabilities";
+import Vulnerabilities from "../../components/vulnerabilities/Vulnerabilities";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
+  const t = useTranslations("vulnerabilitiesPage");
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.intro}>
-          <h1>Sårbarheter</h1>
+          <h1>{t("title")}</h1>
           <p>
-            Tabellen er basert på alle applikasjoner som har generert en SBOM
-            for nais console, og som er i et namespace du tilhører.
+            {t("description")}
           </p>
           <Vulnerabilities />
         </div>

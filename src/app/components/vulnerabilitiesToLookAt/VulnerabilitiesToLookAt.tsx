@@ -6,6 +6,7 @@ import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } fr
 import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
+import { useTranslations } from "next-intl";
 
 interface WorkloadWithVulns {
     workload: Workload;
@@ -22,6 +23,7 @@ interface VulnerabilitiesToLookAtProps {
 }
 
 const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams }: VulnerabilitiesToLookAtProps) => {
+    const t = useTranslations();
     const { data, isLoading } = useVulnerabilities();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
@@ -111,7 +113,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         return (
             <div style={{ marginTop: "1.5rem" }}>
                 <Heading size="small" spacing>{bucketName}</Heading>
-                <BodyShort>Laster sårbarheter...</BodyShort>
+                <BodyShort>{t("common.loading")} {t("common.vulnerabilities")}...</BodyShort>
             </div>
         );
     }
@@ -120,7 +122,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         return (
             <div style={{ marginTop: "1.5rem" }}>
                 <Heading size="small" spacing>{bucketName}</Heading>
-                <BodyShort>🙌 Ingen sårbarheter i denne kategorien! 🙌</BodyShort>
+                <BodyShort>{t("list.noVulnerabilities")}</BodyShort>
             </div>
         );
     }
@@ -129,7 +131,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         <div style={{ marginTop: "1.5rem" }}>
             <HStack justify="space-between" align="center" style={{ marginBottom: "1rem" }}>
                 <Heading size="small">
-                    {bucketName} ({totalVulnCount} i {workloadsWithVulns.length} applikasjoner)
+                    {bucketName} ({totalVulnCount} {t("common.in")} {workloadsWithVulns.length} {t("common.applications")})
                 </Heading>
                 <Button
                     variant="tertiary"
@@ -137,7 +139,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                     icon={Object.values(expandedItems).some(Boolean) ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
                     onClick={toggleAll}
                 >
-                    {Object.values(expandedItems).some(Boolean) ? "Lukk alle" : "Åpne alle"}
+                    {Object.values(expandedItems).some(Boolean) ? t("list.closeAll") : t("list.openAll")}
                 </Button>
             </HStack>
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -155,7 +157,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                     <Accordion.Header>
                                         <HStack gap="2" align="center" justify="space-between" style={{ width: "100%" }}>
                                             <span>
-                                                {workloadGroup.workload.name} ({workloadGroup.vulnerabilities.length} sårbarheter)
+                                                {workloadGroup.workload.name} ({workloadGroup.vulnerabilities.length} {t("common.vulnerabilities")})
                                             </span>
                                             <HStack gap="2" align="center">
                                                 {workloadGroup.workload.repository && (
@@ -197,7 +199,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                         .map(([packageName, vulnerabilities]) => (
                                             <div key={packageName} style={{ marginBottom: "1rem" }}>
                                                 <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
-                                                    {packageName} ({vulnerabilities.length} sårbarheter)
+                                                    {packageName} ({vulnerabilities.length} {t("common.vulnerabilities")})
                                                 </BodyShort>
                                                 {vulnerabilities.map((vuln, vulnIndex) => {
                                                     const maxDescriptionLength = 200;

@@ -13,7 +13,7 @@ export interface RiskFactor {
     severity: "high" | "medium" | "low" | "info";
 }
 
-export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
+export function getRiskFactors(vuln: Vulnerability, translate?: (key: string) => string): RiskFactor[] {
     const breakdown = vuln.riskScoreBreakdown;
 
     if (!breakdown?.factors) return [];
@@ -27,7 +27,7 @@ export function getRiskFactors(vuln: Vulnerability): RiskFactor[] {
             const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
 
             return {
-                name: getNorskNavn(factor.name),
+                name: getFactorName(factor.name, translate),
                 description: factor.explanation,
                 contribution: factor.contribution,
                 percentage: factor.percentage,
@@ -128,7 +128,12 @@ function getIcon(name: string) {
     }
 }
 
-function getNorskNavn(name: string) {
+function getFactorName(name: string, translate?: (key: string) => string): string {
+    if (translate) {
+        return translate(`riskFactors.${name}`);
+    }
+    
+    // Fallback to Norwegian for backwards compatibility
     switch (name) {
         case "severity":
             return "Alvorlighetsgrad";
@@ -147,7 +152,7 @@ function getNorskNavn(name: string) {
         case "build_age":
             return "Gammelt bygg";
         default:
-            console.error("getNorskNavn() unknown name: " + name)
+            console.error("getFactorName() unknown name: " + name);
             return name;
     }
 }

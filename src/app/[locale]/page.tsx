@@ -5,8 +5,10 @@ import VulnerabilitySummary, { BucketThreshold } from "@/app/components/vulnerab
 import { useConfig } from "@/app/hooks/useConfig";
 import { useVulnerabilities } from "@/app/hooks/useVulnerabilities";
 import { BodyShort, Loader, Box } from "@navikt/ds-react";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
+  const t = useTranslations();
   const { config, isLoading } = useConfig();
   const [selectedTeams, setSelectedTeams] = useState<string[] | undefined>(undefined);
   const { data: vulnData } = useVulnerabilities();
@@ -16,11 +18,11 @@ export default function Home() {
   const defaultBucket = useMemo<BucketThreshold | null>(() => {
     if (!config) return null;
     return {
-      name: "Superkritiske",
+      name: t("buckets.highPriority"),
       minThreshold: config.thresholds.high,
       maxThreshold: Number.MAX_VALUE,
     };
-  }, [config]);
+  }, [config, t]);
 
   const [selectedBucket, setSelectedBucket] = useState<BucketThreshold | null>(null);
 
@@ -33,17 +35,12 @@ export default function Home() {
       <div style={{ marginTop: "2rem" }}>
         <main>
           <div>
-            <h1>
-              Sårbarhetsprioritering som gir <i>mening</i>
-            </h1>
+            <h1 dangerouslySetInnerHTML={{ __html: t.raw("home.title") }} />
             <BodyShort spacing>
-              Titt på ting er et prioriteringsverktøy ment for å filtrere bort
-              støy og usikkerhet.
+              {t("home.description1")}
             </BodyShort>
             <BodyShort spacing>
-              Ikke alle sårbarheter er født like og vi har gjort jobben for med
-              deg å analysere og rangere de mest kritiske sårbarhetene i teamene
-              du tilhører. Sårbarhetslisten hentes fra Nais API.
+              {t("home.description2")}
             </BodyShort>
           </div>
           <Box
@@ -52,7 +49,7 @@ export default function Home() {
             background="surface-subtle"
             style={{ marginBottom: "1.5rem", textAlign: "center" }}
           >
-            <Loader size="large" title="Henter sårbarheter..." />
+            <Loader size="large" title={t("home.loadingVulnerabilities")} />
           </Box>
         </main>
       </div>
@@ -63,17 +60,12 @@ export default function Home() {
     <div style={{ marginTop: "2rem" }}>
       <main>
         <div>
-          <h1>
-            Sårbarhetsprioritering som gir <i>mening</i>
-          </h1>
+          <h1 dangerouslySetInnerHTML={{ __html: t.raw("home.title") }} />
           <BodyShort spacing>
-            Titt på ting er et prioriteringsverktøy ment for å filtrere bort
-            støy og usikkerhet.
+            {t("home.description1")}
           </BodyShort>
           <BodyShort spacing>
-            Ikke alle sårbarheter er født like og vi har gjort jobben for med
-            deg å analysere og rangere de mest kritiske sårbarhetene i teamene
-            du tilhører. Sårbarhetslisten hentes fra Nais API.
+            {t("home.description2")}
           </BodyShort>
         </div>
         <VulnerabilitySummary 

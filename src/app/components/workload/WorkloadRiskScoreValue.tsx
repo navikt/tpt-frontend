@@ -1,6 +1,7 @@
 "use client";
 import {Tag, Popover, Button, Table} from "@navikt/ds-react";
 import {useState} from "react";
+import { useTranslations } from "next-intl";
 
 interface VulnerabilityWithMultipliers {
     riskScore: number;
@@ -18,12 +19,13 @@ interface VulnerabilityWithMultipliers {
 const WorkloadRiskScoreValue = ({vuln}: {
     vuln: VulnerabilityWithMultipliers;
 }) => {
+    const t = useTranslations("workload");
     const [openState, setOpenState] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
     return (
         <>
-            <b>Risk score:</b>{" "}
+            <b>{t("riskScore")}</b>{" "}
             <Button
                 ref={(el) => setAnchorEl(el)}
                 onClick={() => setOpenState(!openState)}
@@ -51,40 +53,40 @@ const WorkloadRiskScoreValue = ({vuln}: {
                 placement="right"
             >
                 <Popover.Content>
-                    <b>Risk score utregning</b>
+                    <b>{t("riskScoreCalculation")}</b>
                     {vuln.riskScoreMultipliers ? (
                         <Table style={{fontSize: "0.875rem"}}>
                             <Table.Body>
                                 <Table.Row>
-                                    <Table.DataCell>Fra CVE:</Table.DataCell>
+                                    <Table.DataCell>{t("fromCVE")}</Table.DataCell>
                                     <Table.DataCell>{vuln.riskScoreMultipliers.severity}</Table.DataCell>
                                 </Table.Row>
                                 <Table.Row>
-                                    <Table.DataCell>Eksponert ingress:</Table.DataCell>
+                                    <Table.DataCell>{t("exposedIngress")}</Table.DataCell>
                                     <Table.DataCell>{vuln.riskScoreMultipliers.exposure}x</Table.DataCell>
                                 </Table.Row>
                                 <Table.Row>
-                                    <Table.DataCell>KEV:</Table.DataCell>
+                                    <Table.DataCell>{t("kev")}</Table.DataCell>
                                     <Table.DataCell>{vuln.riskScoreMultipliers.kev}x</Table.DataCell>
                                 </Table.Row>
                                 <Table.Row>
-                                    <Table.DataCell>EPSS:</Table.DataCell>
+                                    <Table.DataCell>{t("epss")}</Table.DataCell>
                                     <Table.DataCell>{vuln.riskScoreMultipliers.epss}x</Table.DataCell>
                                 </Table.Row>
                                 <Table.Row>
-                                    <Table.DataCell>I produksjon:</Table.DataCell>
+                                    <Table.DataCell>{t("production")}</Table.DataCell>
                                     <Table.DataCell>{vuln.riskScoreMultipliers.production}x</Table.DataCell>
                                 </Table.Row>
                                 <Table.Row>
-                                    <Table.DataCell>Gammelt bygg:</Table.DataCell>
+                                    <Table.DataCell>{t("oldBuild")}</Table.DataCell>
                                     <Table.DataCell>{vuln.riskScoreMultipliers.old_build}x{" "}
-                                        (Dager siden sist bygg:{" "}{vuln.riskScoreMultipliers.old_build_days})
+                                        ({t("daysSinceLastBuild")}{" "}{vuln.riskScoreMultipliers.old_build_days})
                                     </Table.DataCell>
                                 </Table.Row>
                             </Table.Body>
                         </Table>
                     ) : (
-                        ("Beregningsdata ikke tilgjengelig")
+                        (t("calculationDataUnavailable"))
                     )}
                 </Popover.Content>
             </Popover>
