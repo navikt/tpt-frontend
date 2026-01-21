@@ -1,9 +1,9 @@
 "use client";
 import { useState, useMemo } from "react";
-import VulnerabilitiesToLookAt from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitiesToLookAt";
-import VulnerabilitySummary, { BucketThreshold } from "@/app/components/vulnerabilitiesToLookAt/VulnerabilitySummary";
-import { useConfig } from "@/app/hooks/useConfig";
-import { useVulnerabilities } from "@/app/hooks/useVulnerabilities";
+import VulnerabilitiesToLookAt from "@/app/modules/vulnerabilities/components/VulnerabilitiesToLookAt";
+import VulnerabilitySummary, { BucketThreshold } from "@/app/modules/vulnerabilities/components/VulnerabilitySummary";
+import { useConfig } from "@/app/shared/hooks/useConfig";
+import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
 import { BodyShort, Loader, Box } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 

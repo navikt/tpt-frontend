@@ -9,7 +9,7 @@ import {
   BodyShort,
   Loader,
 } from "@navikt/ds-react";
-import { useVulnerabilities } from "../../hooks/useVulnerabilities";
+import { useVulnerabilities } from "../hooks/useVulnerabilities";
 import { useTranslations } from "next-intl";
 
 interface TeamFilterModalProps {

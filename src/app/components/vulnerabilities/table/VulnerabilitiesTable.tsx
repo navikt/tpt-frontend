@@ -1,5 +1,5 @@
 "use client";
-import { VulnerabilitiesResponse } from "@/app/types/vulnerabilities";
+import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import { Table, Link } from "@navikt/ds-react";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";

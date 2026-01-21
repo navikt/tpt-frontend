@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { useGitHubVulnerabilities } from "../../hooks/useGitHubVulnerabilities";
-import { Vulnerability } from "@/app/types/vulnerabilities";
-import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button } from "@navikt/ds-react";
-import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
+import { useGitHubVulnerabilities } from "../hooks/useGitHubVulnerabilities";
+import { Vulnerability } from "@/app/shared/types/vulnerabilities";
+import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
+import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { BucketThreshold } from "./GitHubVulnerabilitySummary";
@@ -161,58 +161,77 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                     </HStack>
                   </Accordion.Header>
                   <Accordion.Content>
-                    {/* Group vulnerabilities by package name */}
+                    {/* Group vulnerabilities by scope > ecosystem */}
                     {Object.entries(
                       repoGroup.vulnerabilities.reduce((acc, vuln) => {
-                        const packageName = vuln.packageName || "Unknown Package";
-                        if (!acc[packageName]) {
-                          acc[packageName] = [];
+                        const scope = vuln.dependencyScope || "Unknown Scope";
+                        const ecosystem = vuln.packageEcosystem || "Unknown Ecosystem";
+                        const key = `${scope}|||${ecosystem}`;
+                        if (!acc[key]) {
+                          acc[key] = [];
                         }
-                        acc[packageName].push(vuln);
+                        acc[key].push(vuln);
                         return acc;
                       }, {} as Record<string, Vulnerability[]>)
                     )
                     .sort((a, b) => b[1].length - a[1].length) // Sort by vulnerability count descending
-                    .map(([packageName, vulnerabilities]) => (
-                      <div key={packageName} style={{ marginBottom: "1rem" }}>
-                        <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
-                          {packageName} ({vulnerabilities.length} {t("common.vulnerabilities")})
-                        </BodyShort>
-                        {vulnerabilities.map((vuln, vulnIndex) => {
-                          const maxDescriptionLength = 200;
-                          const description = vuln.description 
-                            ? (vuln.description.replace(/\n/g, " ").length > maxDescriptionLength 
-                              ? vuln.description.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
-                              : vuln.description.replace(/\n/g, " "))
-                            : null;
-                          return (
-                            <LinkCard
-                              key={`${vuln.identifier}-${vulnIndex}`}
-                              style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
-                            >
-                              <LinkCard.Title>
-                                <HStack gap="2" align="center" justify="space-between" wrap>
-                                  <LinkCard.Anchor asChild>
-                                    <Link href={`/github/${encodeURIComponent(repoGroup.repository.name)}/${vuln.identifier}`}>
-                                      {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
-                                    </Link>
-                                  </LinkCard.Anchor>
-                                  <WorkloadRiskScoreTags 
-                                    vuln={vuln}
-                                  />
-                                </HStack>
-                              </LinkCard.Title>
+                    .map(([key, vulnerabilities]) => {
+                      const [scope, ecosystem] = key.split('|||');
+                      return (
+                        <div key={key} style={{ marginBottom: "1rem" }}>
+                          <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
+                            {scope} / {ecosystem} ({vulnerabilities.length} {t("common.vulnerabilities")})
+                          </BodyShort>
+                          {vulnerabilities.map((vuln, vulnIndex) => {
+                            const displayText = vuln.summary || vuln.description;
+                            const maxDescriptionLength = 200;
+                            const truncatedText = displayText 
+                              ? (displayText.replace(/\n/g, " ").length > maxDescriptionLength 
+                                ? displayText.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
+                                : displayText.replace(/\n/g, " "))
+                              : null;
+                            const isCritical = vuln.cvssScore && vuln.cvssScore >= 9.0;
+                            return (
+                              <LinkCard
+                                key={`${vuln.identifier}-${vulnIndex}`}
+                                style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
+                              >
+                                <LinkCard.Title>
+                                  <HStack gap="2" align="center" justify="space-between" wrap>
+                                    <LinkCard.Anchor asChild>
+                                      <Link href={`/github/${encodeURIComponent(repoGroup.repository.name)}/${vuln.identifier}`}>
+                                        {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""} ({vuln.packageName})
+                                      </Link>
+                                    </LinkCard.Anchor>
+                                    <HStack gap="2" align="center">
+                                      {isCritical && (
+                                        <Tag variant="error" size="small">
+                                          CVSS {vuln.cvssScore?.toFixed(1)}
+                                        </Tag>
+                                      )}
+                                      {vuln.dependabotUpdatePullRequestUrl && (
+                                        <Tag variant="success" size="small">
+                                          Fix available
+                                        </Tag>
+                                      )}
+                                      <WorkloadRiskScoreTags 
+                                        vuln={vuln}
+                                      />
+                                    </HStack>
+                                  </HStack>
+                                </LinkCard.Title>
 
-                              {description && (
-                                <LinkCard.Description>
-                                  {description}
-                                </LinkCard.Description>
-                              )}
-                            </LinkCard>
-                          );
-                        })}
-                      </div>
-                    ))}
+                                {truncatedText && (
+                                  <LinkCard.Description>
+                                    {truncatedText}
+                                  </LinkCard.Description>
+                                )}
+                              </LinkCard>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                   </Accordion.Content>
                 </Accordion.Item>
               </Accordion>

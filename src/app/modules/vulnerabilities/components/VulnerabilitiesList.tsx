@@ -1,6 +1,6 @@
-import {VulnerabilitiesResponse, Workload} from "@/app/types/vulnerabilities";
+import {VulnerabilitiesResponse, Workload} from "@/app/shared/types/vulnerabilities";
 import {Accordion, Link, LinkCard, Tag} from "@navikt/ds-react";
-import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
+import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 
 interface CompleteVulnerability {
     identifier: string;
