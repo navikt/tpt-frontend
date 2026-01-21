@@ -40,5 +40,8 @@ spec:
     logging:
       destinations:
         - id: loki
+  frontend:
+    generatedConfig:
+      mountPath: /app/public/nais.js
   envFrom:
     - secret: tpt-frontend
