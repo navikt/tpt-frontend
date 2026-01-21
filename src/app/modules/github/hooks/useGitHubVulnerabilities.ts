@@ -121,7 +121,7 @@ export const useGitHubVulnerabilities = () => {
     return (
       data?.teams
         .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
-        .flatMap((team) => team.repositories?.map((repo) => repo.name) || []) ||
+        .flatMap((team) => team.repositories?.map((repo) => repo.nameWithOwner) || []) ||
       []
     );
   }, [data, teamFilters]);
@@ -140,7 +140,7 @@ export const useGitHubVulnerabilities = () => {
               ?.filter(
                 (repo) =>
                   !hasRepositoryFilters ||
-                  repositoryFilters[repo.name] === true
+                  repositoryFilters[repo.nameWithOwner] === true
               )
               .flatMap((repo) =>
                 repo.vulnerabilities.map((vuln) => vuln.identifier)

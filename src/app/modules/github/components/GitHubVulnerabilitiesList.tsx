@@ -27,7 +27,7 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const toggleAll = () => {
-    const allIds = repositoriesWithVulns.map(r => r.repository.name);
+    const allIds = repositoriesWithVulns.map(r => r.repository.nameWithOwner);
     const hasAnyOpen = allIds.some(id => expandedItems[id]);
     
     if (hasAnyOpen) {
@@ -64,7 +64,7 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
         if (filteredVulns.length === 0) return;
         
         // Use repository name as the key
-        const key = repository.name;
+        const key = repository.nameWithOwner;
         
         if (repositoryMap.has(key)) {
           // Merge with existing repository
@@ -136,20 +136,20 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {repositoriesWithVulns.map((repoGroup) => {
           return (
-            <div key={repoGroup.repository.name}>
+            <div key={repoGroup.repository.nameWithOwner}>
               <Accordion>
                 <Accordion.Item 
-                  open={expandedItems[repoGroup.repository.name] || false}
-                  onOpenChange={() => toggleItem(repoGroup.repository.name)}
+                  open={expandedItems[repoGroup.repository.nameWithOwner] || false}
+                  onOpenChange={() => toggleItem(repoGroup.repository.nameWithOwner)}
                 >
                   <Accordion.Header>
                     <HStack gap="2" align="center" justify="space-between" style={{ width: "100%" }}>
                       <span>
-                        {repoGroup.repository.name} ({repoGroup.vulnerabilities.length} {t("common.vulnerabilities")})
+                        {repoGroup.repository.nameWithOwner} ({repoGroup.vulnerabilities.length} {t("common.vulnerabilities")})
                       </span>
                       <HStack gap="2" align="center">
                         <a
-                          href={`https://www.github.com/${repoGroup.repository.name}`}
+                          href={`https://www.github.com/${repoGroup.repository.nameWithOwner}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
@@ -199,7 +199,7 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                                 <LinkCard.Title>
                                   <HStack gap="2" align="center" justify="space-between" wrap>
                                     <LinkCard.Anchor asChild>
-                                      <Link href={`/github/${encodeURIComponent(repoGroup.repository.name)}/${vuln.identifier}`}>
+                                      <Link href={`/github/${encodeURIComponent(repoGroup.repository.nameWithOwner)}/${vuln.identifier}`}>
                                         {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""} ({vuln.packageName})
                                       </Link>
                                     </LinkCard.Anchor>

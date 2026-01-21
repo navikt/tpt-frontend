@@ -58,7 +58,7 @@ export default function GitHubVulnerabilityDetailPage() {
   interface TeamRepo {
     team: string;
     repo: {
-      name: string;
+      nameWithOwner: string;
       vulnerabilities: Vulnerability[];
     };
   }
@@ -67,7 +67,7 @@ export default function GitHubVulnerabilityDetailPage() {
   const teamAndRepo = data?.teams.reduce(
     (acc: TeamRepo | null, team) => {
       if (acc) return acc;
-      const repo = team.repositories?.find((r) => r.name === repository);
+      const repo = team.repositories?.find((r) => r.nameWithOwner === repository);
       return repo ? { team: team.team, repo } : null;
     },
     null

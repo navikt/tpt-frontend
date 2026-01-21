@@ -41,7 +41,7 @@ export interface Workload {
 }
 
 export interface Repository {
-  name: string;
+  nameWithOwner: string;
   vulnerabilities: Vulnerability[];
 }
 
