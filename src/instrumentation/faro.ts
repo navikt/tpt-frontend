@@ -1,53 +1,39 @@
-import { initializeFaro, getWebInstrumentations } from '@grafana/faro-web-sdk';
+import { initializeFaro, getWebInstrumentations, Faro } from '@grafana/faro-web-sdk';
 import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
-declare global {
-  interface Window {
-    naisConfig?: {
-      telemetryCollectorURL: string;
-      app: {
-        name: string;
-        version: string;
-      };
-    };
-  }
+let faro: Faro | null = null;
+
+export function initInstrumentation(): void {
+  if (typeof window === 'undefined' || faro !== null) return;
+
+  getFaro();
 }
 
-let faroInstance: ReturnType<typeof initializeFaro> | null = null;
-
-export function initFaro() {
-  if (typeof window === 'undefined' || faroInstance) {
-    return faroInstance;
+export function getFaro(): Faro | null {
+  if (faro !== null || typeof window === 'undefined') {
+    return faro;
   }
 
-  try {
-    // Wait for nais.js to load and set window.naisConfig
-    const checkConfig = () => {
-      if (window.naisConfig) {
-        faroInstance = initializeFaro({
-          url: window.naisConfig.telemetryCollectorURL,
-          app: window.naisConfig.app,
-          instrumentations: [
-            ...getWebInstrumentations({
-              captureConsole: true,
-            }),
-            new TracingInstrumentation(),
-          ],
-        });
-      } else {
-        // Retry after a short delay if config not loaded yet
-        setTimeout(checkConfig, 100);
-      }
-    };
+  const telemetryUrl = process.env.NEXT_PUBLIC_TELEMETRY_URL;
 
-    checkConfig();
-  } catch (error) {
-    console.warn('Failed to initialize Faro telemetry:', error);
+  if (!telemetryUrl) {
+    console.warn('NEXT_PUBLIC_TELEMETRY_URL is not set, Faro instrumentation will not be initialized');
+    return null;
   }
 
-  return faroInstance;
-}
+  faro = initializeFaro({
+    url: telemetryUrl,
+    app: {
+      name: 'tpt-frontend',
+      version: process.env.NEXT_PUBLIC_VERSION || 'unknown',
+    },
+    instrumentations: [
+      ...getWebInstrumentations({
+        captureConsole: true,
+      }),
+      new TracingInstrumentation(),
+    ],
+  });
 
-export function getFaro() {
-  return faroInstance;
+  return faro;
 }

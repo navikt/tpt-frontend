@@ -40,8 +40,8 @@ spec:
     logging:
       destinations:
         - id: loki
-  frontend:
-    generatedConfig:
-      mountPath: /app/public/nais.js
+  env:
+    - name: NEXT_PUBLIC_TELEMETRY_URL
+      value: https://telemetry.nav.no/collect
   envFrom:
     - secret: tpt-frontend

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { initFaro } from '@/instrumentation/faro';
+import { initInstrumentation } from '@/instrumentation/faro';
 
 export function FaroInitializer() {
   useEffect(() => {
-    initFaro();
+    initInstrumentation();
   }, []);
 
   return null;
