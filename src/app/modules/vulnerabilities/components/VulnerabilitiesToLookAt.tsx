@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { useVulnerabilities } from "../../hooks/useVulnerabilities";
-import { Vulnerability, Workload } from "@/app/types/vulnerabilities";
+import { useVulnerabilities } from "../hooks/useVulnerabilities";
+import { Vulnerability, Workload } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
-import WorkloadRiskScoreTags from "@/app/components/workload/WorkloadRiskScoreTags";
+import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
 import { useTranslations } from "next-intl";

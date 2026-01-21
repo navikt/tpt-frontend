@@ -1,21 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import styles from "../page.module.css";
-import GitHubVulnerabilitiesList from "../../components/github/GitHubVulnerabilitiesList";
-import GitHubVulnerabilitySummary, { BucketThreshold } from "../../components/github/GitHubVulnerabilitySummary";
-import { useGitHubVulnerabilities } from "../../hooks/useGitHubVulnerabilities";
+import GitHubVulnerabilitiesList from "../../modules/github/components/GitHubVulnerabilitiesList";
+import GitHubVulnerabilitySummary, { BucketThreshold } from "../../modules/github/components/GitHubVulnerabilitySummary";
+import { useGitHubVulnerabilities } from "../../modules/github/hooks/useGitHubVulnerabilities";
+import { useConfig } from "../../shared/hooks/useConfig";
 import { useTranslations } from "next-intl";
-import { Box, HStack, BodyShort } from "@navikt/ds-react";
+import { Box, HStack, BodyShort, Loader } from "@navikt/ds-react";
 
 export default function GitHubPage() {
   const t = useTranslations();
   const { data } = useGitHubVulnerabilities();
-  const [selectedBucket, setSelectedBucket] = useState<BucketThreshold>({
-    name: t("buckets.highPriority"),
-    minThreshold: 150,
-    maxThreshold: Number.MAX_VALUE,
-  });
+  const { config, isLoading } = useConfig();
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  
+  // Create default bucket from config
+  const defaultBucket = useMemo<BucketThreshold | null>(() => {
+    if (!config) return null;
+    return {
+      name: t("buckets.highPriority"),
+      minThreshold: config.thresholds.high,
+      maxThreshold: Number.MAX_VALUE,
+    };
+  }, [config, t]);
+
+  const [selectedBucket, setSelectedBucket] = useState<BucketThreshold | null>(null);
+
+  // Use defaultBucket if no bucket is selected
+  const activeBucket = selectedBucket || defaultBucket;
 
   // Calculate metadata
   const totalTeams = data?.teams.length || 0;
@@ -27,6 +39,28 @@ export default function GitHubPage() {
     team: team.team,
     repos: team.repositories?.length || 0,
   })) || [];
+
+  // Show loading state while config is loading
+  if (isLoading || !activeBucket) {
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <div className={styles.intro}>
+            <h1>{t("github.tab")}</h1>
+            <p>{t("github.pageDescription")}</p>
+            <Box
+              padding="6"
+              borderRadius="medium"
+              background="surface-subtle"
+              style={{ marginBottom: "1.5rem", textAlign: "center" }}
+            >
+              <Loader size="large" title={t("home.loadingVulnerabilities")} />
+            </Box>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -79,13 +113,13 @@ export default function GitHubPage() {
           </Box>
 
           <GitHubVulnerabilitySummary
-            selectedBucket={selectedBucket}
+            selectedBucket={activeBucket}
             onBucketSelect={setSelectedBucket}
             selectedTeams={selectedTeams}
             onTeamsChange={setSelectedTeams}
           />
           <GitHubVulnerabilitiesList
-            selectedBucket={selectedBucket}
+            selectedBucket={activeBucket}
             selectedTeams={selectedTeams}
           />
         </div>

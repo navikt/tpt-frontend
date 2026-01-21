@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useConfig } from '../useConfig';
+import { useConfig } from '../../shared/hooks/useConfig';
 
 // Mock the global fetch
 global.fetch = jest.fn();

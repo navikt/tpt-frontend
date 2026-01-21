@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useGitHubVulnerabilities } from "@/app/hooks/useGitHubVulnerabilities";
-import { Vulnerability } from "@/app/types/vulnerabilities";
+import { useGitHubVulnerabilities } from "@/app/modules/github/hooks/useGitHubVulnerabilities";
+import { Vulnerability } from "@/app/shared/types/vulnerabilities";
 import Link from "next/link";
 import {
   Heading,
@@ -28,7 +28,7 @@ import {
   getSeverityColor,
   getSeverityIconColor,
   RiskFactor,
-} from "@/app/utils/riskFactors";
+} from "@/app/shared/utils/riskFactors";
 import { useTranslations } from "next-intl";
 
 function getIconForFactor(iconName: string): React.ReactNode {
@@ -171,6 +171,15 @@ export default function GitHubVulnerabilityDetailPage() {
                 rel="noopener noreferrer"
               >
                 Link to CVE →
+              </DSLink>
+            )}
+            {vulnerability.dependabotUpdatePullRequestUrl && (
+              <DSLink
+                href={vulnerability.dependabotUpdatePullRequestUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Dependabot fix available →
               </DSLink>
             )}
           </HStack>

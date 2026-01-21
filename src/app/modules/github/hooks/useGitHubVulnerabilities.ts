@@ -1,74 +1,32 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { VulnerabilitiesResponse } from "@/app/types/vulnerabilities";
+import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
+import {
+  getStoredNumber,
+  setStoredNumber,
+  getStoredJSON,
+  setStoredJSON,
+} from "@/app/shared/utils/storageHelpers";
 
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
-const LAST_REFRESH_STORAGE_KEY = "tpt-last-refresh-time";
-const VULNERABILITIES_STORAGE_KEY = "tpt-vulnerabilities-data";
-const CACHE_TIMESTAMP_STORAGE_KEY = "tpt-cache-timestamp";
-
-// Helper to get last refresh time from localStorage
-const getStoredLastRefreshTime = (): number | null => {
-  if (typeof window === "undefined") return null;
-  const stored = localStorage.getItem(LAST_REFRESH_STORAGE_KEY);
-  return stored ? parseInt(stored, 10) : null;
-};
-
-// Helper to store last refresh time in localStorage
-const setStoredLastRefreshTime = (time: number) => {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(LAST_REFRESH_STORAGE_KEY, time.toString());
-};
-
-// Helper to get cache timestamp from localStorage
-const getStoredCacheTimestamp = (): number | null => {
-  if (typeof window === "undefined") return null;
-  const stored = localStorage.getItem(CACHE_TIMESTAMP_STORAGE_KEY);
-  return stored ? parseInt(stored, 10) : null;
-};
-
-// Helper to store cache timestamp in localStorage
-const setStoredCacheTimestamp = (time: number) => {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(CACHE_TIMESTAMP_STORAGE_KEY, time.toString());
-};
-
-// Helper to get cached vulnerabilities data from localStorage
-const getStoredVulnerabilities = (): VulnerabilitiesResponse | null => {
-  if (typeof window === "undefined") return null;
-  try {
-    const stored = localStorage.getItem(VULNERABILITIES_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch {
-    return null;
-  }
-};
-
-// Helper to store vulnerabilities data in localStorage
-const setStoredVulnerabilities = (data: VulnerabilitiesResponse) => {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(VULNERABILITIES_STORAGE_KEY, JSON.stringify(data));
-    setStoredCacheTimestamp(Date.now());
-  } catch (error) {
-    console.warn("Failed to cache vulnerabilities data:", error);
-  }
-};
+const LAST_REFRESH_STORAGE_KEY = "tpt-last-refresh-github";
+const VULNERABILITIES_STORAGE_KEY = "tpt-github-vulnerabilities-data";
+const CACHE_TIMESTAMP_STORAGE_KEY = "tpt-github-cache-timestamp";
 
 // Check if cache is expired (older than 30 minutes)
 const isCacheExpired = (): boolean => {
-  const cacheTimestamp = getStoredCacheTimestamp();
+  const cacheTimestamp = getStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY);
   if (!cacheTimestamp) return true;
   return Date.now() - cacheTimestamp > CACHE_MAX_AGE_MS;
 };
 
-export const useVulnerabilities = () => {
+export const useGitHubVulnerabilities = () => {
   const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
   const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
-  const [applicationFilters, setApplicationFilters] = useState<
+  const [repositoryFilters, setRepositoryFilters] = useState<
     Record<string, boolean>
   >({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
@@ -76,12 +34,12 @@ export const useVulnerabilities = () => {
 
   // Load cached data and last refresh time from localStorage on mount
   useEffect(() => {
-    const storedTime = getStoredLastRefreshTime();
+    const storedTime = getStoredNumber(LAST_REFRESH_STORAGE_KEY);
     if (storedTime) {
       setLastRefreshTime(storedTime);
     }
     
-    const cachedData = getStoredVulnerabilities();
+    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
     if (cachedData && !isCacheExpired()) {
       setData(cachedData);
     }
@@ -94,24 +52,25 @@ export const useVulnerabilities = () => {
       } else {
         setIsLoading(true);
       }
-      const url = bypassCache ? "/api/applications?bypassCache=true" : "/api/applications";
+      const url = bypassCache ? "/api/github?bypassCache=true" : "/api/github";
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const responseData: VulnerabilitiesResponse = await response.json();
       setData(responseData);
-      setStoredVulnerabilities(responseData);
+      setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
+      setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
       setTeamFilters({});
-      setApplicationFilters({});
+      setRepositoryFilters({});
       setCveFilters({});
       if (bypassCache) {
         const now = Date.now();
         setLastRefreshTime(now);
-        setStoredLastRefreshTime(now);
+        setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
       }
     } catch (error) {
-      console.error("Error fetching applications data:", error);
+      console.error("Error fetching GitHub vulnerabilities data:", error);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -120,7 +79,7 @@ export const useVulnerabilities = () => {
 
   const refresh = useCallback(() => {
     const now = Date.now();
-    const storedTime = getStoredLastRefreshTime();
+    const storedTime = getStoredNumber(LAST_REFRESH_STORAGE_KEY);
     if (storedTime && now - storedTime < REFRESH_COOLDOWN_MS) {
       return false; // Cooldown not elapsed
     }
@@ -139,7 +98,7 @@ export const useVulnerabilities = () => {
     return Math.max(0, REFRESH_COOLDOWN_MS - elapsed);
   }, [lastRefreshTime]);
 
-  useEffect(function fetchVulnerabilitiesEffect() {
+  useEffect(function fetchGitHubVulnerabilitiesEffect() {
     // Skip if already fetched in this session
     if (hasFetchedRef.current) return;
     
@@ -157,19 +116,19 @@ export const useVulnerabilities = () => {
     [data]
   );
 
-  const availableApplications = useMemo(() => {
+  const availableRepositories = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
     return (
       data?.teams
         .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
-        .flatMap((team) => team.workloads.map((workload) => workload.name)) ||
+        .flatMap((team) => team.repositories?.map((repo) => repo.name) || []) ||
       []
     );
   }, [data, teamFilters]);
 
   const availableCves = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
-    const hasApplicationFilters = Object.values(applicationFilters).some(
+    const hasRepositoryFilters = Object.values(repositoryFilters).some(
       (v) => v === true
     );
     return Array.from(
@@ -177,42 +136,42 @@ export const useVulnerabilities = () => {
         data?.teams
           .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
           .flatMap((team) =>
-            team.workloads
-              .filter(
-                (workload) =>
-                  !hasApplicationFilters ||
-                  applicationFilters[workload.name] === true
+            team.repositories
+              ?.filter(
+                (repo) =>
+                  !hasRepositoryFilters ||
+                  repositoryFilters[repo.name] === true
               )
-              .flatMap((workload) =>
-                workload.vulnerabilities.map((vuln) => vuln.identifier)
-              )
+              .flatMap((repo) =>
+                repo.vulnerabilities.map((vuln) => vuln.identifier)
+              ) || []
           ) || []
       )
     );
-  }, [data, teamFilters, applicationFilters]);
+  }, [data, teamFilters, repositoryFilters]);
 
   useEffect(
-    function cleanupApplicationFilters() {
+    function cleanupRepositoryFilters() {
       if (!data) return;
 
-      const validApplications = new Set(availableApplications);
-      const currentApplications = Object.keys(applicationFilters).filter(
-        (app) => applicationFilters[app] === true
+      const validRepositories = new Set(availableRepositories);
+      const currentRepositories = Object.keys(repositoryFilters).filter(
+        (repo) => repositoryFilters[repo] === true
       );
-      const hasInvalidApps = currentApplications.some(
-        (app) => !validApplications.has(app)
+      const hasInvalidRepos = currentRepositories.some(
+        (repo) => !validRepositories.has(repo)
       );
 
-      if (hasInvalidApps) {
+      if (hasInvalidRepos) {
         const cleanedFilters = Object.fromEntries(
-          Object.entries(applicationFilters).filter(([app]) =>
-            validApplications.has(app)
+          Object.entries(repositoryFilters).filter(([repo]) =>
+            validRepositories.has(repo)
           )
         );
-        setApplicationFilters(cleanedFilters);
+        setRepositoryFilters(cleanedFilters);
       }
     },
-    [availableApplications, teamFilters, data, applicationFilters]
+    [availableRepositories, teamFilters, data, repositoryFilters]
   );
 
   useEffect(
@@ -232,7 +191,7 @@ export const useVulnerabilities = () => {
         setCveFilters(cleanedFilters);
       }
     },
-    [availableCves, teamFilters, applicationFilters, data, cveFilters]
+    [availableCves, teamFilters, repositoryFilters, data, cveFilters]
   );
 
   return {
@@ -244,12 +203,12 @@ export const useVulnerabilities = () => {
     timeUntilRefresh,
     teamFilters,
     setTeamFilters,
-    applicationFilters,
-    setApplicationFilters,
+    repositoryFilters,
+    setRepositoryFilters,
     cveFilters,
     setCveFilters,
     allTeams,
-    availableApplications,
+    availableRepositories,
     availableCves,
   };
 };

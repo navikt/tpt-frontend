@@ -1,5 +1,5 @@
 "use client";
-import {useVulnerabilities} from "../../../hooks/useVulnerabilities";
+import {useVulnerabilities} from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
 import {useParams} from "next/navigation";
 import {
     Heading,
@@ -27,7 +27,7 @@ import {
     getRiskFactors,
     getSeverityColor,
     getSeverityIconColor
-} from "../../../utils/riskFactors";
+} from "@/app/shared/utils/riskFactors";
 import {useTranslations} from "next-intl";
 
 function getIconForFactor(iconName: string): React.ReactNode {

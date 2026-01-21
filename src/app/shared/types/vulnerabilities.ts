@@ -17,10 +17,16 @@ export interface Vulnerability {
   identifier: string;
   name?: string;
   packageName: string;
+  packageEcosystem?: string;
   description?: string;
+  summary?: string;
   vulnerabilityDetailsLink?: string;
   riskScore: number;
   riskScoreBreakdown?: RiskScoreBreakdown;
+  dependencyScope?: string;
+  dependabotUpdatePullRequestUrl?: string;
+  publishedAt?: string;
+  cvssScore?: number;
 }
 
 export interface Workload {
@@ -46,5 +52,6 @@ export interface Team {
 }
 
 export interface VulnerabilitiesResponse {
+  userRole?: string;
   teams: Team[];
 }
