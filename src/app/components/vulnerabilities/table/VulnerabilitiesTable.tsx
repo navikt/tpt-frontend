@@ -10,6 +10,7 @@ interface VulnerabilitiesTableProps {
   teamFilters: Record<string, boolean>;
   applicationFilters: Record<string, boolean>;
   cveFilters: Record<string, boolean>;
+  packageNameFilters: Record<string, boolean>;
 }
 
 type SortColumn = "team" | "workload" | "vulnerability" | "riskScore";
@@ -20,6 +21,7 @@ const VulnerabilitiesTable = ({
   teamFilters,
   applicationFilters,
   cveFilters,
+  packageNameFilters,
 }: VulnerabilitiesTableProps) => {
   const t = useTranslations();
   const [sort, setSort] = useState<{
@@ -46,8 +48,8 @@ const VulnerabilitiesTable = ({
       workload: string;
       workloadId: string;
       vulnerabilityId: string;
-      ingressTypes: string[] | undefined;
       vulnerability: string;
+      packageName: string;
       riskScore: number;
     }> = [];
 
@@ -57,6 +59,9 @@ const VulnerabilitiesTable = ({
       (v) => v
     );
     const hasCveFilters = Object.values(cveFilters).some((v) => v);
+    const hasPackageNameFilters = Object.values(packageNameFilters).some(
+      (v) => v
+    );
 
     data?.teams.forEach((team) => {
       // Show team if no team filters OR team is selected
@@ -69,17 +74,20 @@ const VulnerabilitiesTable = ({
           ) {
             workload.vulnerabilities.forEach((vulnerability) => {
               // Show CVE if no CVE filters OR CVE is selected
+              // Show package if no package filters OR package is selected
               if (
-                !hasCveFilters ||
-                cveFilters[vulnerability.identifier]
+                (!hasCveFilters ||
+                  cveFilters[vulnerability.identifier]) &&
+                (!hasPackageNameFilters ||
+                  packageNameFilters[vulnerability.packageName])
               ) {
                 rows.push({
                   team: team.team,
                   workload: workload.name,
                   workloadId: workload.id,
                   vulnerabilityId: vulnerability.identifier,
-                  ingressTypes: workload.ingressTypes,
                   vulnerability: vulnerability.identifier,
+                  packageName: vulnerability.packageName,
                   riskScore: vulnerability.riskScore,
                 });
               }
@@ -90,7 +98,7 @@ const VulnerabilitiesTable = ({
     });
 
     return rows;
-  }, [data, teamFilters, applicationFilters, cveFilters]);
+  }, [data, teamFilters, applicationFilters, cveFilters, packageNameFilters]);
 
   const sortedRows = useMemo(() => {
     if (sort.direction === "none") return tableRows;

@@ -129,7 +129,8 @@
   },
   "filter": {
     "searchPlaceholder": "Search {filterName}...",
-    "noResults": "No results"
+    "noResults": "No results",
+    "showingLimited": "Showing {showing} of {total}. Search to narrow down."
   },
   "riskFactors": {
     "severity": "Severity",

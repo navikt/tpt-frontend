@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import VulnerabilitiesToLookAt from "@/app/modules/vulnerabilities/components/VulnerabilitiesToLookAt";
 import VulnerabilitySummary, { BucketThreshold } from "@/app/modules/vulnerabilities/components/VulnerabilitySummary";
 import { useConfig } from "@/app/shared/hooks/useConfig";
@@ -10,9 +10,22 @@ import { useTranslations } from "next-intl";
 export default function Home() {
   const t = useTranslations();
   const { config, isLoading } = useConfig();
-  const [selectedTeams, setSelectedTeams] = useState<string[] | undefined>(undefined);
-  const { data: vulnData } = useVulnerabilities();
-  const effectiveSelectedTeams: string[] = selectedTeams ?? (vulnData?.teams ? Array.from(new Set(vulnData.teams.map((t) => t.team))) : []);
+  const { data: vulnData, teamFilters, setTeamFilters } = useVulnerabilities();
+  
+  // Compute selected teams from teamFilters
+  const selectedTeams = useMemo(() => {
+    const filtered = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
+    // If no filters are set, show all teams
+    if (filtered.length === 0 && vulnData?.teams) {
+      return Array.from(new Set(vulnData.teams.map((t) => t.team)));
+    }
+    return filtered;
+  }, [teamFilters, vulnData]);
+
+  const handleTeamsChange = (teams: string[]) => {
+    const newFilters = Object.fromEntries(teams.map(team => [team, true]));
+    setTeamFilters(newFilters);
+  };
   
   // Create default bucket from config
   const defaultBucket = useMemo<BucketThreshold | null>(() => {
@@ -71,14 +84,14 @@ export default function Home() {
         <VulnerabilitySummary 
           selectedBucket={activeBucket} 
           onBucketSelect={setSelectedBucket}
-          selectedTeams={effectiveSelectedTeams}
-          onTeamsChange={setSelectedTeams}
+          selectedTeams={selectedTeams}
+          onTeamsChange={handleTeamsChange}
         />
         <VulnerabilitiesToLookAt 
           bucketName={activeBucket.name}
           minThreshold={activeBucket.minThreshold}
           maxThreshold={activeBucket.maxThreshold}
-          selectedTeams={effectiveSelectedTeams}
+          selectedTeams={selectedTeams}
         />
       </main>
     </div>

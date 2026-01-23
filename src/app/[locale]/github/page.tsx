@@ -10,9 +10,23 @@ import { Box, HStack, BodyShort, Loader } from "@navikt/ds-react";
 
 export default function GitHubPage() {
   const t = useTranslations();
-  const { data } = useGitHubVulnerabilities();
+  const { data, teamFilters, setTeamFilters } = useGitHubVulnerabilities();
   const { config, isLoading } = useConfig();
-  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  
+  // Compute selected teams from teamFilters
+  const selectedTeams = useMemo(() => {
+    const filtered = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
+    // If no filters are set, show all teams
+    if (filtered.length === 0 && data?.teams) {
+      return Array.from(new Set(data.teams.map((t) => t.team)));
+    }
+    return filtered;
+  }, [teamFilters, data]);
+
+  const handleTeamsChange = (teams: string[]) => {
+    const newFilters = Object.fromEntries(teams.map(team => [team, true]));
+    setTeamFilters(newFilters);
+  };
   
   // Create default bucket from config
   const defaultBucket = useMemo<BucketThreshold | null>(() => {
@@ -116,7 +130,7 @@ export default function GitHubPage() {
             selectedBucket={activeBucket}
             onBucketSelect={setSelectedBucket}
             selectedTeams={selectedTeams}
-            onTeamsChange={setSelectedTeams}
+            onTeamsChange={handleTeamsChange}
           />
           <GitHubVulnerabilitiesList
             selectedBucket={activeBucket}

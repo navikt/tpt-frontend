@@ -12,6 +12,7 @@ const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 const LAST_REFRESH_STORAGE_KEY = "tpt-last-refresh-github";
 const VULNERABILITIES_STORAGE_KEY = "tpt-github-vulnerabilities-data";
 const CACHE_TIMESTAMP_STORAGE_KEY = "tpt-github-cache-timestamp";
+const TEAM_PREFERENCES_KEY = "tpt-github-team-preferences";
 
 // Check if cache is expired (older than 30 minutes)
 const isCacheExpired = (): boolean => {
@@ -42,6 +43,13 @@ export const useGitHubVulnerabilities = () => {
     const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
     if (cachedData && !isCacheExpired()) {
       setData(cachedData);
+    }
+
+    // Load saved team preferences for GitHub
+    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
+    if (savedTeams && Array.isArray(savedTeams)) {
+      const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
+      setTeamFilters(teamFiltersObj);
     }
   }, []);
 
@@ -115,6 +123,12 @@ export const useGitHubVulnerabilities = () => {
     () => data?.teams.map((team) => team.team) || [],
     [data]
   );
+
+  // Persist team filters to localStorage when they change
+  useEffect(() => {
+    const selectedTeams = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
+    setStoredJSON(TEAM_PREFERENCES_KEY, selectedTeams);
+  }, [teamFilters]);
 
   const availableRepositories = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);

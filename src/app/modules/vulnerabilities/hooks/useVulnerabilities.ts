@@ -5,6 +5,7 @@ import {
   setStoredNumber,
   getStoredJSON,
   setStoredJSON,
+  TEAM_PREFERENCES_KEY,
 } from "@/app/shared/utils/storageHelpers";
 
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
@@ -30,6 +31,9 @@ export const useVulnerabilities = () => {
     Record<string, boolean>
   >({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
+  const [packageNameFilters, setPackageNameFilters] = useState<
+    Record<string, boolean>
+  >({});
   const hasFetchedRef = useRef(false);
 
   // Load cached data and last refresh time from localStorage on mount
@@ -42,6 +46,13 @@ export const useVulnerabilities = () => {
     const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
     if (cachedData && !isCacheExpired()) {
       setData(cachedData);
+    }
+
+    // Load saved team preferences
+    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
+    if (savedTeams && Array.isArray(savedTeams)) {
+      const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
+      setTeamFilters(teamFiltersObj);
     }
   }, []);
 
@@ -64,6 +75,7 @@ export const useVulnerabilities = () => {
       setTeamFilters({});
       setApplicationFilters({});
       setCveFilters({});
+      setPackageNameFilters({});
       if (bypassCache) {
         const now = Date.now();
         setLastRefreshTime(now);
@@ -116,6 +128,12 @@ export const useVulnerabilities = () => {
     [data]
   );
 
+  // Persist team filters to localStorage when they change
+  useEffect(() => {
+    const selectedTeams = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
+    setStoredJSON(TEAM_PREFERENCES_KEY, selectedTeams);
+  }, [teamFilters]);
+
   const availableApplications = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
     return (
@@ -149,6 +167,36 @@ export const useVulnerabilities = () => {
       )
     );
   }, [data, teamFilters, applicationFilters]);
+
+  const availablePackageNames = useMemo(() => {
+    const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
+    const hasApplicationFilters = Object.values(applicationFilters).some(
+      (v) => v === true
+    );
+    const hasCveFilters = Object.values(cveFilters).some((v) => v === true);
+    return Array.from(
+      new Set(
+        data?.teams
+          .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
+          .flatMap((team) =>
+            team.workloads
+              .filter(
+                (workload) =>
+                  !hasApplicationFilters ||
+                  applicationFilters[workload.name] === true
+              )
+              .flatMap((workload) =>
+                workload.vulnerabilities
+                  .filter(
+                    (vuln) =>
+                      !hasCveFilters || cveFilters[vuln.identifier] === true
+                  )
+                  .map((vuln) => vuln.packageName)
+              )
+          ) || []
+      )
+    );
+  }, [data, teamFilters, applicationFilters, cveFilters]);
 
   useEffect(
     function cleanupApplicationFilters() {
@@ -194,6 +242,30 @@ export const useVulnerabilities = () => {
     [availableCves, teamFilters, applicationFilters, data, cveFilters]
   );
 
+  useEffect(
+    function cleanupPackageNameFilters() {
+      if (!data) return;
+
+      const validPackageNames = new Set(availablePackageNames);
+      const currentPackageNames = Object.keys(packageNameFilters).filter(
+        (pkg) => packageNameFilters[pkg] === true
+      );
+      const hasInvalidPackages = currentPackageNames.some(
+        (pkg) => !validPackageNames.has(pkg)
+      );
+
+      if (hasInvalidPackages) {
+        const cleanedFilters = Object.fromEntries(
+          Object.entries(packageNameFilters).filter(([pkg]) =>
+            validPackageNames.has(pkg)
+          )
+        );
+        setPackageNameFilters(cleanedFilters);
+      }
+    },
+    [availablePackageNames, teamFilters, applicationFilters, cveFilters, data, packageNameFilters]
+  );
+
   return {
     data,
     isLoading,
@@ -210,5 +282,8 @@ export const useVulnerabilities = () => {
     allTeams,
     availableApplications,
     availableCves,
+    packageNameFilters,
+    setPackageNameFilters,
+    availablePackageNames,
   };
 };

@@ -129,7 +129,8 @@
   },
   "filter": {
     "searchPlaceholder": "Søk {filterName}...",
-    "noResults": "Ingen resultater"
+    "noResults": "Ingen resultater",
+    "showingLimited": "Viser {showing} av {total}. Søk for å begrense."
   },
   "riskFactors": {
     "severity": "Alvorlighetsgrad",

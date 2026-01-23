@@ -1,5 +1,5 @@
 "use client";
-import { ActionMenu, Button, TextField } from "@navikt/ds-react";
+import { ActionMenu, Button, TextField, BodyShort } from "@navikt/ds-react";
 import { ChevronDownIcon } from "@navikt/aksel-icons";
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
@@ -12,6 +12,9 @@ type FilterActionMenuProps = {
   style?: React.CSSProperties;
 };
 
+const MAX_ITEMS_WITHOUT_SEARCH = 100;
+const MAX_ITEMS_WITH_SEARCH = 200;
+
 const FilterActionMenu = ({
   filterName,
   filterOptions,
@@ -22,11 +25,26 @@ const FilterActionMenu = ({
   const [searchQuery, setSearchQuery] = useState("");
   const t = useTranslations("filter");
 
-  const filteredOptions = useMemo(() => {
-    if (!searchQuery) return filterOptions;
-    return filterOptions.filter((option) =>
-      option.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const { filteredOptions, displayOptions, isLimited } = useMemo(() => {
+    let filtered = filterOptions;
+    
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filterOptions.filter((option) =>
+        option.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Determine limit based on whether user is searching
+    const limit = searchQuery ? MAX_ITEMS_WITH_SEARCH : MAX_ITEMS_WITHOUT_SEARCH;
+    const limited = filtered.length > limit;
+    const display = limited ? filtered.slice(0, limit) : filtered;
+
+    return {
+      filteredOptions: filtered,
+      displayOptions: display,
+      isLimited: limited,
+    };
   }, [filterOptions, searchQuery]);
 
   const handleCheckboxChange = (option: string) => {
@@ -63,16 +81,28 @@ const FilterActionMenu = ({
             />
           </div>
           <ActionMenu.Group label={filterName}>
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, i) => (
-                <ActionMenu.CheckboxItem
-                  key={option + i}
-                  checked={selectedFilters?.[option] || false}
-                  onCheckedChange={() => handleCheckboxChange(option)}
-                >
-                  {option}
-                </ActionMenu.CheckboxItem>
-              ))
+            {displayOptions.length > 0 ? (
+              <>
+                {displayOptions.map((option, i) => (
+                  <ActionMenu.CheckboxItem
+                    key={option + i}
+                    checked={selectedFilters?.[option] || false}
+                    onCheckedChange={() => handleCheckboxChange(option)}
+                  >
+                    {option}
+                  </ActionMenu.CheckboxItem>
+                ))}
+                {isLimited && (
+                  <div style={{ padding: "0.5rem", borderTop: "1px solid #e0e0e0" }}>
+                    <BodyShort size="small" style={{ color: "#888", fontStyle: "italic" }}>
+                      {t("showingLimited", {
+                        showing: displayOptions.length,
+                        total: filteredOptions.length,
+                      })}
+                    </BodyShort>
+                  </div>
+                )}
+              </>
             ) : (
               <div style={{ padding: "0.5rem", color: "#888" }}>
                 {t("noResults")}

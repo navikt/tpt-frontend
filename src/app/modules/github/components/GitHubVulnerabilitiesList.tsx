@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useGitHubVulnerabilities } from "../hooks/useGitHubVulnerabilities";
-import { Vulnerability } from "@/app/shared/types/vulnerabilities";
+import { Vulnerability, Repository } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
@@ -9,9 +9,7 @@ import { useTranslations } from "next-intl";
 import { BucketThreshold } from "./GitHubVulnerabilitySummary";
 
 interface RepositoryWithVulns {
-  repository: {
-    name: string;
-  };
+  repository: Repository;
   team: string;
   vulnerabilities: Vulnerability[];
 }

@@ -41,3 +41,6 @@ export const clearStoredItem = (key: string) => {
   if (typeof window === "undefined") return;
   localStorage.removeItem(key);
 };
+
+// Storage keys
+export const TEAM_PREFERENCES_KEY = "tpt-team-preferences";
