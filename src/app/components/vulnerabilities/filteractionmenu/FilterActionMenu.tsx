@@ -12,8 +12,8 @@ type FilterActionMenuProps = {
   style?: React.CSSProperties;
 };
 
-const MAX_ITEMS_WITHOUT_SEARCH = 100;
-const MAX_ITEMS_WITH_SEARCH = 200;
+const MAX_ITEMS_WITHOUT_SEARCH = 20;
+const MAX_ITEMS_WITH_SEARCH = 50;
 
 const FilterActionMenu = ({
   filterName,

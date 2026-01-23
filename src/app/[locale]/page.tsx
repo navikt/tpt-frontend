@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import VulnerabilitiesToLookAt from "@/app/modules/vulnerabilities/components/VulnerabilitiesToLookAt";
 import VulnerabilitySummary, { BucketThreshold } from "@/app/modules/vulnerabilities/components/VulnerabilitySummary";
 import { useConfig } from "@/app/shared/hooks/useConfig";
