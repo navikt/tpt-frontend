@@ -47,6 +47,7 @@ export const useVulnerabilities = () => {
   const hasFetchedRef = useRef(false);
   const isInitializedRef = useRef(false);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldSyncToUrlRef = useRef(false);
 
   // Load cached data and last refresh time from localStorage on mount
   // Initialize filters from URL query params (takes priority) or localStorage
@@ -68,18 +69,22 @@ export const useVulnerabilities = () => {
     );
 
     if (hasUrlFilters) {
+      // Load from URL - should sync future changes
       setTeamFilters(filtersFromUrl.teamFilters);
       setApplicationFilters(filtersFromUrl.applicationFilters);
       setEnvironmentFilters(filtersFromUrl.environmentFilters);
       setCveFilters(filtersFromUrl.cveFilters);
       setPackageNameFilters(filtersFromUrl.packageNameFilters);
+      shouldSyncToUrlRef.current = true;
     } else {
-      // Fallback to localStorage team preferences
+      // Fallback to localStorage team preferences - don't sync to URL yet
       const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
       if (savedTeams && Array.isArray(savedTeams)) {
         const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
         setTeamFilters(teamFiltersObj);
       }
+      // Only sync to URL after user makes a change
+      shouldSyncToUrlRef.current = false;
     }
 
     isInitializedRef.current = true;
@@ -167,6 +172,7 @@ export const useVulnerabilities = () => {
   // Sync filters to URL query params (debounced)
   useEffect(() => {
     if (!isInitializedRef.current) return;
+    if (!shouldSyncToUrlRef.current) return;
 
     // Clear any pending update
     if (updateTimeoutRef.current) {
@@ -387,6 +393,32 @@ export const useVulnerabilities = () => {
     [availablePackageNames, teamFilters, applicationFilters, cveFilters, data, packageNameFilters]
   );
 
+  // Wrapped setters that enable URL syncing when filters change
+  const wrappedSetTeamFilters = useCallback((filters: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    shouldSyncToUrlRef.current = true;
+    setTeamFilters(filters);
+  }, []);
+
+  const wrappedSetApplicationFilters = useCallback((filters: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    shouldSyncToUrlRef.current = true;
+    setApplicationFilters(filters);
+  }, []);
+
+  const wrappedSetEnvironmentFilters = useCallback((filters: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    shouldSyncToUrlRef.current = true;
+    setEnvironmentFilters(filters);
+  }, []);
+
+  const wrappedSetCveFilters = useCallback((filters: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    shouldSyncToUrlRef.current = true;
+    setCveFilters(filters);
+  }, []);
+
+  const wrappedSetPackageNameFilters = useCallback((filters: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    shouldSyncToUrlRef.current = true;
+    setPackageNameFilters(filters);
+  }, []);
+
   return {
     data,
     isLoading,
@@ -395,19 +427,19 @@ export const useVulnerabilities = () => {
     canRefresh,
     timeUntilRefresh,
     teamFilters,
-    setTeamFilters,
+    setTeamFilters: wrappedSetTeamFilters,
     applicationFilters,
-    setApplicationFilters,
+    setApplicationFilters: wrappedSetApplicationFilters,
     environmentFilters,
-    setEnvironmentFilters,
+    setEnvironmentFilters: wrappedSetEnvironmentFilters,
     availableEnvironments,
     cveFilters,
-    setCveFilters,
+    setCveFilters: wrappedSetCveFilters,
     allTeams,
     availableApplications,
     availableCves,
     packageNameFilters,
-    setPackageNameFilters,
+    setPackageNameFilters: wrappedSetPackageNameFilters,
     availablePackageNames,
   };
 };
