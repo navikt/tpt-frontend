@@ -92,6 +92,41 @@ describe("queryParamHelpers", () => {
       const params = filtersToSearchParams(filters);
       expect(params.get(QUERY_PARAM_KEYS.team)).toBe("team with spaces");
     });
+
+    it("should switch to compression for large filter lists", () => {
+      // Create a filter list that will exceed 200 chars
+      const largeFilters = {
+        teamFilters: {},
+        applicationFilters: {},
+        environmentFilters: {},
+        cveFilters: {},
+        packageNameFilters: Object.fromEntries(
+          Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
+        ),
+      };
+
+      const params = filtersToSearchParams(largeFilters);
+      
+      // Should use compressed format
+      expect(params.get(QUERY_PARAM_KEYS.compressed)).not.toBeNull();
+      expect(params.get(QUERY_PARAM_KEYS.pkg)).toBeNull();
+    });
+
+    it("should use readable format for small filter lists", () => {
+      const smallFilters = {
+        teamFilters: { team1: true },
+        applicationFilters: { app1: true },
+        environmentFilters: { prod: true },
+        cveFilters: {},
+        packageNameFilters: { pkg1: true },
+      };
+
+      const params = filtersToSearchParams(smallFilters);
+      
+      // Should use readable format
+      expect(params.get(QUERY_PARAM_KEYS.compressed)).toBeNull();
+      expect(params.get(QUERY_PARAM_KEYS.team)).toBe("team1");
+    });
   });
 
   describe("searchParamsToFilters", () => {
@@ -138,16 +173,69 @@ describe("queryParamHelpers", () => {
       expect(filters.cveFilters).toEqual({});
       expect(filters.packageNameFilters).toEqual({});
     });
+
+    it("should handle compressed format", () => {
+      const originalFilters = {
+        teamFilters: { team1: true, team2: true },
+        applicationFilters: { app1: true, app2: true },
+        environmentFilters: { prod: true },
+        cveFilters: { "CVE-2024-1234": true },
+        packageNameFilters: { express: true, react: true },
+      };
+
+      // First compress
+      const compressedParams = filtersToSearchParams({
+        ...originalFilters,
+        packageNameFilters: Object.fromEntries(
+          Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
+        ),
+      });
+
+      // Then decompress
+      const decompressed = searchParamsToFilters(compressedParams);
+
+      expect(decompressed.teamFilters).toEqual(originalFilters.teamFilters);
+      expect(Object.keys(decompressed.packageNameFilters).length).toBe(50);
+    });
+
+    it("should gracefully handle invalid compressed data", () => {
+      const params = new URLSearchParams({
+        [QUERY_PARAM_KEYS.compressed]: "invalid-base64-data!!!",
+      });
+
+      const filters = searchParamsToFilters(params);
+
+      // Should return empty filters
+      expect(filters.teamFilters).toEqual({});
+      expect(filters.applicationFilters).toEqual({});
+    });
   });
 
   describe("round-trip conversion", () => {
-    it("should maintain filter state through serialization and deserialization", () => {
+    it("should maintain filter state through serialization and deserialization (readable)", () => {
       const originalFilters = {
         teamFilters: { team1: true, team2: true },
         applicationFilters: { app1: true },
         environmentFilters: { prod: true, dev: true },
         cveFilters: { "CVE-2024-1234": true },
         packageNameFilters: { express: true },
+      };
+
+      const params = filtersToSearchParams(originalFilters);
+      const roundTripFilters = searchParamsToFilters(params);
+
+      expect(roundTripFilters).toEqual(originalFilters);
+    });
+
+    it("should maintain filter state through compression round-trip", () => {
+      const originalFilters = {
+        teamFilters: { team1: true, team2: true },
+        applicationFilters: { app1: true },
+        environmentFilters: { prod: true },
+        cveFilters: {},
+        packageNameFilters: Object.fromEntries(
+          Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
+        ),
       };
 
       const params = filtersToSearchParams(originalFilters);

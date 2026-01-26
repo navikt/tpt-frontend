@@ -1,5 +1,6 @@
 /**
  * Utility functions for serializing and deserializing vulnerability filters to/from URL query params
+ * Supports hybrid mode: readable params for small filters, base64 compression for large ones
  */
 
 export type FilterState = Record<string, boolean>;
@@ -19,7 +20,31 @@ export const QUERY_PARAM_KEYS = {
   env: "env",
   cve: "cve",
   pkg: "pkg",
+  compressed: "f", // Single compressed filter param
 } as const;
+
+// Threshold for switching to compression (characters)
+const COMPRESSION_THRESHOLD = 200;
+
+/**
+ * Compress filters to base64 string
+ */
+function compressFilters(filters: VulnerabilityFilters): string {
+  const json = JSON.stringify(filters);
+  return btoa(encodeURIComponent(json));
+}
+
+/**
+ * Decompress base64 string to filters
+ */
+function decompressFilters(compressed: string): VulnerabilityFilters | null {
+  try {
+    const json = decodeURIComponent(atob(compressed));
+    return JSON.parse(json) as VulnerabilityFilters;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Serialize filter state to comma-separated string
@@ -40,11 +65,12 @@ export function deserializeFilters(value: string | null): FilterState {
 }
 
 /**
- * Convert filter states to URLSearchParams
+ * Convert filter states to URLSearchParams (hybrid mode)
  */
 export function filtersToSearchParams(filters: VulnerabilityFilters): URLSearchParams {
   const params = new URLSearchParams();
 
+  // Build readable params first
   const teamParam = serializeFilters(filters.teamFilters);
   if (teamParam) params.set(QUERY_PARAM_KEYS.team, teamParam);
 
@@ -60,13 +86,31 @@ export function filtersToSearchParams(filters: VulnerabilityFilters): URLSearchP
   const pkgParam = serializeFilters(filters.packageNameFilters);
   if (pkgParam) params.set(QUERY_PARAM_KEYS.pkg, pkgParam);
 
+  // Check if URL is too long, switch to compression if needed
+  const readableUrl = params.toString();
+  if (readableUrl.length > COMPRESSION_THRESHOLD) {
+    const compressedParams = new URLSearchParams();
+    compressedParams.set(QUERY_PARAM_KEYS.compressed, compressFilters(filters));
+    return compressedParams;
+  }
+
   return params;
 }
 
 /**
- * Parse URLSearchParams into filter states
+ * Parse URLSearchParams into filter states (supports both formats)
  */
 export function searchParamsToFilters(searchParams: URLSearchParams): VulnerabilityFilters {
+  // Check for compressed format first
+  const compressed = searchParams.get(QUERY_PARAM_KEYS.compressed);
+  if (compressed) {
+    const decompressed = decompressFilters(compressed);
+    if (decompressed) {
+      return decompressed;
+    }
+  }
+
+  // Fall back to readable format
   return {
     teamFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.team)),
     applicationFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.app)),
