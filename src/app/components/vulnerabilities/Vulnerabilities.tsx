@@ -11,11 +11,14 @@ const Vulnerabilities = () => {
     setTeamFilters,
     applicationFilters,
     setApplicationFilters,
+    environmentFilters,
+    setEnvironmentFilters,
     cveFilters,
     setCveFilters,
     packageNameFilters,
     setPackageNameFilters,
     allTeams,
+    availableEnvironments,
     availableApplications,
     availableCves,
     availablePackageNames,
@@ -45,6 +48,13 @@ const Vulnerabilities = () => {
             />
             <FilterActionMenu
               style={{ marginLeft: "1rem" }}
+              filterName="Environment"
+              filterOptions={availableEnvironments}
+              selectedFilters={environmentFilters}
+              setFilter={setEnvironmentFilters}
+            />
+            <FilterActionMenu
+              style={{ marginLeft: "1rem" }}
               filterName="Application"
               filterOptions={availableApplications}
               selectedFilters={applicationFilters}
@@ -69,6 +79,7 @@ const Vulnerabilities = () => {
             data={data}
             teamFilters={teamFilters}
             applicationFilters={applicationFilters}
+            environmentFilters={environmentFilters}
             cveFilters={cveFilters}
             packageNameFilters={packageNameFilters}
           />

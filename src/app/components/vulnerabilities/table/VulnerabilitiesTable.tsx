@@ -9,6 +9,7 @@ interface VulnerabilitiesTableProps {
   data?: VulnerabilitiesResponse;
   teamFilters: Record<string, boolean>;
   applicationFilters: Record<string, boolean>;
+  environmentFilters: Record<string, boolean>;
   cveFilters: Record<string, boolean>;
   packageNameFilters: Record<string, boolean>;
 }
@@ -20,6 +21,7 @@ const VulnerabilitiesTable = ({
   data,
   teamFilters,
   applicationFilters,
+  environmentFilters,
   cveFilters,
   packageNameFilters,
 }: VulnerabilitiesTableProps) => {
@@ -58,6 +60,7 @@ const VulnerabilitiesTable = ({
     const hasApplicationFilters = Object.values(applicationFilters).some(
       (v) => v
     );
+    const hasEnvironmentFilters = Object.values(environmentFilters).some((v) => v);
     const hasCveFilters = Object.values(cveFilters).some((v) => v);
     const hasPackageNameFilters = Object.values(packageNameFilters).some(
       (v) => v
@@ -69,8 +72,8 @@ const VulnerabilitiesTable = ({
         team.workloads.forEach((workload) => {
           // Show workload if no application filters OR workload is selected
           if (
-            !hasApplicationFilters ||
-            applicationFilters[workload.name]
+            (!hasApplicationFilters || applicationFilters[workload.name]) && 
+            (!hasEnvironmentFilters || environmentFilters[workload.environment])
           ) {
             workload.vulnerabilities.forEach((vulnerability) => {
               // Show CVE if no CVE filters OR CVE is selected
@@ -98,7 +101,7 @@ const VulnerabilitiesTable = ({
     });
 
     return rows;
-  }, [data, teamFilters, applicationFilters, cveFilters, packageNameFilters]);
+  }, [data, teamFilters, environmentFilters, applicationFilters, cveFilters, packageNameFilters]);
 
   const sortedRows = useMemo(() => {
     if (sort.direction === "none") return tableRows;
