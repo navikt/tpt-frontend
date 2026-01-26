@@ -44,8 +44,15 @@ jobs:
     permissions:
       contents: write # for dependency graph & sarif
       security-events: write # push sarif to github security
+      id-token: write # for nais/login
     needs: build-and-push
     steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          persist-credentials: false
+      - uses: nais/login@e7cf2c159677dc7c7d599feff5f808f2bf59c7cf
+        with:
+          team: appsec
       - name: Scan docker image for secrets
         uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5
         with:
