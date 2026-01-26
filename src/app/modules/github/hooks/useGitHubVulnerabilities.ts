@@ -22,42 +22,39 @@ const isCacheExpired = (): boolean => {
 };
 
 export const useGitHubVulnerabilities = () => {
-  const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
+  // Lazy initialization - load cache synchronously before first render
+  const [data, setData] = useState<VulnerabilitiesResponse | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
+    return (cachedData && !isCacheExpired()) ? cachedData : null;
+  });
+  
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
-  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
-  const [repositoryFilters, setRepositoryFilters] = useState<
-    Record<string, boolean>
-  >({});
+  
+  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return getStoredNumber(LAST_REFRESH_STORAGE_KEY);
+  });
+  
+  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
+    if (savedTeams && Array.isArray(savedTeams)) {
+      return Object.fromEntries(savedTeams.map(team => [team, true]));
+    }
+    return {};
+  });
+  
+  const [repositoryFilters, setRepositoryFilters] = useState<Record<string, boolean>>({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
   const hasFetchedRef = useRef(false);
 
-  // Load cached data and last refresh time from localStorage on mount
-  useEffect(() => {
-    const storedTime = getStoredNumber(LAST_REFRESH_STORAGE_KEY);
-    if (storedTime) {
-      setLastRefreshTime(storedTime);
-    }
-    
-    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
-    if (cachedData && !isCacheExpired()) {
-      setData(cachedData);
-    }
-
-    // Load saved team preferences for GitHub
-    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
-    if (savedTeams && Array.isArray(savedTeams)) {
-      const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
-      setTeamFilters(teamFiltersObj);
-    }
-  }, []);
-
-  const fetchData = useCallback(async (bypassCache = false) => {
+  const fetchData = useCallback(async (bypassCache = false, showLoading = true) => {
     try {
       if (bypassCache) {
         setIsRefreshing(true);
-      } else {
+      } else if (showLoading) {
         setIsLoading(true);
       }
       const url = bypassCache ? "/api/github?bypassCache=true" : "/api/github";
@@ -110,10 +107,15 @@ export const useGitHubVulnerabilities = () => {
     // Skip if already fetched in this session
     if (hasFetchedRef.current) return;
     
-    // If we have valid cached data, don't fetch
-    if (data && !isCacheExpired()) return;
+    // If we have valid cached data, fetch in background without showing loader
+    const hasValidCache = data && !isCacheExpired();
+    if (hasValidCache) {
+      hasFetchedRef.current = true;
+      fetchData(false, false); // Fetch in background, don't show loading
+      return;
+    }
     
-    // Fetch data (cache is missing or expired)
+    // No cache or expired - fetch with loading indicator
     hasFetchedRef.current = true;
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps

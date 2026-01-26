@@ -29,75 +29,93 @@ const isCacheExpired = (): boolean => {
 export const useVulnerabilities = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
+  
+  // Lazy initialization - load cache synchronously before first render
+  const [data, setData] = useState<VulnerabilitiesResponse | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
+    return (cachedData && !isCacheExpired()) ? cachedData : null;
+  });
+  
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
-  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
-  const [applicationFilters, setApplicationFilters] = useState<
-    Record<string, boolean>
-  >({});
-  const [environmentFilters, setEnvironmentFilters] = useState<
-    Record<string, boolean>
-  >({});
-  const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
-  const [packageNameFilters, setPackageNameFilters] = useState<
-    Record<string, boolean>
-  >({});
+  
+  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return getStoredNumber(LAST_REFRESH_STORAGE_KEY);
+  });
+  
+  // Initialize filters from URL or localStorage synchronously
+  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    
+    // Check URL first
+    const filtersFromUrl = searchParamsToFilters(searchParams);
+    if (Object.keys(filtersFromUrl.teamFilters).length > 0) {
+      return filtersFromUrl.teamFilters;
+    }
+    
+    // Fallback to localStorage
+    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
+    if (savedTeams && Array.isArray(savedTeams)) {
+      return Object.fromEntries(savedTeams.map(team => [team, true]));
+    }
+    return {};
+  });
+  
+  const [applicationFilters, setApplicationFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    const filtersFromUrl = searchParamsToFilters(searchParams);
+    return filtersFromUrl.applicationFilters;
+  });
+  
+  const [environmentFilters, setEnvironmentFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    const filtersFromUrl = searchParamsToFilters(searchParams);
+    return filtersFromUrl.environmentFilters;
+  });
+  
+  const [cveFilters, setCveFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    const filtersFromUrl = searchParamsToFilters(searchParams);
+    return filtersFromUrl.cveFilters;
+  });
+  
+  const [packageNameFilters, setPackageNameFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    const filtersFromUrl = searchParamsToFilters(searchParams);
+    return filtersFromUrl.packageNameFilters;
+  });
+  
   const hasFetchedRef = useRef(false);
   const isInitializedRef = useRef(false);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldSyncToUrlRef = useRef(false);
   const lastSyncedParamsRef = useRef<string>("");
+  const isFirstDataLoadRef = useRef(true); // Track first data load
 
-  // Load cached data and last refresh time from localStorage on mount
-  // Initialize filters from URL query params (takes priority) or localStorage
+  // Mark as initialized and set URL sync flag
   useEffect(() => {
-    const storedTime = getStoredNumber(LAST_REFRESH_STORAGE_KEY);
-    if (storedTime) {
-      setLastRefreshTime(storedTime);
-    }
-    
-    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
-    if (cachedData && !isCacheExpired()) {
-      setData(cachedData);
-    }
-
-    // Initialize filters from URL query params first (priority)
     const filtersFromUrl = searchParamsToFilters(searchParams);
     const hasUrlFilters = Object.values(filtersFromUrl).some(
       (filterMap) => Object.keys(filterMap).length > 0
     );
 
     if (hasUrlFilters) {
-      // Load from URL - should sync future changes
-      setTeamFilters(filtersFromUrl.teamFilters);
-      setApplicationFilters(filtersFromUrl.applicationFilters);
-      setEnvironmentFilters(filtersFromUrl.environmentFilters);
-      setCveFilters(filtersFromUrl.cveFilters);
-      setPackageNameFilters(filtersFromUrl.packageNameFilters);
       shouldSyncToUrlRef.current = true;
-      // Remember what we loaded so we don't immediately re-sync the same params
       lastSyncedParamsRef.current = searchParams.toString();
     } else {
-      // Fallback to localStorage team preferences - don't sync to URL yet
-      const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
-      if (savedTeams && Array.isArray(savedTeams)) {
-        const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
-        setTeamFilters(teamFiltersObj);
-      }
-      // Only sync to URL after user makes a change
       shouldSyncToUrlRef.current = false;
     }
 
     isInitializedRef.current = true;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchData = useCallback(async (bypassCache = false) => {
+  const fetchData = useCallback(async (bypassCache = false, showLoading = true) => {
     try {
       if (bypassCache) {
         setIsRefreshing(true);
-      } else {
+      } else if (showLoading) {
         setIsLoading(true);
       }
       const url = bypassCache ? "/api/applications?bypassCache=true" : "/api/applications";
@@ -109,11 +127,14 @@ export const useVulnerabilities = () => {
       setData(responseData);
       setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
       setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
-      setTeamFilters({});
-      setApplicationFilters({});
-      setEnvironmentFilters({});
-      setCveFilters({});
-      setPackageNameFilters({});
+      // Only clear filters when doing a refresh (not initial load)
+      if (bypassCache) {
+        setTeamFilters({});
+        setApplicationFilters({});
+        setEnvironmentFilters({});
+        setCveFilters({});
+        setPackageNameFilters({});
+      }
       if (bypassCache) {
         const now = Date.now();
         setLastRefreshTime(now);
@@ -152,10 +173,15 @@ export const useVulnerabilities = () => {
     // Skip if already fetched in this session
     if (hasFetchedRef.current) return;
     
-    // If we have valid cached data, don't fetch
-    if (data && !isCacheExpired()) return;
+    // If we have valid cached data, fetch in background without showing loader
+    const hasValidCache = data && !isCacheExpired();
+    if (hasValidCache) {
+      hasFetchedRef.current = true;
+      fetchData(false, false); // Fetch in background, don't show loading
+      return;
+    }
     
-    // Fetch data (cache is missing or expired)
+    // No cache or expired - fetch with loading indicator
     hasFetchedRef.current = true;
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -305,7 +331,12 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupApplicationFilters() {
       if (!data) return;
-      if (!isInitializedRef.current) return; // Don't cleanup during initialization
+      if (!isInitializedRef.current) return;
+      if (isFirstDataLoadRef.current) {
+        // Skip cleanup on first data load to preserve URL filters
+        isFirstDataLoadRef.current = false;
+        return;
+      }
 
       const validApplications = new Set(availableApplications);
       const currentApplications = Object.keys(applicationFilters).filter(
@@ -330,7 +361,8 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupEnvironmentFilters() {
       if (!data) return;
-      if (!isInitializedRef.current) return; // Don't cleanup during initialization
+      if (!isInitializedRef.current) return;
+      if (isFirstDataLoadRef.current) return; // Skip on first data load
 
       const validEnvironments = new Set(availableEnvironments);
       const currentEnvironments = Object.keys(environmentFilters).filter(
@@ -355,7 +387,8 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupCveFilters() {
       if (!data) return;
-      if (!isInitializedRef.current) return; // Don't cleanup during initialization
+      if (!isInitializedRef.current) return;
+      if (isFirstDataLoadRef.current) return; // Skip on first data load
 
       const validCves = new Set(availableCves);
       const currentCves = Object.keys(cveFilters).filter(
@@ -376,7 +409,8 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupPackageNameFilters() {
       if (!data) return;
-      if (!isInitializedRef.current) return; // Don't cleanup during initialization
+      if (!isInitializedRef.current) return;
+      if (isFirstDataLoadRef.current) return; // Skip on first data load
 
       const validPackageNames = new Set(availablePackageNames);
       const currentPackageNames = Object.keys(packageNameFilters).filter(
