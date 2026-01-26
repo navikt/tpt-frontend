@@ -48,6 +48,7 @@ export const useVulnerabilities = () => {
   const isInitializedRef = useRef(false);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldSyncToUrlRef = useRef(false);
+  const lastSyncedParamsRef = useRef<string>("");
 
   // Load cached data and last refresh time from localStorage on mount
   // Initialize filters from URL query params (takes priority) or localStorage
@@ -76,6 +77,8 @@ export const useVulnerabilities = () => {
       setCveFilters(filtersFromUrl.cveFilters);
       setPackageNameFilters(filtersFromUrl.packageNameFilters);
       shouldSyncToUrlRef.current = true;
+      // Remember what we loaded so we don't immediately re-sync the same params
+      lastSyncedParamsRef.current = searchParams.toString();
     } else {
       // Fallback to localStorage team preferences - don't sync to URL yet
       const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
@@ -189,12 +192,11 @@ export const useVulnerabilities = () => {
         packageNameFilters,
       });
 
-      const currentParams = new URLSearchParams(searchParams.toString());
       const newParamsString = params.toString();
-      const currentParamsString = currentParams.toString();
-
-      // Only update if params actually changed
-      if (newParamsString !== currentParamsString) {
+      
+      // Only update if params actually changed from what we last synced
+      if (newParamsString !== lastSyncedParamsRef.current) {
+        lastSyncedParamsRef.current = newParamsString;
         const newUrl = newParamsString
           ? `?${newParamsString}`
           : window.location.pathname;
@@ -214,7 +216,6 @@ export const useVulnerabilities = () => {
     cveFilters,
     packageNameFilters,
     router,
-    searchParams,
   ]);
 
   const availableEnvironments = useMemo(() => {
