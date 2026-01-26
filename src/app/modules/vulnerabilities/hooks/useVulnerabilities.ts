@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import {
   getStoredNumber,
@@ -7,6 +8,10 @@ import {
   setStoredJSON,
   TEAM_PREFERENCES_KEY,
 } from "@/app/shared/utils/storageHelpers";
+import {
+  filtersToSearchParams,
+  searchParamsToFilters,
+} from "../utils/queryParamHelpers";
 
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
@@ -22,6 +27,8 @@ const isCacheExpired = (): boolean => {
 };
 
 export const useVulnerabilities = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -38,8 +45,11 @@ export const useVulnerabilities = () => {
     Record<string, boolean>
   >({});
   const hasFetchedRef = useRef(false);
+  const isInitializedRef = useRef(false);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load cached data and last refresh time from localStorage on mount
+  // Initialize filters from URL query params (takes priority) or localStorage
   useEffect(() => {
     const storedTime = getStoredNumber(LAST_REFRESH_STORAGE_KEY);
     if (storedTime) {
@@ -51,13 +61,29 @@ export const useVulnerabilities = () => {
       setData(cachedData);
     }
 
-    // Load saved team preferences
-    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
-    if (savedTeams && Array.isArray(savedTeams)) {
-      const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
-      setTeamFilters(teamFiltersObj);
+    // Initialize filters from URL query params first (priority)
+    const filtersFromUrl = searchParamsToFilters(searchParams);
+    const hasUrlFilters = Object.values(filtersFromUrl).some(
+      (filterMap) => Object.keys(filterMap).length > 0
+    );
+
+    if (hasUrlFilters) {
+      setTeamFilters(filtersFromUrl.teamFilters);
+      setApplicationFilters(filtersFromUrl.applicationFilters);
+      setEnvironmentFilters(filtersFromUrl.environmentFilters);
+      setCveFilters(filtersFromUrl.cveFilters);
+      setPackageNameFilters(filtersFromUrl.packageNameFilters);
+    } else {
+      // Fallback to localStorage team preferences
+      const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
+      if (savedTeams && Array.isArray(savedTeams)) {
+        const teamFiltersObj = Object.fromEntries(savedTeams.map(team => [team, true]));
+        setTeamFilters(teamFiltersObj);
+      }
     }
-  }, []);
+
+    isInitializedRef.current = true;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchData = useCallback(async (bypassCache = false) => {
     try {
@@ -137,6 +163,53 @@ export const useVulnerabilities = () => {
     const selectedTeams = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
     setStoredJSON(TEAM_PREFERENCES_KEY, selectedTeams);
   }, [teamFilters]);
+
+  // Sync filters to URL query params (debounced)
+  useEffect(() => {
+    if (!isInitializedRef.current) return;
+
+    // Clear any pending update
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+
+    // Debounce URL updates to avoid excessive history entries
+    updateTimeoutRef.current = setTimeout(() => {
+      const params = filtersToSearchParams({
+        teamFilters,
+        applicationFilters,
+        environmentFilters,
+        cveFilters,
+        packageNameFilters,
+      });
+
+      const currentParams = new URLSearchParams(searchParams.toString());
+      const newParamsString = params.toString();
+      const currentParamsString = currentParams.toString();
+
+      // Only update if params actually changed
+      if (newParamsString !== currentParamsString) {
+        const newUrl = newParamsString
+          ? `?${newParamsString}`
+          : window.location.pathname;
+        router.replace(newUrl, { scroll: false });
+      }
+    }, 500);
+
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, [
+    teamFilters,
+    applicationFilters,
+    environmentFilters,
+    cveFilters,
+    packageNameFilters,
+    router,
+    searchParams,
+  ]);
 
   const availableEnvironments = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
