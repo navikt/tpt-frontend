@@ -30,6 +30,9 @@ export const useVulnerabilities = () => {
   const [applicationFilters, setApplicationFilters] = useState<
     Record<string, boolean>
   >({});
+  const [environmentFilters, setEnvironmentFilters] = useState<
+    Record<string, boolean>
+  >({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
   const [packageNameFilters, setPackageNameFilters] = useState<
     Record<string, boolean>
@@ -74,6 +77,7 @@ export const useVulnerabilities = () => {
       setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
       setTeamFilters({});
       setApplicationFilters({});
+      setEnvironmentFilters({});
       setCveFilters({});
       setPackageNameFilters({});
       if (bypassCache) {
@@ -134,21 +138,39 @@ export const useVulnerabilities = () => {
     setStoredJSON(TEAM_PREFERENCES_KEY, selectedTeams);
   }, [teamFilters]);
 
-  const availableApplications = useMemo(() => {
+  const availableEnvironments = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
-    return (
-      data?.teams
-        .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
-        .flatMap((team) => team.workloads.map((workload) => workload.name)) ||
-      []
+    return Array.from(
+      new Set(
+        data?.teams
+          .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
+          .flatMap((team) =>
+            team.workloads.map((workload) => workload.environment)
+          ) || []
+      )
     );
   }, [data, teamFilters]);
+
+
+  const availableApplications = useMemo(() => {
+    const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
+    const hasEnvironmentFilters = Object.values(environmentFilters).some((v) => v === true);
+    return Array.from(
+      new Set(data?.teams
+        .filter((team) => !hasTeamFilters || teamFilters[team.team] === true)
+        .flatMap((team) => team.workloads
+          .filter((workload) => !hasEnvironmentFilters || environmentFilters[workload.environment] === true)
+          .map((workload) => workload.name))) ||
+      []
+    );
+  }, [data, teamFilters, environmentFilters]);
 
   const availableCves = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
     const hasApplicationFilters = Object.values(applicationFilters).some(
       (v) => v === true
     );
+    const hasEnvironmentFilters = Object.values(environmentFilters).some((v) => v === true);
     return Array.from(
       new Set(
         data?.teams
@@ -157,8 +179,10 @@ export const useVulnerabilities = () => {
             team.workloads
               .filter(
                 (workload) =>
-                  !hasApplicationFilters ||
-                  applicationFilters[workload.name] === true
+                  (!hasApplicationFilters ||
+                  applicationFilters[workload.name] === true) &&
+                  (!hasEnvironmentFilters ||
+                  environmentFilters[workload.environment] === true)
               )
               .flatMap((workload) =>
                 workload.vulnerabilities.map((vuln) => vuln.identifier)
@@ -166,7 +190,7 @@ export const useVulnerabilities = () => {
           ) || []
       )
     );
-  }, [data, teamFilters, applicationFilters]);
+  }, [data, teamFilters, applicationFilters, environmentFilters]);
 
   const availablePackageNames = useMemo(() => {
     const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
@@ -220,6 +244,30 @@ export const useVulnerabilities = () => {
       }
     },
     [availableApplications, teamFilters, data, applicationFilters]
+  );
+
+  useEffect(
+    function cleanupEnvironmentFilters() {
+      if (!data) return;
+
+      const validEnvironments = new Set(availableEnvironments);
+      const currentEnvironments = Object.keys(environmentFilters).filter(
+        (env) => environmentFilters[env] === true
+      );
+      const hasInvalidEnvs = currentEnvironments.some(
+        (env) => !validEnvironments.has(env)
+      );
+
+      if (hasInvalidEnvs) {
+        const cleanedFilters = Object.fromEntries(
+          Object.entries(environmentFilters).filter(([env]) =>
+            validEnvironments.has(env)
+          )
+        );
+        setEnvironmentFilters(cleanedFilters);
+      }
+    },
+    [availableEnvironments, applicationFilters, data, environmentFilters]
   );
 
   useEffect(
@@ -277,6 +325,9 @@ export const useVulnerabilities = () => {
     setTeamFilters,
     applicationFilters,
     setApplicationFilters,
+    environmentFilters,
+    setEnvironmentFilters,
+    availableEnvironments,
     cveFilters,
     setCveFilters,
     allTeams,

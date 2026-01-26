@@ -51,6 +51,52 @@ export const mockVulnerabilitiesPayload = {
         },
         {
           id: "workload-002",
+          name: "TPT Frontend Application",
+          environment: "dev-gcp",
+          repository: "navikt/tpt-frontend",
+          ingressTypes: ["external"],
+          buildTime: "2025-11-27",
+          vulnerabilities: [
+            {
+              identifier: "CVE-2025-0001",
+              packageName: "express",
+              description:
+                "A buffer overflow vulnerability in the X.509 certificate parser could allow remote code execution",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0001",
+              riskScore: 200,
+              riskScoreMultipliers: {
+                base_high: 70,
+                exposure: 2,
+                kev: 1.5,
+                epss: 1.2,
+                production: 1.1,
+                old_build_days: 45,
+                old_build: 1.05,
+              },
+            },
+            {
+              identifier: "CVE-2025-0002",
+              packageName: "lodash",
+              description:
+                "Prototype pollution vulnerability allowing arbitrary property injection",
+              vulnerabilityDetailsLink:
+                "https://nvd.nist.gov/vuln/detail/CVE-2025-0002",
+              riskScore: 45,
+              riskScoreMultipliers: {
+                base_high: 50,
+                exposure: 1,
+                kev: 1,
+                epss: 1.1,
+                production: 1.1,
+                old_build_days: 20,
+                old_build: 1.02,
+              },
+            },
+          ],
+        },
+        {
+          id: "workload-002",
           name: "API Gateway",
           environment: "dev-gcp",
           repository: "navikt/api-gateway",
