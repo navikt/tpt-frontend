@@ -111,15 +111,15 @@ export const useVulnerabilities = () => {
     isInitializedRef.current = true;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchData = useCallback(async (bypassCache = false, showLoading = true) => {
+  const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
     try {
-      if (bypassCache) {
+      if (isRefresh) {
         setIsRefreshing(true);
       } else if (showLoading) {
         setIsLoading(true);
       }
-      const url = bypassCache ? "/api/applications?bypassCache=true" : "/api/applications";
-      const response = await fetch(url);
+      
+      const response = await fetch("/api/applications");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -127,15 +127,15 @@ export const useVulnerabilities = () => {
       setData(responseData);
       setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
       setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
-      // Only clear filters when doing a refresh (not initial load)
-      if (bypassCache) {
+      
+      // Only clear filters when doing a manual refresh (not initial load)
+      if (isRefresh) {
         setTeamFilters({});
         setApplicationFilters({});
         setEnvironmentFilters({});
         setCveFilters({});
         setPackageNameFilters({});
-      }
-      if (bypassCache) {
+        
         const now = Date.now();
         setLastRefreshTime(now);
         setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
@@ -154,7 +154,7 @@ export const useVulnerabilities = () => {
     if (storedTime && now - storedTime < REFRESH_COOLDOWN_MS) {
       return false; // Cooldown not elapsed
     }
-    fetchData(true);
+    fetchData(true); // isRefresh = true
     return true;
   }, [fetchData]);
 
@@ -173,17 +173,11 @@ export const useVulnerabilities = () => {
     // Skip if already fetched in this session
     if (hasFetchedRef.current) return;
     
+    hasFetchedRef.current = true;
+    
     // If we have valid cached data, fetch in background without showing loader
     const hasValidCache = data && !isCacheExpired();
-    if (hasValidCache) {
-      hasFetchedRef.current = true;
-      fetchData(false, false); // Fetch in background, don't show loading
-      return;
-    }
-    
-    // No cache or expired - fetch with loading indicator
-    hasFetchedRef.current = true;
-    fetchData();
+    fetchData(false, !hasValidCache); // showLoading only if no cache
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 

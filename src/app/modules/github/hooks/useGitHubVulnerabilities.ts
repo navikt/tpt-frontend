@@ -50,15 +50,15 @@ export const useGitHubVulnerabilities = () => {
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
   const hasFetchedRef = useRef(false);
 
-  const fetchData = useCallback(async (bypassCache = false, showLoading = true) => {
+  const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
     try {
-      if (bypassCache) {
+      if (isRefresh) {
         setIsRefreshing(true);
       } else if (showLoading) {
         setIsLoading(true);
       }
-      const url = bypassCache ? "/api/github?bypassCache=true" : "/api/github";
-      const response = await fetch(url);
+      
+      const response = await fetch("/api/github");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -69,7 +69,8 @@ export const useGitHubVulnerabilities = () => {
       setTeamFilters({});
       setRepositoryFilters({});
       setCveFilters({});
-      if (bypassCache) {
+      
+      if (isRefresh) {
         const now = Date.now();
         setLastRefreshTime(now);
         setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
@@ -88,7 +89,7 @@ export const useGitHubVulnerabilities = () => {
     if (storedTime && now - storedTime < REFRESH_COOLDOWN_MS) {
       return false; // Cooldown not elapsed
     }
-    fetchData(true);
+    fetchData(true); // isRefresh = true
     return true;
   }, [fetchData]);
 
@@ -107,17 +108,11 @@ export const useGitHubVulnerabilities = () => {
     // Skip if already fetched in this session
     if (hasFetchedRef.current) return;
     
+    hasFetchedRef.current = true;
+    
     // If we have valid cached data, fetch in background without showing loader
     const hasValidCache = data && !isCacheExpired();
-    if (hasValidCache) {
-      hasFetchedRef.current = true;
-      fetchData(false, false); // Fetch in background, don't show loading
-      return;
-    }
-    
-    // No cache or expired - fetch with loading indicator
-    hasFetchedRef.current = true;
-    fetchData();
+    fetchData(false, !hasValidCache); // showLoading only if no cache
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 

@@ -27,10 +27,6 @@ export async function GET(request: NextRequest) {
   try {
     const { tptBackendUrl } = getServerEnv();
 
-    // Check for bypassCache query parameter
-    const { searchParams } = new URL(request.url);
-    const bypassCache = searchParams.get("bypassCache") === "true";
-
     let backendToken: string;
 
     // In local dev mode, create a mock token instead of using OBO flow
@@ -57,9 +53,7 @@ export async function GET(request: NextRequest) {
       backendToken = oboResult.token;
     }
 
-    const backendUrl = bypassCache
-      ? `${tptBackendUrl}/vulnerabilities/user?bypassCache=true`
-      : `${tptBackendUrl}/vulnerabilities/user`;
+    const backendUrl = `${tptBackendUrl}/vulnerabilities/user`;
 
     const response = await fetch(backendUrl, {
       headers: {
