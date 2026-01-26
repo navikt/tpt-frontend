@@ -2,6 +2,7 @@
 import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
 import DeveloperView from "./views/DeveloperView";
 import TeamMemberView from "./views/TeamMemberView";
+import LeaderView from "./views/LeaderView";
 import { Loader, Box } from "@navikt/ds-react";
 
 export default function Home() {
@@ -22,6 +23,10 @@ export default function Home() {
   // Route based on user role
   if (vulnData.userRole === "DEVELOPER") {
     return <DeveloperView />;
+  }
+
+  if (vulnData.userRole === "LEADER") {
+    return <LeaderView />;
   }
 
   // Default to TeamMemberView for TEAM_MEMBER or undefined roles

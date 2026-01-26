@@ -6,7 +6,7 @@ import { BodyShort, Loader, Box, Heading, VStack, HGrid } from "@navikt/ds-react
 import { useTranslations } from "next-intl";
 
 export default function TeamMemberView() {
-  const t = useTranslations();
+  const t = useTranslations("teamMemberView");
   const { config, isLoading: configLoading } = useConfig();
   const { data: vulnData, isLoading: dataLoading } = useVulnerabilities();
 
@@ -61,10 +61,10 @@ export default function TeamMemberView() {
           <VStack gap="6">
             <div>
               <Heading size="large" level="1">
-                Oversikt over sårbarheter
+                {t("title")}
               </Heading>
               <BodyShort spacing>
-                Laster statistikk...
+                {t("loadingStatistics")}
               </BodyShort>
             </div>
             <Box
@@ -73,7 +73,7 @@ export default function TeamMemberView() {
               background="surface-subtle"
               style={{ textAlign: "center" }}
             >
-              <Loader size="large" title="Laster data" />
+              <Loader size="large" title={t("loadingData")} />
             </Box>
           </VStack>
         </main>
@@ -87,10 +87,10 @@ export default function TeamMemberView() {
         <VStack gap="8">
           <div>
             <Heading size="large" level="1" spacing>
-              Oversikt over sårbarheter
+              {t("title")}
             </Heading>
             <BodyShort spacing>
-              En enkel oversikt over antall applikasjoner og sårbarheter i teamene dine.
+              {t("description")}
             </BodyShort>
           </div>
 
@@ -102,7 +102,7 @@ export default function TeamMemberView() {
             >
               <VStack gap="2">
                 <BodyShort size="small" textColor="subtle">
-                  Totalt antall applikasjoner
+                  {t("totalApplications")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
                   {statistics.totalWorkloads}
@@ -117,7 +117,7 @@ export default function TeamMemberView() {
             >
               <VStack gap="2">
                 <BodyShort size="small" textColor="subtle">
-                  Totalt antall sårbarheter
+                  {t("totalVulnerabilities")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
                   {statistics.totalVulnerabilities}
@@ -135,7 +135,7 @@ export default function TeamMemberView() {
           >
             <VStack gap="6">
               <Heading size="medium" level="2">
-                Sårbarheter etter prioritet
+                {t("vulnerabilitiesByPriority")}
               </Heading>
 
               <HGrid columns={{ xs: 1, sm: 2, lg: 4 }} gap="4">
@@ -146,7 +146,7 @@ export default function TeamMemberView() {
                 >
                   <VStack gap="2">
                     <BodyShort size="small" weight="semibold">
-                      Høy prioritet
+                      {t("highPriority")}
                     </BodyShort>
                     <Heading size="large" level="3">
                       {statistics.highPriority}
@@ -161,7 +161,7 @@ export default function TeamMemberView() {
                 >
                   <VStack gap="2">
                     <BodyShort size="small" weight="semibold">
-                      Lurt å ta unna
+                      {t("shouldHandle")}
                     </BodyShort>
                     <Heading size="large" level="3">
                       {statistics.mediumPriority}
@@ -176,7 +176,7 @@ export default function TeamMemberView() {
                 >
                   <VStack gap="2">
                     <BodyShort size="small" weight="semibold">
-                      Når du har tid
+                      {t("whenTime")}
                     </BodyShort>
                     <Heading size="large" level="3">
                       {statistics.lowPriority}
@@ -191,7 +191,7 @@ export default function TeamMemberView() {
                 >
                   <VStack gap="2">
                     <BodyShort size="small" weight="semibold">
-                      Lav prioritet
+                      {t("lowPriority")}
                     </BodyShort>
                     <Heading size="large" level="3">
                       {statistics.veryLowPriority}
@@ -210,10 +210,10 @@ export default function TeamMemberView() {
               style={{ textAlign: "center" }}
             >
               <Heading size="medium" level="2">
-                🙌 Ingen kritiske sårbarheter!
+                {t("noCriticalVulnerabilities")}
               </Heading>
               <BodyShort>
-                Det er ingen sårbarheter med høy prioritet akkurat nå.
+                {t("noCriticalDescription")}
               </BodyShort>
             </Box>
           )}
