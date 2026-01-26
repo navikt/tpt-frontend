@@ -305,6 +305,7 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupApplicationFilters() {
       if (!data) return;
+      if (!isInitializedRef.current) return; // Don't cleanup during initialization
 
       const validApplications = new Set(availableApplications);
       const currentApplications = Object.keys(applicationFilters).filter(
@@ -329,6 +330,7 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupEnvironmentFilters() {
       if (!data) return;
+      if (!isInitializedRef.current) return; // Don't cleanup during initialization
 
       const validEnvironments = new Set(availableEnvironments);
       const currentEnvironments = Object.keys(environmentFilters).filter(
@@ -353,6 +355,7 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupCveFilters() {
       if (!data) return;
+      if (!isInitializedRef.current) return; // Don't cleanup during initialization
 
       const validCves = new Set(availableCves);
       const currentCves = Object.keys(cveFilters).filter(
@@ -373,6 +376,7 @@ export const useVulnerabilities = () => {
   useEffect(
     function cleanupPackageNameFilters() {
       if (!data) return;
+      if (!isInitializedRef.current) return; // Don't cleanup during initialization
 
       const validPackageNames = new Set(availablePackageNames);
       const currentPackageNames = Object.keys(packageNameFilters).filter(
