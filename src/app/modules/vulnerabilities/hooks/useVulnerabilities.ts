@@ -12,6 +12,7 @@ import {
   filtersToSearchParams,
   searchParamsToFilters,
 } from "../utils/queryParamHelpers";
+import { ApiError, handleApiError } from "@/app/shared/utils/errorHandling";
 
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
@@ -39,6 +40,7 @@ export const useVulnerabilities = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
   
   const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(() => {
     if (typeof window === 'undefined') return null;
@@ -119,10 +121,20 @@ export const useVulnerabilities = () => {
         setIsLoading(true);
       }
       
+      setError(null); // Clear any previous errors
+      
       const response = await fetch("/api/applications");
+      
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorData = await response.json().catch(() => ({}));
+        const apiError: ApiError = {
+          message: errorData.error || "errors.fetchApplicationsError",
+          status: response.status,
+        };
+        setError(apiError);
+        return;
       }
+      
       const responseData: VulnerabilitiesResponse = await response.json();
       setData(responseData);
       setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
@@ -140,8 +152,13 @@ export const useVulnerabilities = () => {
         setLastRefreshTime(now);
         setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
       }
-    } catch (error) {
-      console.error("Error fetching applications data:", error);
+    } catch (err) {
+      const apiError = handleApiError(
+        err,
+        "useVulnerabilities.fetchData",
+        { isRefresh, showLoading }
+      );
+      setError(apiError);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -456,6 +473,7 @@ export const useVulnerabilities = () => {
     data,
     isLoading,
     isRefreshing,
+    error,
     refresh,
     canRefresh,
     timeUntilRefresh,

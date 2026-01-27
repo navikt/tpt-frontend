@@ -1,6 +1,11 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useConfig } from '../../shared/hooks/useConfig';
 
+// Mock Faro instrumentation
+jest.mock('@/instrumentation/faro', () => ({
+  getFaro: jest.fn(() => null),
+}));
+
 // Mock the global fetch
 global.fetch = jest.fn();
 
@@ -32,10 +37,10 @@ describe('useConfig hook', () => {
     });
 
     expect(result.current.config).toEqual(mockConfig);
+    expect(result.current.error).toBeNull();
   });
 
   it('should handle fetch errors', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
     const { result } = renderHook(() => useConfig());
@@ -45,8 +50,8 @@ describe('useConfig hook', () => {
     });
 
     expect(result.current.config).toBeNull();
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.error?.message).toBe('errors.networkError');
   });
 
   it('should handle non-ok responses', async () => {
@@ -54,6 +59,7 @@ describe('useConfig hook', () => {
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
+      json: async () => ({ error: 'errors.fetchConfigError' }),
     });
 
     const { result } = renderHook(() => useConfig());
@@ -63,5 +69,7 @@ describe('useConfig hook', () => {
     });
 
     expect(result.current.config).toBeNull();
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.error?.message).toBe('errors.fetchConfigError');
   });
 });

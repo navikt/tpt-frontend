@@ -182,5 +182,16 @@
     "lowPriority": "Lav prioritet",
     "noCriticalVulnerabilities": "🙌 Ingen kritiske sårbarheter!",
     "noCriticalDescription": "Det er ingen sårbarheter med høy prioritet akkurat nå."
+  },
+  "errors": {
+    "title": "Det oppstod en feil",
+    "networkError": "Kunne ikke koble til serveren. Vennligst prøv igjen senere.",
+    "internalError": "En intern feil oppstod",
+    "fetchApplicationsError": "Kunne ikke hente applikasjonsdata",
+    "fetchConfigError": "Kunne ikke hente konfigurasjon",
+    "fetchVulnerabilitiesError": "Kunne ikke laste sårbarhetsdata",
+    "traceId": "Sporings-ID",
+    "copyId": "Kopier ID",
+    "copiedId": "Kopiert!"
   }
 }

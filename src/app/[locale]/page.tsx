@@ -4,9 +4,22 @@ import DeveloperView from "./views/DeveloperView";
 import TeamMemberView from "./views/TeamMemberView";
 import LeaderView from "./views/LeaderView";
 import { Loader, Box } from "@navikt/ds-react";
+import { ErrorMessage } from "@/app/components/ErrorMessage";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
-  const { data: vulnData, isLoading } = useVulnerabilities();
+  const { data: vulnData, isLoading, error } = useVulnerabilities();
+  const t = useTranslations("errors");
+
+  // Show error state if fetch failed
+  if (error) {
+    return (
+      <ErrorMessage
+        error={error}
+        title={t("fetchVulnerabilitiesError")}
+      />
+    );
+  }
 
   // Show loading state while data is being fetched
   if (isLoading || !vulnData) {

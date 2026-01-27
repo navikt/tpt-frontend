@@ -182,5 +182,16 @@
     "lowPriority": "Low priority",
     "noCriticalVulnerabilities": "🙌 No critical vulnerabilities!",
     "noCriticalDescription": "There are no high priority vulnerabilities at the moment."
+  },
+  "errors": {
+    "title": "An error occurred",
+    "networkError": "Could not connect to the server. Please try again later.",
+    "internalError": "An internal error occurred",
+    "fetchApplicationsError": "Could not fetch application data",
+    "fetchConfigError": "Could not fetch configuration",
+    "fetchVulnerabilitiesError": "Could not load vulnerability data",
+    "traceId": "Trace ID",
+    "copyId": "Copy ID",
+    "copiedId": "Copied!"
   }
 }

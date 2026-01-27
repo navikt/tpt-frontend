@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     console.log("mocks enabled - returning mock data");
     return NextResponse.json(mockVulnerabilitiesPayload);
   }
+  
   try {
     const { tptBackendUrl } = getServerEnv();
 
@@ -63,8 +64,11 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
+      console.error(
+        `Failed to fetch applications: ${response.status} ${response.statusText}`
+      );
       return NextResponse.json(
-        { error: "Failed to fetch applications" },
+        { error: "errors.fetchApplicationsError" },
         { status: response.status }
       );
     }
@@ -72,9 +76,20 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Internal server error: ", error);
+    console.error("Internal server error:", error);
+    
+    const isNetworkError = error instanceof Error && (
+      error.message.includes("fetch failed") ||
+      error.message.includes("ECONNREFUSED") ||
+      error.message.includes("network")
+    );
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: isNetworkError
+          ? "errors.networkError"
+          : "errors.internalError",
+      },
       { status: 500 }
     );
   }
