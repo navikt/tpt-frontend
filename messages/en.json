@@ -62,7 +62,9 @@
     "description": "Select which teams you want to see vulnerabilities for. Only selected teams will be shown on the main page.",
     "noTeams": "No teams found",
     "cancel": "Cancel",
-    "apply": "Apply filter"
+    "apply": "Apply filter",
+    "showAllBuckets": "Show all priority buckets",
+    "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise."
   },
   "vulnerabilitiesPage": {
     "title": "Vulnerabilities",

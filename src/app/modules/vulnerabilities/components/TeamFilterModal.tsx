@@ -17,6 +17,8 @@ interface TeamFilterModalProps {
   onClose: () => void;
   selectedTeams: string[];
   onTeamsChange: (teams: string[]) => void;
+  showAllBuckets?: boolean;
+  onShowAllBucketsChange?: (show: boolean) => void;
 }
 
 const TeamFilterModal = ({
@@ -24,6 +26,8 @@ const TeamFilterModal = ({
   onClose,
   selectedTeams,
   onTeamsChange,
+  showAllBuckets = false,
+  onShowAllBucketsChange,
 }: TeamFilterModalProps) => {
   const t = useTranslations("teamFilter");
   const { data, isLoading } = useVulnerabilities();
@@ -72,6 +76,21 @@ const TeamFilterModal = ({
                 {t("description")}
               </BodyShort>
             </div>
+
+            {/* Show all buckets toggle */}
+            {onShowAllBucketsChange && (
+              <div>
+                <Checkbox
+                  checked={showAllBuckets}
+                  onChange={(e) => onShowAllBucketsChange(e.target.checked)}
+                >
+                  {t("showAllBuckets")}
+                </Checkbox>
+                <BodyShort size="small" style={{ color: "var(--a-text-subtle)", marginTop: "0.5rem" }}>
+                  {t("showAllBucketsDescription")}
+                </BodyShort>
+              </div>
+            )}
 
             {uniqueTeams.length > 0 && (
               <div>

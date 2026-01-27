@@ -62,7 +62,9 @@
     "description": "Velg hvilke team du vil se sårbarheter for. Bare valgte team vil vises på hovedsiden.",
     "noTeams": "Ingen team funnet",
     "cancel": "Avbryt",
-    "apply": "Bruk filter"
+    "apply": "Bruk filter",
+    "showAllBuckets": "Vis alle prioritetskategorier",
+    "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy."
   },
   "vulnerabilitiesPage": {
     "title": "Sårbarheter",

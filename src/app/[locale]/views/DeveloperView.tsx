@@ -4,6 +4,7 @@ import VulnerabilitiesToLookAt from "@/app/modules/vulnerabilities/components/Vu
 import VulnerabilitySummary, { BucketThreshold } from "@/app/modules/vulnerabilities/components/VulnerabilitySummary";
 import { useConfig } from "@/app/shared/hooks/useConfig";
 import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import { useUserPreferences } from "@/app/shared/hooks/useUserPreferences";
 import { BodyShort, Loader, Box } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 
@@ -11,6 +12,7 @@ export default function DeveloperView() {
   const t = useTranslations();
   const { config, isLoading } = useConfig();
   const { data: vulnData, teamFilters, setTeamFilters } = useVulnerabilities();
+  const { preferences, updatePreferences } = useUserPreferences();
   
   const selectedTeams = useMemo(() => {
     const filtered = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
@@ -81,6 +83,8 @@ export default function DeveloperView() {
           onBucketSelect={setSelectedBucket}
           selectedTeams={selectedTeams}
           onTeamsChange={handleTeamsChange}
+          showAllBuckets={preferences.showAllBuckets}
+          onShowAllBucketsChange={(show) => updatePreferences({ showAllBuckets: show })}
         />
         <VulnerabilitiesToLookAt 
           bucketName={activeBucket.name}
