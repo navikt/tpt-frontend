@@ -5,6 +5,7 @@ import { Vulnerability, Repository } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
+import styles from "./GitHubVulnerabilitiesList.module.css";
 import { useTranslations } from "next-intl";
 import { BucketThreshold } from "./GitHubVulnerabilitySummary";
 
@@ -134,7 +135,10 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {repositoriesWithVulns.map((repoGroup) => {
           return (
-            <div key={repoGroup.repository.nameWithOwner}>
+            <div
+              key={repoGroup.repository.nameWithOwner}
+              className={styles.accordionWrapper}
+            >
               <Accordion>
                 <Accordion.Item 
                   open={expandedItems[repoGroup.repository.nameWithOwner] || false}
@@ -142,16 +146,16 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                 >
                   <Accordion.Header>
                     <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
-                      <span>
+                      <BodyShort weight="semibold">
                         {repoGroup.repository.nameWithOwner} ({repoGroup.vulnerabilities.length} {t("common.vulnerabilities")})
-                      </span>
+                      </BodyShort>
                       <HStack gap="space-8" align="center">
                         <a
                           href={`https://www.github.com/${repoGroup.repository.nameWithOwner}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          style={{ textDecoration: "none" }}
+                          className={styles.githubLink}
                         >
                           GitHub
                         </a>
