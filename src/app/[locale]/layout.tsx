@@ -1,31 +1,26 @@
 "use client";
 import { Page, InternalHeader, GlobalAlert, Spacer } from "@navikt/ds-react";
 import { useUser } from "../shared/hooks/useUser";
-import { useVulnerabilities } from "../modules/vulnerabilities/hooks/useVulnerabilities";
+import { useRoleContext, RoleContextProvider } from "../shared/hooks/useRoleContext";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import { RoleContextSwitcher } from "../components/RoleContextSwitcher";
 import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 
-export default function LocaleLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useUser();
-  const { data: vulnData } = useVulnerabilities();
+  const { effectiveRole } = useRoleContext();
   const t = useTranslations();
   const locale = useLocale();
-
-  const userRole = vulnData?.userRole;
 
   const filteredNavLinks = moduleNavLinks.filter((link) => {
     if (!link.allowedRoles || link.allowedRoles.length === 0) {
       return true;
     }
-    if (!userRole) {
+    if (!effectiveRole) {
       return false;
     }
-    return link.allowedRoles.includes(userRole);
+    return link.allowedRoles.includes(effectiveRole);
   });
 
   return (
@@ -44,6 +39,7 @@ export default function LocaleLayout({
             </InternalHeader.Title>
           ))}
         <Spacer />
+        <RoleContextSwitcher />
         <LanguageSwitcher />
         {!isLoading && user && (
           <InternalHeader.User name={user.email} description="" />
@@ -60,5 +56,17 @@ export default function LocaleLayout({
         {children}
       </Page.Block>
     </Page>
+  );
+}
+
+export default function LocaleLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <RoleContextProvider>
+      <LocaleLayoutContent>{children}</LocaleLayoutContent>
+    </RoleContextProvider>
   );
 }

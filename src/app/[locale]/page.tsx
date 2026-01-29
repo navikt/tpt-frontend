@@ -1,14 +1,17 @@
 "use client";
 import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import DeveloperView from "./views/DeveloperView";
 import TeamMemberView from "./views/TeamMemberView";
 import LeaderView from "./views/LeaderView";
+import NoTeamView from "./views/NoTeamView";
 import { Loader, Box } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations } from "next-intl";
 
 export default function Home() {
   const { data: vulnData, isLoading, error } = useVulnerabilities();
+  const { effectiveRole, isInitialized } = useRoleContext();
   const t = useTranslations("errors");
 
   // Show error state if fetch failed
@@ -21,8 +24,8 @@ export default function Home() {
     );
   }
 
-  // Show loading state while data is being fetched
-  if (isLoading || !vulnData) {
+  // Show loading state while data is being fetched or role context is initializing
+  if (isLoading || !vulnData || !isInitialized) {
     return (
       <Box
         paddingBlock="space-24"
@@ -33,15 +36,19 @@ export default function Home() {
     );
   }
 
-  // Route based on user role
-  if (vulnData.userRole === "DEVELOPER") {
+  // Route based on effective role (selected context or actual user role)
+  if (effectiveRole === "DEVELOPER") {
     return <DeveloperView />;
   }
 
-  if (vulnData.userRole === "LEADER") {
+  if (effectiveRole === "TEAM_MEMBER") {
+    return <TeamMemberView />;
+  }
+
+  if (effectiveRole === "LEADER") {
     return <LeaderView />;
   }
 
-  // Default to TeamMemberView for TEAM_MEMBER or undefined roles
-  return <TeamMemberView />;
+  // Show NoTeamView for NONE or undefined roles
+  return <NoTeamView />;
 }

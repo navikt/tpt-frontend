@@ -183,6 +183,18 @@
     "noCriticalVulnerabilities": "🙌 Ingen kritiske sårbarheter!",
     "noCriticalDescription": "Det er ingen sårbarheter med høy prioritet akkurat nå."
   },
+  "noTeamView": {
+    "title": "Ingen team funnet",
+    "description": "Vi kunne ikke koble deg til noen utviklingsteam.",
+    "message": "Det ser ut til at du ikke er medlem av noen team i vårt system. Ta kontakt med team appsec hvis du tror dette er en feil."
+  },
+  "roleContext": {
+    "viewAs": "Vis som",
+    "developer": "Utvikler",
+    "teamMember": "Teammedlem",
+    "leader": "Leder",
+    "none": "Ingen rolle"
+  },
   "errors": {
     "title": "Det oppstod en feil",
     "networkError": "Kunne ikke koble til serveren. Vennligst prøv igjen senere.",

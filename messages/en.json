@@ -183,6 +183,18 @@
     "noCriticalVulnerabilities": "🙌 No critical vulnerabilities!",
     "noCriticalDescription": "There are no high priority vulnerabilities at the moment."
   },
+  "noTeamView": {
+    "title": "No teams found",
+    "description": "We were unable to link you to any development teams.",
+    "message": "It appears you are not a member of any teams in our system. Please contact the appsec team if you believe this is an error."
+  },
+  "roleContext": {
+    "viewAs": "View as",
+    "developer": "Developer",
+    "teamMember": "Team Member",
+    "leader": "Leader",
+    "none": "No role"
+  },
   "errors": {
     "title": "An error occurred",
     "networkError": "Could not connect to the server. Please try again later.",
