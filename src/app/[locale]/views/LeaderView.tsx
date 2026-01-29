@@ -301,15 +301,15 @@ export default function LeaderView() {
                       <Table.DataCell>{team.lowPriority + team.veryLowPriority}</Table.DataCell>
                       <Table.DataCell>
                         {team.highPriority > 0 ? (
-                          <Tag variant="error" size="small">
+                          <Tag data-color="danger" variant="outline" size="small">
                             {t("statusRequiresAction")}
                           </Tag>
                         ) : team.mediumPriority > 0 ? (
-                          <Tag variant="warning" size="small">
+                          <Tag data-color="warning" variant="outline" size="small">
                             {t("statusFollowUp")}
                           </Tag>
                         ) : (
-                          <Tag variant="success" size="small">
+                          <Tag data-color="success" variant="outline" size="small">
                             {t("statusOk")}
                           </Tag>
                         )}

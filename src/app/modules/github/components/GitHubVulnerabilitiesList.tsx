@@ -203,12 +203,12 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                                     </LinkCard.Anchor>
                                     <HStack gap="space-8" align="center">
                                       {isCritical && (
-                                        <Tag variant="error" size="small">
+                                        <Tag data-color="danger" variant="outline" size="small">
                                           CVSS {vuln.cvssScore?.toFixed(1)}
                                         </Tag>
                                       )}
                                       {vuln.dependabotUpdatePullRequestUrl && (
-                                        <Tag variant="success" size="small">
+                                        <Tag data-color="success" variant="outline" size="small">
                                           Fix available
                                         </Tag>
                                       )}

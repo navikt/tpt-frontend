@@ -288,10 +288,10 @@ export default function GitHubVulnerabilityDetailPage() {
                             {Math.round(factor.contribution)}
                           </Tag>
                           <Tag
-                            variant="info"
+                            data-color="info"
+                            variant="outline"
                             size="xsmall"
-                            style={{ width: "4em" }}
-                          >
+                            style={{ width: "4em" }}>
                             {factor.multiplier}x
                           </Tag>
                         </HStack>

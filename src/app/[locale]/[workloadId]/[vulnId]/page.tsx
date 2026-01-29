@@ -275,11 +275,7 @@ export default function WorkloadDetailPage() {
                                                     >
                                                         {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
                                                     </Tag>
-                                                    <Tag
-                                                        variant="info"
-                                                        size="xsmall"
-                                                        style={{width: "4em"}}
-                                                    >
+                                                    <Tag data-color="info" variant="outline" size="xsmall" style={{width: "4em"}}>
                                                         {factor.multiplier}x
                                                     </Tag>
                                                 </HStack>
