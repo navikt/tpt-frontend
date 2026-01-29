@@ -1,5 +1,5 @@
 .accordionWrapper {
-    background: var(--a-surface-subtle);
+    background: var(--ax-bg-neutral-soft);
     border-radius: 8px;
     overflow: hidden;
 }

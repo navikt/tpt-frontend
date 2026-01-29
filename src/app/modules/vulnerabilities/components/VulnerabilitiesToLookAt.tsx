@@ -198,7 +198,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                         .sort((a, b) => b[1].length - a[1].length) // Sort by vulnerability count descending
                                         .map(([packageName, vulnerabilities]) => (
                                             <div key={packageName} style={{ marginBottom: "1rem" }}>
-                                                <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
+                                                <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}>
                                                     {packageName} ({vulnerabilities.length} {t("common.vulnerabilities")})
                                                 </BodyShort>
                                                 {vulnerabilities.map((vuln, vulnIndex) => {

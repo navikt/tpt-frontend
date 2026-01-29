@@ -196,7 +196,7 @@ export default function LeaderView() {
                   <BodyShort size="small" textColor="subtle">
                     {t("highPriority")}
                   </BodyShort>
-                  <Heading size="large" level="3" style={{ color: "var(--a-text-danger)" }}>
+                  <Heading size="large" level="3" style={{ color: "var(--ax-text-danger-subtle)" }}>
                     {aggregateStats.highPriority}
                   </Heading>
                 </div>
@@ -282,7 +282,7 @@ export default function LeaderView() {
                       <Table.DataCell>{team.totalVulnerabilities}</Table.DataCell>
                       <Table.DataCell>
                         {team.highPriority > 0 ? (
-                          <span style={{ color: "var(--a-text-danger)", fontWeight: "600" }}>
+                          <span style={{ color: "var(--ax-text-danger-subtle)", fontWeight: "600" }}>
                             {team.highPriority}
                           </span>
                         ) : (

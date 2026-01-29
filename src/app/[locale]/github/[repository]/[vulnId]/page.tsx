@@ -226,8 +226,8 @@ export default function GitHubVulnerabilityDetailPage() {
             padding="4"
             borderRadius="medium"
             style={{
-              backgroundColor: "var(--a-surface-info-subtle)",
-              border: "2px solid var(--a-border-info)",
+              backgroundColor: "var(--ax-bg-info-soft)",
+              border: "2px solid var(--ax-border-info)",
               marginBottom: "1rem",
             }}
           >
@@ -238,7 +238,7 @@ export default function GitHubVulnerabilityDetailPage() {
                 </BodyShort>
                 <BodyShort
                   size="small"
-                  style={{ color: "var(--a-text-subtle)" }}
+                  style={{ color: "var(--ax-text-neutral-subtle)" }}
                 >
                   Based on CVE severity (CVSS)
                 </BodyShort>
@@ -263,7 +263,7 @@ export default function GitHubVulnerabilityDetailPage() {
                     borderRadius="medium"
                     style={{
                       backgroundColor: getSeverityColor(factor.severity),
-                      border: "1px solid var(--a-border-subtle)",
+                      border: "1px solid var(--ax-border-neutral-subtle)",
                     }}
                   >
                     <HStack gap="4" align="start">
@@ -326,7 +326,7 @@ export default function GitHubVulnerabilityDetailPage() {
                 </BodyShort>
                 <BodyShort
                   size="small"
-                  style={{ color: "var(--a-text-subtle)" }}
+                  style={{ color: "var(--ax-text-neutral-subtle)" }}
                 >
                   Total
                 </BodyShort>

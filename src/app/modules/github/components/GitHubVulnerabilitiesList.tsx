@@ -177,7 +177,7 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                       const [scope, ecosystem] = key.split('|||');
                       return (
                         <div key={key} style={{ marginBottom: "1rem" }}>
-                          <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
+                          <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}>
                             {scope} / {ecosystem} ({vulnerabilities.length} {t("common.vulnerabilities")})
                           </BodyShort>
                           {vulnerabilities.map((vuln, vulnIndex) => {

@@ -72,7 +72,7 @@ const TeamFilterModal = ({
         ) : (
           <VStack gap="6">
             <div>
-              <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
+              <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                 {t("description")}
               </BodyShort>
             </div>
@@ -86,7 +86,7 @@ const TeamFilterModal = ({
                 >
                   {t("showAllBuckets")}
                 </Checkbox>
-                <BodyShort size="small" style={{ color: "var(--a-text-subtle)", marginTop: "0.5rem" }}>
+                <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginTop: "0.5rem" }}>
                   {t("showAllBucketsDescription")}
                 </BodyShort>
               </div>

@@ -221,15 +221,15 @@ export default function WorkloadDetailPage() {
                         padding="4"
                         borderRadius="medium"
                         style={{
-                            backgroundColor: "var(--a-surface-info-subtle)",
-                            border: "2px solid var(--a-border-info)",
+                            backgroundColor: "var(--ax-bg-info-soft)",
+                            border: "2px solid var(--ax-border-info)",
                             marginBottom: "1rem",
                         }}
                     >
                         <HStack gap="4" align="center" justify="space-between">
                             <VStack gap="1">
                                 <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.baseScoreTitle")}</BodyShort>
-                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                <BodyShort size="small" style={{color: "var(--ax-text-neutral-subtle)"}}>
                                     {t("vulnerabilityDetail.baseScoreDescription")}
                                 </BodyShort>
                             </VStack>
@@ -252,7 +252,7 @@ export default function WorkloadDetailPage() {
                                         borderRadius="medium"
                                         style={{
                                             backgroundColor: getSeverityColor(factor.severity),
-                                            border: "1px solid var(--a-border-subtle)",
+                                            border: "1px solid var(--ax-border-neutral-subtle)",
                                         }}
                                     >
                                         <HStack gap="4" align="start">
@@ -310,7 +310,7 @@ export default function WorkloadDetailPage() {
                         <HStack gap="4" align="center" justify="space-between">
                             <VStack gap="1">
                                 <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.riskScoreLabel")}</BodyShort>
-                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                <BodyShort size="small" style={{color: "var(--ax-text-neutral-subtle)"}}>
                                     {t("vulnerabilityDetail.riskScoreSummaryDescription")}
                                 </BodyShort>
                             </VStack>

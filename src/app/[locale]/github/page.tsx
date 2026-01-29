@@ -94,7 +94,7 @@ export default function GitHubPage() {
           >
             <HStack gap="6" wrap>
               <div>
-                <BodyShort weight="semibold" size="small" style={{ color: "var(--a-text-subtle)" }}>
+                <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                   {t("github.metadata.teams")}
                 </BodyShort>
                 <BodyShort size="large" weight="semibold">
@@ -102,7 +102,7 @@ export default function GitHubPage() {
                 </BodyShort>
               </div>
               <div>
-                <BodyShort weight="semibold" size="small" style={{ color: "var(--a-text-subtle)" }}>
+                <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                   {t("github.metadata.repositories")}
                 </BodyShort>
                 <BodyShort size="large" weight="semibold">
@@ -111,7 +111,7 @@ export default function GitHubPage() {
               </div>
               {teamRepos.length > 0 && (
                 <div style={{ flex: 1, minWidth: "300px" }}>
-                  <BodyShort weight="semibold" size="small" style={{ color: "var(--a-text-subtle)", marginBottom: "0.5rem" }}>
+                  <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginBottom: "0.5rem" }}>
                     Repositories per team
                   </BodyShort>
                   <HStack gap="4" wrap>
