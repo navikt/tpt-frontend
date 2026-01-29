@@ -116,13 +116,13 @@ export default function GitHubVulnerabilityDetailPage() {
       </Link>
       {/* Vulnerability Header */}
       <Box
-        padding="6"
+        padding="space-24"
         borderRadius="4"
         background="neutral-soft"
         style={{ marginBottom: "1.5rem" }}
       >
-        <VStack gap="4">
-          <HStack gap="4" align="center" justify="space-between" wrap>
+        <VStack gap="space-16">
+          <HStack gap="space-16" align="center" justify="space-between" wrap>
             <Heading size="large">{vulnerability.identifier}</Heading>
             <Tag
               variant={
@@ -157,7 +157,7 @@ export default function GitHubVulnerabilityDetailPage() {
             </BodyShort>
           )}
 
-          <HStack gap="4" wrap>
+          <HStack gap="space-16" wrap>
             {vulnerability.packageName && (
               <BodyShort size="small">
                 <b>Package:</b> {vulnerability.packageName}
@@ -186,12 +186,12 @@ export default function GitHubVulnerabilityDetailPage() {
       </Box>
       {/* Repository Context */}
       <Box
-        padding="4"
+        padding="space-16"
         borderRadius="4"
         background="neutral-soft"
         style={{ marginBottom: "1.5rem" }}
       >
-        <HStack gap="6" wrap>
+        <HStack gap="space-24" wrap>
           <BodyShort size="small">
             <b>Repository:</b> {repository}
           </BodyShort>
@@ -204,7 +204,7 @@ export default function GitHubVulnerabilityDetailPage() {
             rel="noopener noreferrer"
             style={{ fontSize: "0.875rem" }}
           >
-            <HStack gap="1" align="center">
+            <HStack gap="space-4" align="center">
               <BranchingIcon aria-hidden />
               GitHub
             </HStack>
@@ -219,7 +219,7 @@ export default function GitHubVulnerabilityDetailPage() {
       {vulnerability.riskScoreBreakdown && (
         <>
           <Box
-            padding="4"
+            padding="space-16"
             borderRadius="4"
             style={{
               backgroundColor: "var(--ax-bg-info-soft)",
@@ -227,8 +227,8 @@ export default function GitHubVulnerabilityDetailPage() {
               marginBottom: "1rem",
             }}
           >
-            <HStack gap="4" align="center" justify="space-between">
-              <VStack gap="1">
+            <HStack gap="space-16" align="center" justify="space-between">
+              <VStack gap="space-4">
                 <BodyShort weight="semibold" size="large">
                   Base Score
                 </BodyShort>
@@ -246,7 +246,7 @@ export default function GitHubVulnerabilityDetailPage() {
           </Box>
 
           {riskFactors.length > 0 ? (
-            <VStack gap="3" style={{ marginBottom: "1.5rem" }}>
+            <VStack gap="space-12" style={{ marginBottom: "1.5rem" }}>
               {riskFactors
                 .sort((a: RiskFactor, b: RiskFactor) => {
                   const severityOrder = { high: 0, medium: 1, low: 2, info: 3 };
@@ -255,19 +255,19 @@ export default function GitHubVulnerabilityDetailPage() {
                 .map((factor: RiskFactor, index: number) => (
                   <Box
                     key={index}
-                    padding="4"
+                    padding="space-16"
                     borderRadius="4"
                     style={{
                       backgroundColor: getSeverityColor(factor.severity),
                       border: "1px solid var(--ax-border-neutral-subtle)",
                     }}
                   >
-                    <HStack gap="4" align="start">
+                    <HStack gap="space-16" align="start">
                       <div style={{ color: getSeverityIconColor(factor.severity) }}>
                         {getIconForFactor(factor.iconName)}
                       </div>
-                      <VStack gap="1" style={{ flex: 1 }}>
-                        <HStack gap="2" align="end">
+                      <VStack gap="space-4" style={{ flex: 1 }}>
+                        <HStack gap="space-8" align="end">
                           <BodyShort weight="semibold" style={{ flexGrow: 1 }}>
                             {factor.name}
                           </BodyShort>
@@ -307,7 +307,7 @@ export default function GitHubVulnerabilityDetailPage() {
             </Alert>
           )}
           <Box
-            padding="4"
+            padding="space-16"
             borderRadius="4"
             style={{
               backgroundColor: `var(--a-surface-${riskSumColorVariant}-subtle)`,
@@ -315,8 +315,8 @@ export default function GitHubVulnerabilityDetailPage() {
               marginBottom: "1rem",
             }}
           >
-            <HStack gap="4" align="center" justify="space-between">
-              <VStack gap="1">
+            <HStack gap="space-16" align="center" justify="space-between">
+              <VStack gap="space-4">
                 <BodyShort weight="semibold" size="large">
                   Risk Score:
                 </BodyShort>

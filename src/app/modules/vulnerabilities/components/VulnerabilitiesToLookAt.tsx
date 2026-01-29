@@ -155,11 +155,11 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                     onOpenChange={() => toggleItem(workloadGroup.workload.id)}
                                 >
                                     <Accordion.Header>
-                                        <HStack gap="2" align="center" justify="space-between" style={{ width: "100%" }}>
+                                        <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
                                             <span>
                                                 {workloadGroup.workload.name} ({workloadGroup.vulnerabilities.length} {t("common.vulnerabilities")})
                                             </span>
-                                            <HStack gap="2" align="center">
+                                            <HStack gap="space-8" align="center">
                                                 {workloadGroup.workload.repository && (
                                                     <a
                                                         href={`https://www.github.com/${workloadGroup.workload.repository}`}
@@ -214,7 +214,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                                             style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
                                                         >
                                                             <LinkCard.Title>
-                                                                <HStack gap="2" align="center" justify="space-between" wrap>
+                                                                <HStack gap="space-8" align="center" justify="space-between" wrap>
                                                                     <LinkCard.Anchor asChild>
                                                                         <Link href={`/${workloadGroup.workload.id}/${vuln.identifier}`}>
                                                                             {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
@@ -225,7 +225,6 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                                                     />
                                                                 </HStack>
                                                             </LinkCard.Title>
-
                                                             {description && (
                                                                 <LinkCard.Description>
                                                                     {description}

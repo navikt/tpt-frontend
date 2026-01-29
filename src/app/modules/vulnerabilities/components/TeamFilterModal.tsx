@@ -70,7 +70,7 @@ const TeamFilterModal = ({
             <Loader size="medium" title={t("loadingTeams")} />
           </div>
         ) : (
-          <VStack gap="6">
+          <VStack gap="space-24">
             <div>
               <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                 {t("description")}
@@ -94,7 +94,7 @@ const TeamFilterModal = ({
 
             {uniqueTeams.length > 0 && (
               <div>
-                <VStack gap="3">
+                <VStack gap="space-12">
                   {uniqueTeams.map((team) => {
                     const isChecked = tempSelectedTeams.includes(team);
                     
@@ -118,9 +118,8 @@ const TeamFilterModal = ({
           </VStack>
         )}
       </Modal.Body>
-
       <Modal.Footer>
-        <HStack gap="4">
+        <HStack gap="space-16">
           <Button variant="secondary" onClick={onClose}>
             {t("cancel")}
           </Button>

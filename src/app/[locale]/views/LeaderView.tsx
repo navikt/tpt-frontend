@@ -123,7 +123,7 @@ export default function LeaderView() {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
-          <VStack gap="6">
+          <VStack gap="space-24">
             <div>
               <Heading size="large" level="1">
                 {t("title")}
@@ -147,7 +147,7 @@ export default function LeaderView() {
   return (
     <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
       <main>
-        <VStack gap="8">
+        <VStack gap="space-32">
           <div>
             <Heading size="large" level="1" spacing>
               {t("title")}
@@ -163,11 +163,11 @@ export default function LeaderView() {
             borderRadius="8"
             background="neutral-soft"
           >
-            <VStack gap="4">
+            <VStack gap="space-16">
               <Heading size="medium" level="2">
                 {t("total")}
               </Heading>
-              <HGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="4">
+              <HGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="space-16">
                 <div>
                   <BodyShort size="small" textColor="subtle">
                     {t("teams")}
@@ -220,7 +220,7 @@ export default function LeaderView() {
             borderWidth="1"
             borderColor="neutral-subtle"
           >
-            <VStack gap="4">
+            <VStack gap="space-16">
               <Heading size="medium" level="2">
                 {t("teamsSection")}
               </Heading>

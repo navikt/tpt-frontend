@@ -141,11 +141,11 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                   onOpenChange={() => toggleItem(repoGroup.repository.nameWithOwner)}
                 >
                   <Accordion.Header>
-                    <HStack gap="2" align="center" justify="space-between" style={{ width: "100%" }}>
+                    <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
                       <span>
                         {repoGroup.repository.nameWithOwner} ({repoGroup.vulnerabilities.length} {t("common.vulnerabilities")})
                       </span>
-                      <HStack gap="2" align="center">
+                      <HStack gap="space-8" align="center">
                         <a
                           href={`https://www.github.com/${repoGroup.repository.nameWithOwner}`}
                           target="_blank"
@@ -195,13 +195,13 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                                 style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
                               >
                                 <LinkCard.Title>
-                                  <HStack gap="2" align="center" justify="space-between" wrap>
+                                  <HStack gap="space-8" align="center" justify="space-between" wrap>
                                     <LinkCard.Anchor asChild>
                                       <Link href={`/github/${encodeURIComponent(repoGroup.repository.nameWithOwner)}/${vuln.identifier}`}>
                                         {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""} ({vuln.packageName})
                                       </Link>
                                     </LinkCard.Anchor>
-                                    <HStack gap="2" align="center">
+                                    <HStack gap="space-8" align="center">
                                       {isCritical && (
                                         <Tag variant="error" size="small">
                                           CVSS {vuln.cvssScore?.toFixed(1)}
@@ -218,7 +218,6 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                                     </HStack>
                                   </HStack>
                                 </LinkCard.Title>
-
                                 {truncatedText && (
                                   <LinkCard.Description>
                                     {truncatedText}

@@ -58,7 +58,7 @@ export default function TeamMemberView() {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
-          <VStack gap="6">
+          <VStack gap="space-24">
             <div>
               <Heading size="large" level="1">
                 {t("title")}
@@ -84,7 +84,7 @@ export default function TeamMemberView() {
   return (
     <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
       <main>
-        <VStack gap="8">
+        <VStack gap="space-32">
           <div>
             <Heading size="large" level="1" spacing>
               {t("title")}
@@ -94,13 +94,13 @@ export default function TeamMemberView() {
             </BodyShort>
           </div>
 
-          <HGrid columns={{ xs: 1, sm: 2 }} gap="4">
+          <HGrid columns={{ xs: 1, sm: 2 }} gap="space-16">
             <Box
               padding="space-24"
               borderRadius="8"
               background="neutral-soft"
             >
-              <VStack gap="2">
+              <VStack gap="space-8">
                 <BodyShort size="small" textColor="subtle">
                   {t("totalApplications")}
                 </BodyShort>
@@ -115,7 +115,7 @@ export default function TeamMemberView() {
               borderRadius="8"
               background="neutral-soft"
             >
-              <VStack gap="2">
+              <VStack gap="space-8">
                 <BodyShort size="small" textColor="subtle">
                   {t("totalVulnerabilities")}
                 </BodyShort>
@@ -133,18 +133,18 @@ export default function TeamMemberView() {
             borderWidth="1"
             borderColor="neutral-subtle"
           >
-            <VStack gap="6">
+            <VStack gap="space-24">
               <Heading size="medium" level="2">
                 {t("vulnerabilitiesByPriority")}
               </Heading>
 
-              <HGrid columns={{ xs: 1, sm: 2, lg: 4 }} gap="4">
+              <HGrid columns={{ xs: 1, sm: 2, lg: 4 }} gap="space-16">
                 <Box
                   padding="space-16"
                   borderRadius="4"
                   background="danger-soft"
                 >
-                  <VStack gap="2">
+                  <VStack gap="space-8">
                     <BodyShort size="small" weight="semibold">
                       {t("highPriority")}
                     </BodyShort>
@@ -159,7 +159,7 @@ export default function TeamMemberView() {
                   borderRadius="4"
                   background="warning-soft"
                 >
-                  <VStack gap="2">
+                  <VStack gap="space-8">
                     <BodyShort size="small" weight="semibold">
                       {t("shouldHandle")}
                     </BodyShort>
@@ -174,7 +174,7 @@ export default function TeamMemberView() {
                   borderRadius="4"
                   background="info-soft"
                 >
-                  <VStack gap="2">
+                  <VStack gap="space-8">
                     <BodyShort size="small" weight="semibold">
                       {t("whenTime")}
                     </BodyShort>
@@ -189,7 +189,7 @@ export default function TeamMemberView() {
                   borderRadius="4"
                   background="neutral-soft"
                 >
-                  <VStack gap="2">
+                  <VStack gap="space-8">
                     <BodyShort size="small" weight="semibold">
                       {t("lowPriority")}
                     </BodyShort>
