@@ -114,12 +114,11 @@ export default function GitHubVulnerabilityDetailPage() {
       >
         ← Back
       </Link>
-
       {/* Vulnerability Header */}
       <Box
         padding="6"
-        borderRadius="medium"
-        background="surface-subtle"
+        borderRadius="4"
+        background="neutral-soft"
         style={{ marginBottom: "1.5rem" }}
       >
         <VStack gap="4">
@@ -185,12 +184,11 @@ export default function GitHubVulnerabilityDetailPage() {
           </HStack>
         </VStack>
       </Box>
-
       {/* Repository Context */}
       <Box
         padding="4"
-        borderRadius="medium"
-        background="surface-subtle"
+        borderRadius="4"
+        background="neutral-soft"
         style={{ marginBottom: "1.5rem" }}
       >
         <HStack gap="6" wrap>
@@ -213,18 +211,16 @@ export default function GitHubVulnerabilityDetailPage() {
           </DSLink>
         </HStack>
       </Box>
-
       {/* Risk Score Explanation */}
       <Heading size="medium" spacing>
         Why this risk score?
       </Heading>
-
       {/* Base Score Box */}
       {vulnerability.riskScoreBreakdown && (
         <>
           <Box
             padding="4"
-            borderRadius="medium"
+            borderRadius="4"
             style={{
               backgroundColor: "var(--ax-bg-info-soft)",
               border: "2px solid var(--ax-border-info)",
@@ -260,7 +256,7 @@ export default function GitHubVulnerabilityDetailPage() {
                   <Box
                     key={index}
                     padding="4"
-                    borderRadius="medium"
+                    borderRadius="4"
                     style={{
                       backgroundColor: getSeverityColor(factor.severity),
                       border: "1px solid var(--ax-border-neutral-subtle)",
@@ -312,7 +308,7 @@ export default function GitHubVulnerabilityDetailPage() {
           )}
           <Box
             padding="4"
-            borderRadius="medium"
+            borderRadius="4"
             style={{
               backgroundColor: `var(--a-surface-${riskSumColorVariant}-subtle)`,
               border: `2px solid var(--a-border-${riskSumColorVariant})`,

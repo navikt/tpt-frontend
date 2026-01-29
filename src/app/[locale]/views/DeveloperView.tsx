@@ -55,8 +55,8 @@ export default function DeveloperView() {
           </div>
           <Box
             padding="6"
-            borderRadius="medium"
-            background="surface-subtle"
+            borderRadius="4"
+            background="neutral-soft"
             style={{ marginBottom: "1.5rem", textAlign: "center" }}
           >
             <Loader size="large" title={t("home.loadingVulnerabilities")} />

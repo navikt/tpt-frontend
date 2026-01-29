@@ -132,8 +132,8 @@ export default function LeaderView() {
             </div>
             <Box
               padding="space-24"
-              borderRadius="large"
-              background="surface-subtle"
+              borderRadius="8"
+              background="neutral-soft"
               style={{ textAlign: "center" }}
             >
               <Loader size="large" title={t("loadingData")} />
@@ -160,8 +160,8 @@ export default function LeaderView() {
           {/* Aggregate Summary */}
           <Box
             padding="space-24"
-            borderRadius="large"
-            background="surface-subtle"
+            borderRadius="8"
+            background="neutral-soft"
           >
             <VStack gap="4">
               <Heading size="medium" level="2">
@@ -215,10 +215,10 @@ export default function LeaderView() {
           {/* Team Breakdown Table */}
           <Box
             padding="space-24"
-            borderRadius="large"
-            background="surface-default"
+            borderRadius="8"
+            background="default"
             borderWidth="1"
-            borderColor="border-subtle"
+            borderColor="neutral-subtle"
           >
             <VStack gap="4">
               <Heading size="medium" level="2">
@@ -324,8 +324,8 @@ export default function LeaderView() {
           {aggregateStats.highPriority === 0 && (
             <Box
               padding="space-24"
-              borderRadius="large"
-              background="surface-success-subtle"
+              borderRadius="8"
+              background="success-soft"
               style={{ textAlign: "center" }}
             >
               <Heading size="medium" level="2">

@@ -64,8 +64,8 @@ export default function GitHubPage() {
             <p>{t("github.pageDescription")}</p>
             <Box
               padding="6"
-              borderRadius="medium"
-              background="surface-subtle"
+              borderRadius="4"
+              background="neutral-soft"
               style={{ marginBottom: "1.5rem", textAlign: "center" }}
             >
               <Loader size="large" title={t("home.loadingVulnerabilities")} />
@@ -88,8 +88,8 @@ export default function GitHubPage() {
           {/* Metadata Section */}
           <Box
             padding="4"
-            borderRadius="medium"
-            background="surface-subtle"
+            borderRadius="4"
+            background="neutral-soft"
             style={{ marginBottom: "1.5rem" }}
           >
             <HStack gap="6" wrap>

@@ -101,12 +101,11 @@ export default function WorkloadDetailPage() {
             <Link onClick={() => history.back()} href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
                 {t("vulnerabilityDetail.back")}
             </Link>
-
             {/* Vulnerability Header */}
             <Box
                 padding="6"
-                borderRadius="medium"
-                background="surface-subtle"
+                borderRadius="4"
+                background="neutral-soft"
                 style={{marginBottom: "1.5rem"}}
             >
                 <VStack gap="4">
@@ -162,12 +161,11 @@ export default function WorkloadDetailPage() {
                     </HStack>
                 </VStack>
             </Box>
-
             {/* Workload Context */}
             <Box
                 padding="4"
-                borderRadius="medium"
-                background="surface-subtle"
+                borderRadius="4"
+                background="neutral-soft"
                 style={{marginBottom: "1.5rem"}}
             >
                 <HStack gap="6" wrap>
@@ -208,18 +206,16 @@ export default function WorkloadDetailPage() {
                     )}
                 </HStack>
             </Box>
-
             {/* Risk Score Explanation */}
             <Heading size="medium" spacing>
                 {t("vulnerabilityDetail.riskScoreWhy")}
             </Heading>
-
             {/* Base Score Box */}
             {vulnerabilityData.riskScoreBreakdown && (
                 <>
                     <Box
                         padding="4"
-                        borderRadius="medium"
+                        borderRadius="4"
                         style={{
                             backgroundColor: "var(--ax-bg-info-soft)",
                             border: "2px solid var(--ax-border-info)",
@@ -249,7 +245,7 @@ export default function WorkloadDetailPage() {
                                     <Box
                                         key={index}
                                         padding="4"
-                                        borderRadius="medium"
+                                        borderRadius="4"
                                         style={{
                                             backgroundColor: getSeverityColor(factor.severity),
                                             border: "1px solid var(--ax-border-neutral-subtle)",
@@ -300,7 +296,7 @@ export default function WorkloadDetailPage() {
                     )}
                     <Box
                         padding="4"
-                        borderRadius="medium"
+                        borderRadius="4"
                         style={{
                             backgroundColor: "var(--a-surface-" + riscSumColorVariant + "-subtle)",
                             border: "2px solid var(--a-border-" + riscSumColorVariant + ")",
@@ -320,7 +316,6 @@ export default function WorkloadDetailPage() {
                     </Box>
                 </>
             )}
-
         </div>
     );
 }
