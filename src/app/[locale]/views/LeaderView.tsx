@@ -123,7 +123,7 @@ export default function LeaderView() {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
-          <VStack gap="6">
+          <VStack gap="space-24">
             <div>
               <Heading size="large" level="1">
                 {t("title")}
@@ -132,8 +132,8 @@ export default function LeaderView() {
             </div>
             <Box
               padding="space-24"
-              borderRadius="large"
-              background="surface-subtle"
+              borderRadius="8"
+              background="neutral-soft"
               style={{ textAlign: "center" }}
             >
               <Loader size="large" title={t("loadingData")} />
@@ -147,7 +147,7 @@ export default function LeaderView() {
   return (
     <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
       <main>
-        <VStack gap="8">
+        <VStack gap="space-32">
           <div>
             <Heading size="large" level="1" spacing>
               {t("title")}
@@ -160,14 +160,14 @@ export default function LeaderView() {
           {/* Aggregate Summary */}
           <Box
             padding="space-24"
-            borderRadius="large"
-            background="surface-subtle"
+            borderRadius="8"
+            background="neutral-soft"
           >
-            <VStack gap="4">
+            <VStack gap="space-16">
               <Heading size="medium" level="2">
                 {t("total")}
               </Heading>
-              <HGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="4">
+              <HGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="space-16">
                 <div>
                   <BodyShort size="small" textColor="subtle">
                     {t("teams")}
@@ -196,7 +196,7 @@ export default function LeaderView() {
                   <BodyShort size="small" textColor="subtle">
                     {t("highPriority")}
                   </BodyShort>
-                  <Heading size="large" level="3" style={{ color: "var(--a-text-danger)" }}>
+                  <Heading size="large" level="3" style={{ color: "var(--ax-text-danger-subtle)" }}>
                     {aggregateStats.highPriority}
                   </Heading>
                 </div>
@@ -215,12 +215,12 @@ export default function LeaderView() {
           {/* Team Breakdown Table */}
           <Box
             padding="space-24"
-            borderRadius="large"
-            background="surface-default"
+            borderRadius="8"
+            background="default"
             borderWidth="1"
-            borderColor="border-subtle"
+            borderColor="neutral-subtle"
           >
-            <VStack gap="4">
+            <VStack gap="space-16">
               <Heading size="medium" level="2">
                 {t("teamsSection")}
               </Heading>
@@ -282,7 +282,7 @@ export default function LeaderView() {
                       <Table.DataCell>{team.totalVulnerabilities}</Table.DataCell>
                       <Table.DataCell>
                         {team.highPriority > 0 ? (
-                          <span style={{ color: "var(--a-text-danger)", fontWeight: "600" }}>
+                          <span style={{ color: "var(--ax-text-danger-subtle)", fontWeight: "600" }}>
                             {team.highPriority}
                           </span>
                         ) : (
@@ -301,15 +301,15 @@ export default function LeaderView() {
                       <Table.DataCell>{team.lowPriority + team.veryLowPriority}</Table.DataCell>
                       <Table.DataCell>
                         {team.highPriority > 0 ? (
-                          <Tag variant="error" size="small">
+                          <Tag data-color="danger" variant="outline" size="small">
                             {t("statusRequiresAction")}
                           </Tag>
                         ) : team.mediumPriority > 0 ? (
-                          <Tag variant="warning" size="small">
+                          <Tag data-color="warning" variant="outline" size="small">
                             {t("statusFollowUp")}
                           </Tag>
                         ) : (
-                          <Tag variant="success" size="small">
+                          <Tag data-color="success" variant="outline" size="small">
                             {t("statusOk")}
                           </Tag>
                         )}
@@ -324,8 +324,8 @@ export default function LeaderView() {
           {aggregateStats.highPriority === 0 && (
             <Box
               padding="space-24"
-              borderRadius="large"
-              background="surface-success-subtle"
+              borderRadius="8"
+              background="success-soft"
               style={{ textAlign: "center" }}
             >
               <Heading size="medium" level="2">

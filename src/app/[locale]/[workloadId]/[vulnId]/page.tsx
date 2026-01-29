@@ -101,16 +101,15 @@ export default function WorkloadDetailPage() {
             <Link onClick={() => history.back()} href="/" style={{marginBottom: "1rem", display: "inline-block"}}>
                 {t("vulnerabilityDetail.back")}
             </Link>
-
             {/* Vulnerability Header */}
             <Box
-                padding="6"
-                borderRadius="medium"
-                background="surface-subtle"
+                padding="space-24"
+                borderRadius="4"
+                background="neutral-soft"
                 style={{marginBottom: "1.5rem"}}
             >
-                <VStack gap="4">
-                    <HStack gap="4" align="center" justify="space-between" wrap>
+                <VStack gap="space-16">
+                    <HStack gap="space-16" align="center" justify="space-between" wrap>
                         <Heading size="large">{vulnerabilityData.identifier}</Heading>
                         <Tag
                             variant={
@@ -146,7 +145,7 @@ export default function WorkloadDetailPage() {
                         </BodyShort>
                     )}
 
-                    <HStack gap="4" wrap>
+                    <HStack gap="space-16" wrap>
                         <BodyShort size="small">
                             <b>{t("vulnerabilityDetail.package")}</b> {vulnerabilityData.packageName}
                         </BodyShort>
@@ -162,15 +161,14 @@ export default function WorkloadDetailPage() {
                     </HStack>
                 </VStack>
             </Box>
-
             {/* Workload Context */}
             <Box
-                padding="4"
-                borderRadius="medium"
-                background="surface-subtle"
+                padding="space-16"
+                borderRadius="4"
+                background="neutral-soft"
                 style={{marginBottom: "1.5rem"}}
             >
-                <HStack gap="6" wrap>
+                <HStack gap="space-24" wrap>
                     <BodyShort size="small">
                         <b>{t("vulnerabilityDetail.application")}</b> {workloadData.name}
                     </BodyShort>
@@ -187,7 +185,7 @@ export default function WorkloadDetailPage() {
                             rel="noopener noreferrer"
                             style={{fontSize: "0.875rem"}}
                         >
-                            <HStack gap="1" align="center">
+                            <HStack gap="space-4" align="center">
                                 <BranchingIcon aria-hidden/>
                                 {t("vulnerabilityDetail.github")}
                             </HStack>
@@ -200,7 +198,7 @@ export default function WorkloadDetailPage() {
                             rel="noopener noreferrer"
                             style={{fontSize: "0.875rem"}}
                         >
-                            <HStack gap="1" align="center">
+                            <HStack gap="space-4" align="center">
                                 <CloudIcon aria-hidden/>
                                 {t("vulnerabilityDetail.naisConsole")}
                             </HStack>
@@ -208,28 +206,26 @@ export default function WorkloadDetailPage() {
                     )}
                 </HStack>
             </Box>
-
             {/* Risk Score Explanation */}
             <Heading size="medium" spacing>
                 {t("vulnerabilityDetail.riskScoreWhy")}
             </Heading>
-
             {/* Base Score Box */}
             {vulnerabilityData.riskScoreBreakdown && (
                 <>
                     <Box
-                        padding="4"
-                        borderRadius="medium"
+                        padding="space-16"
+                        borderRadius="4"
                         style={{
-                            backgroundColor: "var(--a-surface-info-subtle)",
-                            border: "2px solid var(--a-border-info)",
+                            backgroundColor: "var(--ax-bg-info-soft)",
+                            border: "2px solid var(--ax-border-info)",
                             marginBottom: "1rem",
                         }}
                     >
-                        <HStack gap="4" align="center" justify="space-between">
-                            <VStack gap="1">
+                        <HStack gap="space-16" align="center" justify="space-between">
+                            <VStack gap="space-4">
                                 <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.baseScoreTitle")}</BodyShort>
-                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                <BodyShort size="small" style={{color: "var(--ax-text-neutral-subtle)"}}>
                                     {t("vulnerabilityDetail.baseScoreDescription")}
                                 </BodyShort>
                             </VStack>
@@ -239,7 +235,7 @@ export default function WorkloadDetailPage() {
                     </Box>
 
                     {riskFactors.length > 0 ? (
-                        <VStack gap="3" style={{marginBottom: "1.5rem"}}>
+                        <VStack gap="space-12" style={{marginBottom: "1.5rem"}}>
                             {riskFactors
                                 .sort((a, b) => {
                                     const severityOrder = {high: 0, medium: 1, low: 2, info: 3};
@@ -248,19 +244,19 @@ export default function WorkloadDetailPage() {
                                 .map((factor, index) => (
                                     <Box
                                         key={index}
-                                        padding="4"
-                                        borderRadius="medium"
+                                        padding="space-16"
+                                        borderRadius="4"
                                         style={{
                                             backgroundColor: getSeverityColor(factor.severity),
-                                            border: "1px solid var(--a-border-subtle)",
+                                            border: "1px solid var(--ax-border-neutral-subtle)",
                                         }}
                                     >
-                                        <HStack gap="4" align="start">
+                                        <HStack gap="space-16" align="start">
                                             <div style={{color: getSeverityIconColor(factor.severity)}}>
                                                 {getIconForFactor(factor.iconName)}
                                             </div>
-                                            <VStack gap="1" style={{flex: 1}}>
-                                                <HStack gap="2" align="end">
+                                            <VStack gap="space-4" style={{flex: 1}}>
+                                                <HStack gap="space-8" align="end">
                                                     <BodyShort weight="semibold" style={{flexGrow: 1}}>
                                                         {factor.name}
                                                     </BodyShort>
@@ -279,11 +275,7 @@ export default function WorkloadDetailPage() {
                                                     >
                                                         {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
                                                     </Tag>
-                                                    <Tag
-                                                        variant="info"
-                                                        size="xsmall"
-                                                        style={{width: "4em"}}
-                                                    >
+                                                    <Tag data-color="info" variant="outline" size="xsmall" style={{width: "4em"}}>
                                                         {factor.multiplier}x
                                                     </Tag>
                                                 </HStack>
@@ -299,18 +291,18 @@ export default function WorkloadDetailPage() {
                         </Alert>
                     )}
                     <Box
-                        padding="4"
-                        borderRadius="medium"
+                        padding="space-16"
+                        borderRadius="4"
                         style={{
                             backgroundColor: "var(--a-surface-" + riscSumColorVariant + "-subtle)",
                             border: "2px solid var(--a-border-" + riscSumColorVariant + ")",
                             marginBottom: "1rem",
                         }}
                     >
-                        <HStack gap="4" align="center" justify="space-between">
-                            <VStack gap="1">
+                        <HStack gap="space-16" align="center" justify="space-between">
+                            <VStack gap="space-4">
                                 <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.riskScoreLabel")}</BodyShort>
-                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                <BodyShort size="small" style={{color: "var(--ax-text-neutral-subtle)"}}>
                                     {t("vulnerabilityDetail.riskScoreSummaryDescription")}
                                 </BodyShort>
                             </VStack>
@@ -320,7 +312,6 @@ export default function WorkloadDetailPage() {
                     </Box>
                 </>
             )}
-
         </div>
     );
 }

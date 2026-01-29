@@ -63,9 +63,9 @@ export default function GitHubPage() {
             <h1>{t("github.tab")}</h1>
             <p>{t("github.pageDescription")}</p>
             <Box
-              padding="6"
-              borderRadius="medium"
-              background="surface-subtle"
+              padding="space-24"
+              borderRadius="4"
+              background="neutral-soft"
               style={{ marginBottom: "1.5rem", textAlign: "center" }}
             >
               <Loader size="large" title={t("home.loadingVulnerabilities")} />
@@ -87,14 +87,14 @@ export default function GitHubPage() {
 
           {/* Metadata Section */}
           <Box
-            padding="4"
-            borderRadius="medium"
-            background="surface-subtle"
+            padding="space-16"
+            borderRadius="4"
+            background="neutral-soft"
             style={{ marginBottom: "1.5rem" }}
           >
-            <HStack gap="6" wrap>
+            <HStack gap="space-24" wrap>
               <div>
-                <BodyShort weight="semibold" size="small" style={{ color: "var(--a-text-subtle)" }}>
+                <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                   {t("github.metadata.teams")}
                 </BodyShort>
                 <BodyShort size="large" weight="semibold">
@@ -102,7 +102,7 @@ export default function GitHubPage() {
                 </BodyShort>
               </div>
               <div>
-                <BodyShort weight="semibold" size="small" style={{ color: "var(--a-text-subtle)" }}>
+                <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                   {t("github.metadata.repositories")}
                 </BodyShort>
                 <BodyShort size="large" weight="semibold">
@@ -111,10 +111,10 @@ export default function GitHubPage() {
               </div>
               {teamRepos.length > 0 && (
                 <div style={{ flex: 1, minWidth: "300px" }}>
-                  <BodyShort weight="semibold" size="small" style={{ color: "var(--a-text-subtle)", marginBottom: "0.5rem" }}>
+                  <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginBottom: "0.5rem" }}>
                     Repositories per team
                   </BodyShort>
-                  <HStack gap="4" wrap>
+                  <HStack gap="space-16" wrap>
                     {teamRepos.map((tr) => (
                       <BodyShort key={tr.team} size="small">
                         <span style={{ fontWeight: 500 }}>{tr.team}</span>: {tr.repos}

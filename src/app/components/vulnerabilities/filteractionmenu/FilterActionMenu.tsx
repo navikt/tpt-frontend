@@ -63,9 +63,9 @@ const FilterActionMenu = ({
       <ActionMenu>
         <ActionMenu.Trigger>
           <Button
-            variant="secondary-neutral"
-            icon={<ChevronDownIcon aria-hidden />}
-          >
+            data-color="neutral"
+            variant="secondary"
+            icon={<ChevronDownIcon aria-hidden />}>
             {filterName}
           </Button>
         </ActionMenu.Trigger>

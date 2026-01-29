@@ -26,7 +26,7 @@ export function ErrorMessage({ error, title }: ErrorMessageProps) {
           </BodyShort>
           <BodyShort spacing>{errorMessage}</BodyShort>
           {error.traceId && (
-            <HStack gap="2" align="center">
+            <HStack gap="space-8" align="center">
               <BodyShort size="small" style={{ opacity: 0.8 }}>
                 {t("errors.traceId")}: {error.traceId}
               </BodyShort>

@@ -5,6 +5,7 @@ import { Vulnerability, Repository } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
+import styles from "./GitHubVulnerabilitiesList.module.css";
 import { useTranslations } from "next-intl";
 import { BucketThreshold } from "./GitHubVulnerabilitySummary";
 
@@ -134,24 +135,27 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {repositoriesWithVulns.map((repoGroup) => {
           return (
-            <div key={repoGroup.repository.nameWithOwner}>
+            <div
+              key={repoGroup.repository.nameWithOwner}
+              className={styles.accordionWrapper}
+            >
               <Accordion>
                 <Accordion.Item 
                   open={expandedItems[repoGroup.repository.nameWithOwner] || false}
                   onOpenChange={() => toggleItem(repoGroup.repository.nameWithOwner)}
                 >
                   <Accordion.Header>
-                    <HStack gap="2" align="center" justify="space-between" style={{ width: "100%" }}>
-                      <span>
+                    <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
+                      <BodyShort weight="semibold">
                         {repoGroup.repository.nameWithOwner} ({repoGroup.vulnerabilities.length} {t("common.vulnerabilities")})
-                      </span>
-                      <HStack gap="2" align="center">
+                      </BodyShort>
+                      <HStack gap="space-8" align="center">
                         <a
                           href={`https://www.github.com/${repoGroup.repository.nameWithOwner}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          style={{ textDecoration: "none" }}
+                          className={styles.githubLink}
                         >
                           GitHub
                         </a>
@@ -177,7 +181,7 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                       const [scope, ecosystem] = key.split('|||');
                       return (
                         <div key={key} style={{ marginBottom: "1rem" }}>
-                          <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--a-text-subtle)" }}>
+                          <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}>
                             {scope} / {ecosystem} ({vulnerabilities.length} {t("common.vulnerabilities")})
                           </BodyShort>
                           {vulnerabilities.map((vuln, vulnIndex) => {
@@ -195,20 +199,20 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                                 style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
                               >
                                 <LinkCard.Title>
-                                  <HStack gap="2" align="center" justify="space-between" wrap>
+                                  <HStack gap="space-8" align="center" justify="space-between" wrap>
                                     <LinkCard.Anchor asChild>
                                       <Link href={`/github/${encodeURIComponent(repoGroup.repository.nameWithOwner)}/${vuln.identifier}`}>
                                         {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""} ({vuln.packageName})
                                       </Link>
                                     </LinkCard.Anchor>
-                                    <HStack gap="2" align="center">
+                                    <HStack gap="space-8" align="center">
                                       {isCritical && (
-                                        <Tag variant="error" size="small">
+                                        <Tag data-color="danger" variant="outline" size="small">
                                           CVSS {vuln.cvssScore?.toFixed(1)}
                                         </Tag>
                                       )}
                                       {vuln.dependabotUpdatePullRequestUrl && (
-                                        <Tag variant="success" size="small">
+                                        <Tag data-color="success" variant="outline" size="small">
                                           Fix available
                                         </Tag>
                                       )}
@@ -218,7 +222,6 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                                     </HStack>
                                   </HStack>
                                 </LinkCard.Title>
-
                                 {truncatedText && (
                                   <LinkCard.Description>
                                     {truncatedText}

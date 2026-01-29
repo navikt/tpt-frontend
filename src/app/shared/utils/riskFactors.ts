@@ -45,26 +45,26 @@ export function getRiskFactors(vuln: Vulnerability, translate?: (key: string) =>
 export function getSeverityColor(severity: "high" | "medium" | "low" | "info"): string {
     switch (severity) {
         case "high":
-            return "var(--a-surface-danger-subtle)";
+            return "var(--ax-bg-danger-soft)";
         case "medium":
-            return "var(--a-surface-warning-subtle)";
+            return "var(--ax-bg-warning-soft)";
         case "low":
-            return "var(--a-surface-success-subtle)";
+            return "var(--ax-bg-success-soft)";
         case "info":
-            return "var(--a-surface-info-subtle)";
+            return "var(--ax-bg-info-soft)";
     }
 }
 
 export function getSeverityIconColor(severity: "high" | "medium" | "low" | "info"): string {
     switch (severity) {
         case "high":
-            return "var(--a-icon-danger)";
+            return "var(--ax-text-danger-decoration)";
         case "medium":
-            return "var(--a-icon-warning)";
+            return "var(--ax-text-warning-decoration)";
         case "low":
-            return "var(--a-icon-success)";
+            return "var(--ax-text-success-decoration)";
         case "info":
-            return "var(--a-icon-info)";
+            return "var(--ax-text-info-decoration)";
     }
 }
 
