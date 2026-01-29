@@ -4,46 +4,25 @@
     overflow: hidden;
 }
 
-.accordionWrapper :global(.navds-accordion) {
-    border: none !important;
-    --ac-accordion-header-border: none;
-    --ac-accordion-content-border: none;
+.accordionWrapper :global(.aksel-accordion) {
+    border: none;
 }
 
-.accordionWrapper :global(.navds-accordion__item) {
+.accordionWrapper :global(.aksel-accordion__item) {
     border: none !important;
-    border-top: none !important;
+}
+
+.accordionWrapper :global(.aksel-accordion__item:not(:last-child)) {
     border-bottom: none !important;
 }
 
-.accordionWrapper :global(.navds-accordion__item--open) {
+.accordionWrapper :global(.aksel-accordion__header) {
     border: none !important;
 }
 
-.accordionWrapper :global(.navds-accordion__header) {
+.accordionWrapper :global(.aksel-accordion__header-button) {
+    padding: 0.75rem 1rem;
     border: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
-}
-
-.accordionWrapper :global(.navds-accordion__header-button) {
-    border: none !important;
-    padding: 0.75rem 1rem !important;
-}
-
-.accordionWrapper :global(.navds-accordion__content) {
-    border: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
-    padding: 0 1rem 0.75rem 1rem !important;
-}
-
-.accordionWrapper :global(.navds-accordion__item:first-child) {
-    border-top: none !important;
-}
-
-.accordionWrapper :global(.navds-accordion__item:last-child) {
-    border-bottom: none !important;
 }
 
 .githubLink {
