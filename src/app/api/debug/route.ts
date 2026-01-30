@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
     let backendToken: string;
 
     if (isLocalDev()) {
-      backendToken = createLocalDevToken();
+      const email = process.env.LOCAL_DEV_EMAIL || "lokal.utvikler@nav.no";
+      backendToken = createLocalDevToken(email);
     } else {
       const accessToken = getToken(request);
       if (!accessToken) {

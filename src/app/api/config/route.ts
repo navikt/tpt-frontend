@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getBackendCacheTime } from "@/app/utils/backendCache";
 
 // Hardcoded fallback values
 const FALLBACK_THRESHOLDS = {
@@ -17,6 +18,7 @@ export async function GET() {
         headers: {
           "Content-Type": "application/json",
         },
+        next: { revalidate: getBackendCacheTime() },
       });
 
       if (response.ok) {

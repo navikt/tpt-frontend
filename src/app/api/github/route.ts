@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
+import { getBackendCacheTime } from "@/app/utils/backendCache";
 
 // Environment validation helper
 function getServerEnv() {
@@ -33,8 +34,9 @@ export async function GET(request: NextRequest) {
 
     // In local dev mode, create a mock token instead of using OBO flow
     if (isLocalDev()) {
-      console.log("Local dev mode enabled - using mock token");
-      backendToken = createLocalDevToken();
+      const email = process.env.LOCAL_DEV_EMAIL || "lokal.utvikler@nav.no";
+      console.log("Local dev mode enabled - using mock token for:", email);
+      backendToken = createLocalDevToken(email);
     } else {
       const accessToken = getToken(request);
       if (!accessToken) {
@@ -62,6 +64,7 @@ export async function GET(request: NextRequest) {
         Authorization: `Bearer ${backendToken}`,
         "Content-Type": "application/json",
       },
+      next: { revalidate: getBackendCacheTime() },
     });
 
     if (!response.ok) {
