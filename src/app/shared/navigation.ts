@@ -45,4 +45,10 @@ export const moduleNavLinks: ModuleNavLink[] = [
     order: 2,
     allowedRoles: ["DEVELOPER"],
   },
+  {
+    labelKey: "admin.navTitle",
+    path: "/admin",
+    order: 3,
+    allowedRoles: ["ADMIN"],
+  },
 ];
