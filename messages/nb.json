@@ -44,6 +44,59 @@
     "metadata": {
       "teams": "Teams",
       "repositories": "Repositories"
+    },
+    "overview": {
+      "title": "Oversikt",
+      "totalRepositories": "repositories",
+      "totalVulnerabilities": "sårbarheter totalt",
+      "criticalRepositories": "kritiske repositories",
+      "highRiskRepositories": "repositories med høy risiko",
+      "noCriticalVulnerabilities": "Ingen kritiske sårbarheter!",
+      "teamStatistics": "Teamstatistikk",
+      "repositoriesShort": "repos",
+      "vulnerabilitiesShort": "sårb."
+    },
+    "repository": {
+      "riskScore": "Risikoscore",
+      "vulnerabilities": "Sårbarheter",
+      "vulnerabilityBreakdown": "Sårbarhetsfordeling",
+      "vulnerabilityList": "Alle sårbarheter",
+      "highPriority": "Høy prioritet",
+      "mediumPriority": "Middels prioritet",
+      "lowPriority": "Lav prioritet",
+      "securityMetrics": "Sikkerhetsmålinger",
+      "distrolessImage": "Distroless image",
+      "codeScanning": "Code scanning",
+      "lockFiles": "Lock-files",
+      "comingSoon": "Kommer snart",
+      "yes": "Ja",
+      "no": "Nei",
+      "unknown": "Ukjent",
+      "noRepositories": "Ingen repositories å vise",
+      "showingTop": "Viser topp {count} repositories etter risikoscore",
+      "showMore": "Vis {count} flere",
+      "showLess": "Vis færre",
+      "searchPlaceholder": "Søk etter repositories...",
+      "viewVulnerabilities": "Se sårbarheter",
+      "openPR": "Åpne fix-PR",
+      "viewDetails": "Se detaljer",
+      "package": "Pakke"
+    },
+    "riskLevel": {
+      "critical": "Kritisk",
+      "high": "Høy risiko",
+      "medium": "Middels risiko",
+      "low": "Lav risiko",
+      "none": "Ingen risiko"
+    },
+    "filterTeams": "Filtrer team",
+    "teamFilterModal": {
+      "title": "Filtrer team",
+      "selectAll": "Velg alle",
+      "clearAll": "Fjern alle",
+      "noTeams": "Ingen team funnet",
+      "apply": "Bruk",
+      "cancel": "Avbryt"
     }
   },
   "list": {
