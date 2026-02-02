@@ -32,10 +32,10 @@ spec:
     min: 1
   resources:
     limits:
-      memory: 128Mi
+      memory: 148Mi
     requests:
       cpu: 10m
-      memory: 96Mi
+      memory: 128Mi
   observability:
     logging:
       destinations:
