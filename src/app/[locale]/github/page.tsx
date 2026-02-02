@@ -1,17 +1,20 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import styles from "../page.module.css";
-import GitHubVulnerabilitiesList from "../../modules/github/components/GitHubVulnerabilitiesList";
-import GitHubVulnerabilitySummary, { BucketThreshold } from "../../modules/github/components/GitHubVulnerabilitySummary";
+import { GitHubRepositoryList } from "../../modules/github/components/GitHubRepositoryList";
+import { GitHubTeamFilterModal } from "../../modules/github/components/GitHubTeamFilterModal";
 import { useGitHubVulnerabilities } from "../../modules/github/hooks/useGitHubVulnerabilities";
+import { useRepositoryMetrics } from "../../modules/github/hooks/useRepositoryMetrics";
 import { useConfig } from "../../shared/hooks/useConfig";
 import { useTranslations } from "next-intl";
-import { Box, HStack, BodyShort, Loader } from "@navikt/ds-react";
+import { Box, HStack, BodyShort, Loader, Button, VStack, Heading, HGrid } from "@navikt/ds-react";
+import { useState } from "react";
 
 export default function GitHubPage() {
   const t = useTranslations();
   const { data, teamFilters, setTeamFilters } = useGitHubVulnerabilities();
   const { config, isLoading } = useConfig();
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
   
   // Compute selected teams from teamFilters
   const selectedTeams = useMemo(() => {
@@ -27,21 +30,46 @@ export default function GitHubPage() {
     const newFilters = Object.fromEntries(teams.map(team => [team, true]));
     setTeamFilters(newFilters);
   };
-  
-  // Create default bucket from config
-  const defaultBucket = useMemo<BucketThreshold | null>(() => {
-    if (!config) return null;
-    return {
-      name: t("buckets.highPriority"),
-      minThreshold: config.thresholds.high,
-      maxThreshold: Number.MAX_VALUE,
-    };
-  }, [config, t]);
 
-  const [selectedBucket, setSelectedBucket] = useState<BucketThreshold | null>(null);
+  // Get filtered repositories
+  const filteredRepositories = useMemo(() => {
+    if (!data) return [];
+    
+    return data.teams
+      .filter((team) => selectedTeams.length === 0 || selectedTeams.includes(team.team))
+      .flatMap((team) => team.repositories || [])
+      .filter((repo) => repo.vulnerabilities.length > 0);
+  }, [data, selectedTeams]);
 
-  // Use defaultBucket if no bucket is selected
-  const activeBucket = selectedBucket || defaultBucket;
+  const repositoryMetrics = useRepositoryMetrics({
+    repositories: filteredRepositories,
+    highThreshold: config?.thresholds.high ?? 150,
+    mediumThreshold: config?.thresholds.medium ?? 75,
+    lowThreshold: config?.thresholds.low ?? 30,
+  });
+
+  // Calculate team statistics
+  const teamStatistics = useMemo(() => {
+    if (!data) return [];
+    
+    return data.teams
+      .filter((team) => selectedTeams.length === 0 || selectedTeams.includes(team.team))
+      .map((team) => {
+        const repos = team.repositories || [];
+        const totalVulns = repos.reduce((sum, repo) => sum + repo.vulnerabilities.length, 0);
+        const totalRiskScore = repos.reduce((sum, repo) => 
+          sum + repo.vulnerabilities.reduce((s, v) => s + v.riskScore, 0), 0
+        );
+        
+        return {
+          name: team.team,
+          repositoryCount: repos.length,
+          vulnerabilityCount: totalVulns,
+          avgRiskScore: repos.length > 0 ? Math.round(totalRiskScore / repos.length) : 0,
+        };
+      })
+      .sort((a, b) => b.avgRiskScore - a.avgRiskScore);
+  }, [data, selectedTeams]);
 
   // Calculate metadata
   const totalTeams = data?.teams.length || 0;
@@ -49,13 +77,11 @@ export default function GitHubPage() {
     (sum, team) => sum + (team.repositories?.length || 0),
     0
   ) || 0;
-  const teamRepos = data?.teams.map((team) => ({
-    team: team.team,
-    repos: team.repositories?.length || 0,
-  })) || [];
+
+  const allTeams = data?.teams.map((t) => t.team) || [];
 
   // Show loading state while config is loading
-  if (isLoading || !activeBucket) {
+  if (isLoading) {
     return (
       <div className={styles.page}>
         <main className={styles.main}>
@@ -92,49 +118,85 @@ export default function GitHubPage() {
             background="neutral-soft"
             style={{ marginBottom: "1.5rem" }}
           >
-            <HStack gap="space-24" wrap>
-              <div>
-                <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-                  {t("github.metadata.teams")}
-                </BodyShort>
-                <BodyShort size="large" weight="semibold">
-                  {totalTeams}
-                </BodyShort>
-              </div>
-              <div>
-                <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-                  {t("github.metadata.repositories")}
-                </BodyShort>
-                <BodyShort size="large" weight="semibold">
-                  {totalRepositories}
-                </BodyShort>
-              </div>
-              {teamRepos.length > 0 && (
-                <div style={{ flex: 1, minWidth: "300px" }}>
-                  <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginBottom: "0.5rem" }}>
-                    Repositories per team
+            <HStack gap="space-24" wrap justify="space-between" align="center">
+              <HStack gap="space-24" wrap>
+                <div>
+                  <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+                    {t("github.metadata.teams")}
                   </BodyShort>
-                  <HStack gap="space-16" wrap>
-                    {teamRepos.map((tr) => (
-                      <BodyShort key={tr.team} size="small">
-                        <span style={{ fontWeight: 500 }}>{tr.team}</span>: {tr.repos}
-                      </BodyShort>
-                    ))}
-                  </HStack>
+                  <BodyShort size="large" weight="semibold">
+                    {totalTeams}
+                  </BodyShort>
                 </div>
-              )}
+                <div>
+                  <BodyShort weight="semibold" size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+                    {t("github.metadata.repositories")}
+                  </BodyShort>
+                  <BodyShort size="large" weight="semibold">
+                    {totalRepositories}
+                  </BodyShort>
+                </div>
+              </HStack>
+              
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => setFilterModalOpen(true)}
+              >
+                {t("github.filterTeams")} ({selectedTeams.length > 0 ? selectedTeams.length : "alle"})
+              </Button>
             </HStack>
           </Box>
 
-          <GitHubVulnerabilitySummary
-            selectedBucket={activeBucket}
-            onBucketSelect={setSelectedBucket}
+          {/* Team Statistics */}
+          {teamStatistics.length > 0 && (
+            <Box
+              padding="space-16"
+              borderRadius="4"
+              background="neutral-soft"
+              style={{ marginBottom: "1.5rem" }}
+            >
+              <VStack gap="space-12">
+                <Heading size="small" level="3">
+                  {t("github.overview.teamStatistics")}
+                </Heading>
+                <HGrid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap="space-12">
+                  {teamStatistics.map((team) => (
+                    <Box
+                      key={team.name}
+                      padding="space-12"
+                      borderRadius="4"
+                      style={{ 
+                        backgroundColor: "white",
+                        border: "1px solid var(--a-border-subtle)"
+                      }}
+                    >
+                      <VStack gap="space-4">
+                        <BodyShort weight="semibold">{team.name}</BodyShort>
+                        <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
+                          {team.repositoryCount} {t("github.overview.repositoriesShort")} · {team.vulnerabilityCount} {t("github.overview.vulnerabilitiesShort")}
+                        </BodyShort>
+                        <BodyShort size="small">
+                          Avg. risiko: <span style={{ fontWeight: 600 }}>{team.avgRiskScore}</span>
+                        </BodyShort>
+                      </VStack>
+                    </Box>
+                  ))}
+                </HGrid>
+              </VStack>
+            </Box>
+          )}
+
+          <Box paddingBlock="space-16">
+            <GitHubRepositoryList repositories={repositoryMetrics} />
+          </Box>
+
+          <GitHubTeamFilterModal
+            open={filterModalOpen}
+            onClose={() => setFilterModalOpen(false)}
+            allTeams={allTeams}
             selectedTeams={selectedTeams}
             onTeamsChange={handleTeamsChange}
-          />
-          <GitHubVulnerabilitiesList
-            selectedBucket={activeBucket}
-            selectedTeams={selectedTeams}
           />
         </div>
       </main>

@@ -43,6 +43,7 @@ export interface Workload {
 export interface Repository {
   nameWithOwner: string;
   vulnerabilities: Vulnerability[];
+  usesDistroless?: boolean | null;
 }
 
 export interface Team {

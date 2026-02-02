@@ -44,6 +44,59 @@
     "metadata": {
       "teams": "Teams",
       "repositories": "Repositories"
+    },
+    "overview": {
+      "title": "Overview",
+      "totalRepositories": "repositories",
+      "totalVulnerabilities": "vulnerabilities total",
+      "criticalRepositories": "critical repositories",
+      "highRiskRepositories": "repositories with high risk",
+      "noCriticalVulnerabilities": "No critical vulnerabilities!",
+      "teamStatistics": "Team Statistics",
+      "repositoriesShort": "repos",
+      "vulnerabilitiesShort": "vulns"
+    },
+    "repository": {
+      "riskScore": "Risk score",
+      "vulnerabilities": "Vulnerabilities",
+      "vulnerabilityBreakdown": "Vulnerability Breakdown",
+      "vulnerabilityList": "All Vulnerabilities",
+      "highPriority": "High priority",
+      "mediumPriority": "Medium priority",
+      "lowPriority": "Low priority",
+      "securityMetrics": "Security Metrics",
+      "distrolessImage": "Distroless image",
+      "codeScanning": "Code scanning",
+      "lockFiles": "Lock-files",
+      "comingSoon": "Coming soon",
+      "yes": "Yes",
+      "no": "No",
+      "unknown": "Unknown",
+      "noRepositories": "No repositories to show",
+      "showingTop": "Showing top {count} repositories by risk score",
+      "showMore": "Show {count} more",
+      "showLess": "Show less",
+      "searchPlaceholder": "Search repositories...",
+      "viewVulnerabilities": "View vulnerabilities",
+      "openPR": "Open fix PR",
+      "viewDetails": "View details",
+      "package": "Package"
+    },
+    "riskLevel": {
+      "critical": "Critical",
+      "high": "High risk",
+      "medium": "Medium risk",
+      "low": "Low risk",
+      "none": "No risk"
+    },
+    "filterTeams": "Filter teams",
+    "teamFilterModal": {
+      "title": "Filter teams",
+      "selectAll": "Select all",
+      "clearAll": "Clear all",
+      "noTeams": "No teams found",
+      "apply": "Apply",
+      "cancel": "Cancel"
     }
   },
   "list": {
