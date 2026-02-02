@@ -93,23 +93,25 @@ describe("queryParamHelpers", () => {
       expect(params.get(QUERY_PARAM_KEYS.team)).toBe("team with spaces");
     });
 
-    it("should switch to compression for large filter lists", () => {
+    it("should use readable format for large filter lists", () => {
       // Create a filter list that will exceed 200 chars
+      const packageNames = Object.fromEntries(
+        Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
+      );
+
       const largeFilters = {
         teamFilters: {},
         applicationFilters: {},
         environmentFilters: {},
         cveFilters: {},
-        packageNameFilters: Object.fromEntries(
-          Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
-        ),
+        packageNameFilters: packageNames
       };
 
       const params = filtersToSearchParams(largeFilters);
       
       // Should use compressed format
-      expect(params.get(QUERY_PARAM_KEYS.compressed)).not.toBeNull();
-      expect(params.get(QUERY_PARAM_KEYS.pkg)).toBeNull();
+      expect(params.get(QUERY_PARAM_KEYS.compressed)).toBeNull();
+      expect(params.get(QUERY_PARAM_KEYS.pkg)).toBe(Object.keys(packageNames).join(","));
     });
 
     it("should use readable format for small filter lists", () => {

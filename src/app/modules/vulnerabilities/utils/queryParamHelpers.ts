@@ -23,17 +23,6 @@ export const QUERY_PARAM_KEYS = {
   compressed: "f", // Single compressed filter param
 } as const;
 
-// Threshold for switching to compression (characters)
-const COMPRESSION_THRESHOLD = 200;
-
-/**
- * Compress filters to base64 string
- */
-function compressFilters(filters: VulnerabilityFilters): string {
-  const json = JSON.stringify(filters);
-  return btoa(encodeURIComponent(json));
-}
-
 /**
  * Decompress base64 string to filters
  */
@@ -85,14 +74,6 @@ export function filtersToSearchParams(filters: VulnerabilityFilters): URLSearchP
 
   const pkgParam = serializeFilters(filters.packageNameFilters);
   if (pkgParam) params.set(QUERY_PARAM_KEYS.pkg, pkgParam);
-
-  // Check if URL is too long, switch to compression if needed
-  const readableUrl = params.toString();
-  if (readableUrl.length > COMPRESSION_THRESHOLD) {
-    const compressedParams = new URLSearchParams();
-    compressedParams.set(QUERY_PARAM_KEYS.compressed, compressFilters(filters));
-    return compressedParams;
-  }
 
   return params;
 }
