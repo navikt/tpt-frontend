@@ -9,7 +9,7 @@ import { moduleNavLinks } from "../shared/navigation";
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useUser();
-  const { effectiveRole } = useRoleContext();
+  const { effectiveRole, actualRole } = useRoleContext();
   const t = useTranslations();
   const locale = useLocale();
 
@@ -17,6 +17,13 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
     if (!link.allowedRoles || link.allowedRoles.length === 0) {
       return true;
     }
+    
+    // For ADMIN role, check actualRole (not overridable by context switcher)
+    if (link.allowedRoles.includes("ADMIN")) {
+      return actualRole === "ADMIN";
+    }
+    
+    // For other roles, check effectiveRole (can be overridden)
     if (!effectiveRole) {
       return false;
     }
