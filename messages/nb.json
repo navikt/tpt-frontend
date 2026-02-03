@@ -8,6 +8,9 @@
     "application": "applikasjon",
     "in": "i"
   },
+  "metadata": {
+    "description": "Prioriteringsverktøy for sårbarheter som filtrerer bort støy"
+  },
   "header": {
     "allVulnerabilities": "Alle sårbarheter",
     "language": "Språk"

@@ -8,6 +8,9 @@
     "application": "application",
     "in": "in"
   },
+  "metadata": {
+    "description": "Vulnerability prioritization tool that filters out noise"
+  },
   "header": {
     "allVulnerabilities": "All vulnerabilities",
     "language": "Language"
