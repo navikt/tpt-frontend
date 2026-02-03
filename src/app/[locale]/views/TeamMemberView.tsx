@@ -2,14 +2,19 @@
 import { useMemo } from "react";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
 import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
-import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail } from "@navikt/ds-react";
+import { useConfig } from "@/app/shared/hooks/useConfig";
+import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
+import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   const { data: vulnData, isLoading: vulnLoading } = useVulnerabilities();
+  const { config, isLoading: configLoading } = useConfig();
+  
+  const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
 
   const overview = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;
@@ -36,6 +41,43 @@ export default function TeamMemberView() {
     };
   }, [vulnData]);
 
+  const deploymentCompliance = useMemo(() => {
+    if (!vulnData || !vulnData.teams) return null;
+
+    let totalWorkloadsWithDeployInfo = 0;
+    let nonCompliantWorkloads = 0;
+
+    const teamDetails = vulnData.teams.map((team) => {
+      const workloadDetails = team.workloads?.map((workload) => {
+        const ageInfo = calculateDeploymentAge(workload.lastDeploy, deploymentAgeDays);
+        if (ageInfo.hasDeploymentInfo) {
+          totalWorkloadsWithDeployInfo++;
+          if (!ageInfo.isCompliant) {
+            nonCompliantWorkloads++;
+          }
+        }
+        return {
+          ...workload,
+          ageInfo,
+        };
+      }) || [];
+
+      const teamNonCompliant = workloadDetails.filter(w => w.ageInfo?.hasDeploymentInfo && !w.ageInfo?.isCompliant).length;
+
+      return {
+        team: team.team,
+        workloads: workloadDetails,
+        nonCompliantCount: teamNonCompliant,
+      };
+    });
+
+    return {
+      totalWorkloadsWithDeployInfo,
+      nonCompliantWorkloads,
+      teamDetails: teamDetails.filter(t => t.nonCompliantCount > 0),
+    };
+  }, [vulnData, deploymentAgeDays]);
+
   const slaTotals = useMemo(() => {
     if (!slaData || !slaData.teams) return null;
 
@@ -60,16 +102,25 @@ export default function TeamMemberView() {
       0
     );
 
+    const totalVulnerabilities = totalCriticalOverdue + totalNonCriticalOverdue + totalCriticalWithinSla + totalNonCriticalWithinSla;
+    const totalNeedingAttention = totalCriticalOverdue + totalNonCriticalOverdue;
+    const percentageNeedingAttention = totalVulnerabilities > 0 
+      ? Math.round((totalNeedingAttention / totalVulnerabilities) * 100)
+      : 0;
+
     return {
       totalCriticalOverdue,
       totalNonCriticalOverdue,
       totalCriticalWithinSla,
       totalNonCriticalWithinSla,
       totalRepositoriesOutOfSla,
+      totalVulnerabilities,
+      totalNeedingAttention,
+      percentageNeedingAttention,
     };
   }, [slaData]);
 
-  if (slaLoading || vulnLoading || !slaData || !slaTotals || !overview) {
+  if (slaLoading || vulnLoading || configLoading || !slaData || !slaTotals || !overview || !deploymentCompliance) {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
@@ -118,7 +169,7 @@ export default function TeamMemberView() {
               <Heading size="small" level="2">
                 {t("overview")}
               </Heading>
-              <HGrid columns={{ xs: 1, sm: 3 }} gap="space-16">
+              <HGrid columns={{ xs: 2, sm: 4 }} gap="space-16">
                 <Box>
                   <Detail>{t("totalTeams")}</Detail>
                   <Heading size="medium" level="3">
@@ -134,7 +185,23 @@ export default function TeamMemberView() {
                 <Box>
                   <Detail>{t("totalVulnerabilities")}</Detail>
                   <Heading size="medium" level="3">
-                    {formatNumber(overview.totalVulnerabilities)}
+                    {formatNumber(slaTotals.totalVulnerabilities)}
+                  </Heading>
+                </Box>
+                <Box>
+                  <Detail>{t("percentageNeedingAttention")}</Detail>
+                  <Heading 
+                    size="medium" 
+                    level="3"
+                    style={{ 
+                      color: slaTotals.percentageNeedingAttention > 20 
+                        ? "var(--a-text-danger)" 
+                        : slaTotals.percentageNeedingAttention > 5 
+                          ? "var(--a-text-warning)" 
+                          : "var(--a-text-success)" 
+                    }}
+                  >
+                    {formatNumber(slaTotals.percentageNeedingAttention)}%
                   </Heading>
                 </Box>
               </HGrid>
@@ -152,7 +219,7 @@ export default function TeamMemberView() {
             >
               <VStack gap="space-8">
                 <BodyShort size="small" weight="semibold">
-                  {t("criticalOverdue")}
+                  {t("criticalNeedsAttention")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
                   {formatNumber(slaTotals.totalCriticalOverdue)}
@@ -170,7 +237,7 @@ export default function TeamMemberView() {
             >
               <VStack gap="space-8">
                 <BodyShort size="small" weight="semibold">
-                  {t("nonCriticalOverdue")}
+                  {t("nonCriticalNeedsAttention")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
                   {formatNumber(slaTotals.totalNonCriticalOverdue)}
@@ -182,160 +249,202 @@ export default function TeamMemberView() {
           <Box
             padding="space-24"
             borderRadius="8"
-            background="default"
-            borderWidth="1"
-            borderColor="neutral-subtle"
+            background={deploymentCompliance.nonCompliantWorkloads > 0 ? "warning-soft" : "success-soft"}
+            style={{
+              borderLeft: deploymentCompliance.nonCompliantWorkloads > 0 
+                ? "4px solid var(--a-surface-warning)" 
+                : "4px solid var(--a-surface-success)",
+            }}
           >
-            <VStack gap="space-24">
-              <Heading size="medium" level="2">
-                {t("withinSla")}
+            <VStack gap="space-8">
+              <BodyShort size="small" weight="semibold">
+                {t("deploymentsNeedingUpdate")}
+              </BodyShort>
+              <Heading size="xlarge" level="2">
+                {formatNumber(deploymentCompliance.nonCompliantWorkloads)}
               </Heading>
-
-              <HGrid columns={{ xs: 1, sm: 2 }} gap="space-16">
-                <Box
-                  padding="space-16"
-                  borderRadius="4"
-                  background="success-soft"
-                >
-                  <VStack gap="space-8">
-                    <BodyShort size="small" weight="semibold">
-                      {t("criticalWithinSla")}
-                    </BodyShort>
-                    <Heading size="large" level="3">
-                      {formatNumber(slaTotals.totalCriticalWithinSla)}
-                    </Heading>
-                  </VStack>
-                </Box>
-
-                <Box
-                  padding="space-16"
-                  borderRadius="4"
-                  background="info-soft"
-                >
-                  <VStack gap="space-8">
-                    <BodyShort size="small" weight="semibold">
-                      {t("nonCriticalWithinSla")}
-                    </BodyShort>
-                    <Heading size="large" level="3">
-                      {formatNumber(slaTotals.totalNonCriticalWithinSla)}
-                    </Heading>
-                  </VStack>
-                </Box>
-              </HGrid>
             </VStack>
           </Box>
 
-          {slaTotals.totalCriticalOverdue === 0 && (
+          {deploymentCompliance.teamDetails.length > 0 && (
             <Box
-              padding="space-24"
-              borderRadius="8"
-              background="success-soft"
-              style={{ textAlign: "center" }}
-            >
-              <Heading size="medium" level="2">
-                {t("noCriticalOverdue")}
-              </Heading>
-              <BodyShort>
-                {t("noCriticalOverdueDescription")}
-              </BodyShort>
-            </Box>
-          )}
-
-          {slaData.teams.map((team) => (
-            <Box
-              key={team.teamSlug}
               padding="space-24"
               borderRadius="8"
               background="default"
               borderWidth="1"
               borderColor="neutral-subtle"
             >
-              <VStack gap="space-16">
-                <Heading size="medium" level="2">
-                  {t("team")}: {team.teamSlug}
-                </Heading>
-
-                <HGrid columns={{ xs: 2, sm: 3, md: 4 }} gap="space-12">
-                  <Box>
-                    <Detail>{t("criticalOverdue")}</Detail>
-                    <BodyShort weight="semibold">{formatNumber(team.criticalOverdue)}</BodyShort>
-                  </Box>
-                  <Box>
-                    <Detail>{t("nonCriticalOverdue")}</Detail>
-                    <BodyShort weight="semibold">{formatNumber(team.nonCriticalOverdue)}</BodyShort>
-                  </Box>
-                  <Box>
-                    <Detail>{t("repositoriesOutOfSla")}</Detail>
-                    <BodyShort weight="semibold">{formatNumber(team.repositoriesOutOfSla)}</BodyShort>
-                  </Box>
-                  <Box>
-                    <Detail>{t("maxDaysOverdue")}</Detail>
-                    <BodyShort weight="semibold">{formatNumber(team.maxDaysOverdue)} {t("days")}</BodyShort>
-                  </Box>
-                </HGrid>
-
-                {team.criticalOverdueItems && team.criticalOverdueItems.length > 0 && (
-                  <Box>
-                    <Heading size="small" level="3" spacing>
-                      {t("criticalOverdueItemsTitle")}
-                    </Heading>
-                    <Table size="small">
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.HeaderCell>{t("cveId")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("application")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("severity")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("daysOverdue")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("workdaysOverdue")}</Table.HeaderCell>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {team.criticalOverdueItems.map((item, idx) => (
-                          <Table.Row key={`${item.cveId}-${idx}`}>
-                            <Table.DataCell>{item.cveId}</Table.DataCell>
-                            <Table.DataCell>{item.applicationName}</Table.DataCell>
-                            <Table.DataCell>{item.severity}</Table.DataCell>
-                            <Table.DataCell>{formatNumber(item.daysOverdue)}</Table.DataCell>
-                            <Table.DataCell>{formatNumber(item.workdaysOverdue)}</Table.DataCell>
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                  </Box>
-                )}
-
-                {team.nonCriticalOverdueItems && team.nonCriticalOverdueItems.length > 0 && (
-                  <Box>
-                    <Heading size="small" level="3" spacing>
-                      {t("nonCriticalOverdueItemsTitle")}
-                    </Heading>
-                    <Table size="small">
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.HeaderCell>{t("cveId")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("application")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("severity")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("daysOverdue")}</Table.HeaderCell>
-                          <Table.HeaderCell>{t("workdaysOverdue")}</Table.HeaderCell>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {team.nonCriticalOverdueItems.map((item, idx) => (
-                          <Table.Row key={`${item.cveId}-${idx}`}>
-                            <Table.DataCell>{item.cveId}</Table.DataCell>
-                            <Table.DataCell>{item.applicationName}</Table.DataCell>
-                            <Table.DataCell>{item.severity}</Table.DataCell>
-                            <Table.DataCell>{formatNumber(item.daysOverdue)}</Table.DataCell>
-                            <Table.DataCell>{formatNumber(item.workdaysOverdue)}</Table.DataCell>
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                  </Box>
-                )}
-              </VStack>
+              <Heading size="medium" level="2" spacing>
+                {t("teamDetails")}
+              </Heading>
+              <Accordion>
+                {deploymentCompliance.teamDetails.map((teamDetail) => (
+                  <Accordion.Item key={teamDetail.team}>
+                    <Accordion.Header>
+                      {t("team")}: {teamDetail.team} ({formatNumber(teamDetail.workloads.filter(w => w.ageInfo?.hasDeploymentInfo && !w.ageInfo?.isCompliant).length)} {t("application").toLowerCase()})
+                    </Accordion.Header>
+                    <Accordion.Content>
+                      <VStack gap="space-16">
+                        <Table size="small">
+                          <Table.Header>
+                            <Table.Row>
+                              <Table.HeaderCell>{t("workloadName")}</Table.HeaderCell>
+                              <Table.HeaderCell>{t("environment")}</Table.HeaderCell>
+                              <Table.HeaderCell>{t("daysSinceDeployment")}</Table.HeaderCell>
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            {teamDetail.workloads
+                              .filter(w => w.ageInfo?.hasDeploymentInfo && !w.ageInfo?.isCompliant)
+                              .map((workload) => (
+                                <Table.Row key={workload.id}>
+                                  <Table.DataCell>{workload.name}</Table.DataCell>
+                                  <Table.DataCell>{workload.environment}</Table.DataCell>
+                                  <Table.DataCell>{formatNumber(workload.ageInfo?.daysSinceDeployment)}</Table.DataCell>
+                                </Table.Row>
+                              ))}
+                          </Table.Body>
+                        </Table>
+                      </VStack>
+                    </Accordion.Content>
+                  </Accordion.Item>
+                ))}
+              </Accordion>
             </Box>
-          ))}
+          )}
+
+          {slaData.teams
+            .filter(team => 
+              (team.criticalOverdue && team.criticalOverdue > 0) || 
+              (team.nonCriticalOverdue && team.nonCriticalOverdue > 0)
+            ).length > 0 && (
+            <Box
+              padding="space-24"
+              borderRadius="8"
+              background="default"
+              borderWidth="1"
+              borderColor="neutral-subtle"
+            >
+              <Heading size="medium" level="2" spacing>
+                {t("teamDetails")}
+              </Heading>
+              <Accordion>
+                {slaData.teams
+                  .filter(team => 
+                    (team.criticalOverdue && team.criticalOverdue > 0) || 
+                    (team.nonCriticalOverdue && team.nonCriticalOverdue > 0)
+                  )
+                  .map((team) => (
+                  <Accordion.Item key={team.teamSlug}>
+                    <Accordion.Header>
+                      {t("team")}: {team.teamSlug} ({formatNumber(team.criticalOverdue + team.nonCriticalOverdue)} {t("totalVulnerabilities").toLowerCase()})
+                    </Accordion.Header>
+                    <Accordion.Content>
+                      <VStack gap="space-16">
+
+                        <HGrid columns={{ xs: 2, sm: 3, md: 4 }} gap="space-12">
+                          <Box>
+                            <Detail>{t("criticalNeedsAttention")}</Detail>
+                            <BodyShort weight="semibold">{formatNumber(team.criticalOverdue)}</BodyShort>
+                          </Box>
+                          <Box>
+                            <Detail>{t("nonCriticalNeedsAttention")}</Detail>
+                            <BodyShort weight="semibold">{formatNumber(team.nonCriticalOverdue)}</BodyShort>
+                          </Box>
+                          <Box>
+                            <Detail>{t("repositoriesNeedingAttention")}</Detail>
+                            <BodyShort weight="semibold">{formatNumber(team.repositoriesOutOfSla)}</BodyShort>
+                          </Box>
+                          <Box>
+                            <Detail>{t("maxWorkdaysOverdue")}</Detail>
+                            <BodyShort weight="semibold">{formatNumber(team.maxDaysOverdue)} {t("workdays")}</BodyShort>
+                          </Box>
+                        </HGrid>
+
+                        {team.criticalOverdueItems && team.criticalOverdueItems.length > 0 && (
+                          <>
+                            <Heading size="small" level="3" spacing>
+                              {t("criticalNeedsAttentionTitle")}
+                            </Heading>
+                            <Table size="small" style={{ tableLayout: "fixed" }}>
+                              <Table.Header>
+                                <Table.Row>
+                                  <Table.HeaderCell style={{ width: "50%" }}>{t("application")}</Table.HeaderCell>
+                                  <Table.HeaderCell style={{ width: "25%" }}>{t("vulnerabilityCount")}</Table.HeaderCell>
+                                  <Table.HeaderCell style={{ width: "25%" }}>{t("maxWorkdaysOverTarget")}</Table.HeaderCell>
+                                </Table.Row>
+                              </Table.Header>
+                              <Table.Body>
+                                {Object.entries(
+                                  team.criticalOverdueItems.reduce((acc, item) => {
+                                    const appName = item.applicationName;
+                                    if (!acc[appName]) {
+                                      acc[appName] = { count: 0, maxWorkdays: 0 };
+                                    }
+                                    acc[appName].count++;
+                                    acc[appName].maxWorkdays = Math.max(
+                                      acc[appName].maxWorkdays,
+                                      item.workdaysOverdue
+                                    );
+                                    return acc;
+                                  }, {} as Record<string, { count: number; maxWorkdays: number }>)
+                                ).map(([appName, data]) => (
+                                  <Table.Row key={appName}>
+                                    <Table.DataCell>{appName}</Table.DataCell>
+                                    <Table.DataCell>{formatNumber(data.count)}</Table.DataCell>
+                                    <Table.DataCell>{formatNumber(data.maxWorkdays)}</Table.DataCell>
+                                  </Table.Row>
+                                ))}
+                              </Table.Body>
+                            </Table>
+                          </>
+                        )}
+
+                        {team.nonCriticalOverdueItems && team.nonCriticalOverdueItems.length > 0 && (
+                          <>
+                            <Heading size="small" level="3" spacing>
+                              {t("nonCriticalNeedsAttentionTitle")}
+                            </Heading>
+                            <Table size="small" style={{ tableLayout: "fixed" }}>
+                              <Table.Header>
+                                <Table.Row>
+                                  <Table.HeaderCell style={{ width: "50%" }}>{t("application")}</Table.HeaderCell>
+                                  <Table.HeaderCell style={{ width: "25%" }}>{t("vulnerabilityCount")}</Table.HeaderCell>
+                                  <Table.HeaderCell style={{ width: "25%" }}>{t("maxWorkdaysOverTarget")}</Table.HeaderCell>
+                                </Table.Row>
+                              </Table.Header>
+                              <Table.Body>
+                                {Object.entries(
+                                  team.nonCriticalOverdueItems.reduce((acc, item) => {
+                                    const appName = item.applicationName;
+                                    if (!acc[appName]) {
+                                      acc[appName] = { count: 0, maxWorkdays: 0 };
+                                    }
+                                    acc[appName].count++;
+                                    acc[appName].maxWorkdays = Math.max(
+                                      acc[appName].maxWorkdays,
+                                      item.workdaysOverdue
+                                    );
+                                    return acc;
+                                  }, {} as Record<string, { count: number; maxWorkdays: number }>)
+                                ).map(([appName, data]) => (
+                                  <Table.Row key={appName}>
+                                    <Table.DataCell>{appName}</Table.DataCell>
+                                    <Table.DataCell>{formatNumber(data.count)}</Table.DataCell>
+                                    <Table.DataCell>{formatNumber(data.maxWorkdays)}</Table.DataCell>
+                                  </Table.Row>
+                                ))}
+                              </Table.Body>
+                            </Table>
+                          </>
+                        )}
+                      </VStack>
+                    </Accordion.Content>
+                  </Accordion.Item>
+                ))}
+              </Accordion>
+            </Box>
+          )}
         </VStack>
       </main>
     </Box>

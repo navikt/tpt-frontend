@@ -7,6 +7,7 @@ interface ThresholdConfig {
     medium: number;
     low: number;
   };
+  deploymentAgeDays?: number;
 }
 
 export const useConfig = () => {

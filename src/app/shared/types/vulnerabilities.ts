@@ -37,6 +37,7 @@ export interface Workload {
   repository?: string;
   ingressTypes?: string[];
   buildTime?: string;
+  lastDeploy?: string;
   vulnerabilities: Vulnerability[];
 }
 

@@ -8,6 +8,8 @@ const FALLBACK_THRESHOLDS = {
   low: 30,
 };
 
+const FALLBACK_DEPLOYMENT_AGE_DAYS = 90;
+
 export async function GET() {
   const tptBackendUrl = process.env.TPT_BACKEND_URL;
 
@@ -29,6 +31,7 @@ export async function GET() {
             medium: data.thresholds.medium,
             low: data.thresholds.low,
           },
+          deploymentAgeDays: data.deploymentAgeDays ?? FALLBACK_DEPLOYMENT_AGE_DAYS,
         });
       } else {
         console.warn(
@@ -45,5 +48,6 @@ export async function GET() {
   // Fallback to hardcoded values
   return NextResponse.json({
     thresholds: FALLBACK_THRESHOLDS,
+    deploymentAgeDays: FALLBACK_DEPLOYMENT_AGE_DAYS,
   });
 }
