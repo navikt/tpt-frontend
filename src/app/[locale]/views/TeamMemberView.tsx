@@ -1,35 +1,62 @@
 "use client";
 import { useMemo } from "react";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
+import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
 import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
-  const { data: slaData, isLoading } = useSlaOverdue();
+  const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
+  const { data: vulnData, isLoading: vulnLoading } = useVulnerabilities();
 
-  const totals = useMemo(() => {
-    if (!slaData) return null;
+  const overview = useMemo(() => {
+    if (!vulnData || !vulnData.teams) return null;
+
+    const totalTeams = vulnData.teams.length;
+    const totalWorkloads = vulnData.teams.reduce(
+      (sum, team) => sum + (team.workloads?.length || 0),
+      0
+    );
+    const totalVulnerabilities = vulnData.teams.reduce(
+      (sum, team) =>
+        sum +
+        (team.workloads?.reduce(
+          (workloadSum, workload) => workloadSum + (workload.vulnerabilities?.length || 0),
+          0
+        ) || 0),
+      0
+    );
+
+    return {
+      totalTeams,
+      totalWorkloads,
+      totalVulnerabilities,
+    };
+  }, [vulnData]);
+
+  const slaTotals = useMemo(() => {
+    if (!slaData || !slaData.teams) return null;
 
     const totalCriticalOverdue = slaData.teams.reduce(
-      (sum, team) => sum + team.criticalOverdue,
+      (sum, team) => sum + (team.criticalOverdue || 0),
       0
     );
     const totalNonCriticalOverdue = slaData.teams.reduce(
-      (sum, team) => sum + team.nonCriticalOverdue,
+      (sum, team) => sum + (team.nonCriticalOverdue || 0),
       0
     );
     const totalCriticalWithinSla = slaData.teams.reduce(
-      (sum, team) => sum + team.criticalWithinSla,
+      (sum, team) => sum + (team.criticalWithinSla || 0),
       0
     );
     const totalNonCriticalWithinSla = slaData.teams.reduce(
-      (sum, team) => sum + team.nonCriticalWithinSla,
+      (sum, team) => sum + (team.nonCriticalWithinSla || 0),
       0
     );
     const totalRepositoriesOutOfSla = slaData.teams.reduce(
-      (sum, team) => sum + team.repositoriesOutOfSla,
+      (sum, team) => sum + (team.repositoriesOutOfSla || 0),
       0
     );
 
@@ -42,7 +69,7 @@ export default function TeamMemberView() {
     };
   }, [slaData]);
 
-  if (isLoading || !slaData || !totals) {
+  if (slaLoading || vulnLoading || !slaData || !slaTotals || !overview) {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
@@ -82,6 +109,38 @@ export default function TeamMemberView() {
             </BodyShort>
           </div>
 
+          <Box
+            padding="space-16"
+            borderRadius="8"
+            background="neutral-soft"
+          >
+            <VStack gap="space-12">
+              <Heading size="small" level="2">
+                {t("overview")}
+              </Heading>
+              <HGrid columns={{ xs: 1, sm: 3 }} gap="space-16">
+                <Box>
+                  <Detail>{t("totalTeams")}</Detail>
+                  <Heading size="medium" level="3">
+                    {formatNumber(overview.totalTeams)}
+                  </Heading>
+                </Box>
+                <Box>
+                  <Detail>{t("totalWorkloads")}</Detail>
+                  <Heading size="medium" level="3">
+                    {formatNumber(overview.totalWorkloads)}
+                  </Heading>
+                </Box>
+                <Box>
+                  <Detail>{t("totalVulnerabilities")}</Detail>
+                  <Heading size="medium" level="3">
+                    {formatNumber(overview.totalVulnerabilities)}
+                  </Heading>
+                </Box>
+              </HGrid>
+            </VStack>
+          </Box>
+
           <HGrid columns={{ xs: 1, sm: 2 }} gap="space-16">
             <Box
               padding="space-24"
@@ -96,7 +155,7 @@ export default function TeamMemberView() {
                   {t("criticalOverdue")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
-                  {formatNumber(totals.totalCriticalOverdue)}
+                  {formatNumber(slaTotals.totalCriticalOverdue)}
                 </Heading>
               </VStack>
             </Box>
@@ -114,7 +173,7 @@ export default function TeamMemberView() {
                   {t("nonCriticalOverdue")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
-                  {formatNumber(totals.totalNonCriticalOverdue)}
+                  {formatNumber(slaTotals.totalNonCriticalOverdue)}
                 </Heading>
               </VStack>
             </Box>
@@ -143,7 +202,7 @@ export default function TeamMemberView() {
                       {t("criticalWithinSla")}
                     </BodyShort>
                     <Heading size="large" level="3">
-                      {formatNumber(totals.totalCriticalWithinSla)}
+                      {formatNumber(slaTotals.totalCriticalWithinSla)}
                     </Heading>
                   </VStack>
                 </Box>
@@ -158,7 +217,7 @@ export default function TeamMemberView() {
                       {t("nonCriticalWithinSla")}
                     </BodyShort>
                     <Heading size="large" level="3">
-                      {formatNumber(totals.totalNonCriticalWithinSla)}
+                      {formatNumber(slaTotals.totalNonCriticalWithinSla)}
                     </Heading>
                   </VStack>
                 </Box>
@@ -166,7 +225,7 @@ export default function TeamMemberView() {
             </VStack>
           </Box>
 
-          {totals.totalCriticalOverdue === 0 && (
+          {slaTotals.totalCriticalOverdue === 0 && (
             <Box
               padding="space-24"
               borderRadius="8"
@@ -215,7 +274,7 @@ export default function TeamMemberView() {
                   </Box>
                 </HGrid>
 
-                {team.criticalOverdueItems.length > 0 && (
+                {team.criticalOverdueItems && team.criticalOverdueItems.length > 0 && (
                   <Box>
                     <Heading size="small" level="3" spacing>
                       {t("criticalOverdueItemsTitle")}
@@ -245,7 +304,7 @@ export default function TeamMemberView() {
                   </Box>
                 )}
 
-                {team.nonCriticalOverdueItems.length > 0 && (
+                {team.nonCriticalOverdueItems && team.nonCriticalOverdueItems.length > 0 && (
                   <Box>
                     <Heading size="small" level="3" spacing>
                       {t("nonCriticalOverdueItemsTitle")}

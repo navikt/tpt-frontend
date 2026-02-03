@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 
     // Decode JWT token (simple base64 decode of payload)
     const parts = token.split(".");
-    if (parts.length !== 3) {
+    if (parts.length !== 3 || !parts[1]) {
       return NextResponse.json({ error: "Invalid token format" }, { status: 401 });
     }
 
