@@ -1,60 +1,48 @@
 "use client";
 import { useMemo } from "react";
-import { useConfig } from "@/app/shared/hooks/useConfig";
-import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
-import { BodyShort, Loader, Box, Heading, VStack, HGrid } from "@navikt/ds-react";
+import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
+import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
+import { formatNumber } from "@/lib/format";
 
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
-  const { config, isLoading: configLoading } = useConfig();
-  const { data: vulnData, isLoading: dataLoading } = useVulnerabilities();
+  const { data: slaData, isLoading } = useSlaOverdue();
 
-  const statistics = useMemo(() => {
-    if (!vulnData || !config) return null;
+  const totals = useMemo(() => {
+    if (!slaData) return null;
 
-    const totalWorkloads = vulnData.teams.reduce(
-      (sum, team) => sum + team.workloads.length,
+    const totalCriticalOverdue = slaData.teams.reduce(
+      (sum, team) => sum + team.criticalOverdue,
+      0
+    );
+    const totalNonCriticalOverdue = slaData.teams.reduce(
+      (sum, team) => sum + team.nonCriticalOverdue,
+      0
+    );
+    const totalCriticalWithinSla = slaData.teams.reduce(
+      (sum, team) => sum + team.criticalWithinSla,
+      0
+    );
+    const totalNonCriticalWithinSla = slaData.teams.reduce(
+      (sum, team) => sum + team.nonCriticalWithinSla,
+      0
+    );
+    const totalRepositoriesOutOfSla = slaData.teams.reduce(
+      (sum, team) => sum + team.repositoriesOutOfSla,
       0
     );
 
-    const allVulnerabilities = vulnData.teams.flatMap((team) =>
-      team.workloads.flatMap((workload) => workload.vulnerabilities)
-    );
-
-    const totalVulnerabilities = allVulnerabilities.length;
-
-    const highPriority = allVulnerabilities.filter(
-      (v) => v.riskScore >= config.thresholds.high
-    ).length;
-
-    const mediumPriority = allVulnerabilities.filter(
-      (v) =>
-        v.riskScore >= config.thresholds.medium &&
-        v.riskScore < config.thresholds.high
-    ).length;
-
-    const lowPriority = allVulnerabilities.filter(
-      (v) =>
-        v.riskScore >= config.thresholds.low &&
-        v.riskScore < config.thresholds.medium
-    ).length;
-
-    const veryLowPriority = allVulnerabilities.filter(
-      (v) => v.riskScore < config.thresholds.low
-    ).length;
-
     return {
-      totalWorkloads,
-      totalVulnerabilities,
-      highPriority,
-      mediumPriority,
-      lowPriority,
-      veryLowPriority,
+      totalCriticalOverdue,
+      totalNonCriticalOverdue,
+      totalCriticalWithinSla,
+      totalNonCriticalWithinSla,
+      totalRepositoriesOutOfSla,
     };
-  }, [vulnData, config]);
+  }, [slaData]);
 
-  if (configLoading || dataLoading || !statistics) {
+  if (isLoading || !slaData || !totals) {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
@@ -64,7 +52,7 @@ export default function TeamMemberView() {
                 {t("title")}
               </Heading>
               <BodyShort spacing>
-                {t("loadingStatistics")}
+                {t("description")}
               </BodyShort>
             </div>
             <Box
@@ -98,14 +86,17 @@ export default function TeamMemberView() {
             <Box
               padding="space-24"
               borderRadius="8"
-              background="neutral-soft"
+              background="danger-soft"
+              style={{
+                borderLeft: "4px solid var(--a-surface-danger)",
+              }}
             >
               <VStack gap="space-8">
-                <BodyShort size="small" textColor="subtle">
-                  {t("totalApplications")}
+                <BodyShort size="small" weight="semibold">
+                  {t("criticalOverdue")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
-                  {statistics.totalWorkloads}
+                  {formatNumber(totals.totalCriticalOverdue)}
                 </Heading>
               </VStack>
             </Box>
@@ -113,14 +104,17 @@ export default function TeamMemberView() {
             <Box
               padding="space-24"
               borderRadius="8"
-              background="neutral-soft"
+              background="warning-soft"
+              style={{
+                borderLeft: "4px solid var(--a-surface-warning)",
+              }}
             >
               <VStack gap="space-8">
-                <BodyShort size="small" textColor="subtle">
-                  {t("totalVulnerabilities")}
+                <BodyShort size="small" weight="semibold">
+                  {t("nonCriticalOverdue")}
                 </BodyShort>
                 <Heading size="xlarge" level="2">
-                  {statistics.totalVulnerabilities}
+                  {formatNumber(totals.totalNonCriticalOverdue)}
                 </Heading>
               </VStack>
             </Box>
@@ -135,36 +129,21 @@ export default function TeamMemberView() {
           >
             <VStack gap="space-24">
               <Heading size="medium" level="2">
-                {t("vulnerabilitiesByPriority")}
+                {t("withinSla")}
               </Heading>
 
-              <HGrid columns={{ xs: 1, sm: 2, lg: 4 }} gap="space-16">
+              <HGrid columns={{ xs: 1, sm: 2 }} gap="space-16">
                 <Box
                   padding="space-16"
                   borderRadius="4"
-                  background="danger-soft"
+                  background="success-soft"
                 >
                   <VStack gap="space-8">
                     <BodyShort size="small" weight="semibold">
-                      {t("highPriority")}
+                      {t("criticalWithinSla")}
                     </BodyShort>
                     <Heading size="large" level="3">
-                      {statistics.highPriority}
-                    </Heading>
-                  </VStack>
-                </Box>
-
-                <Box
-                  padding="space-16"
-                  borderRadius="4"
-                  background="warning-soft"
-                >
-                  <VStack gap="space-8">
-                    <BodyShort size="small" weight="semibold">
-                      {t("shouldHandle")}
-                    </BodyShort>
-                    <Heading size="large" level="3">
-                      {statistics.mediumPriority}
+                      {formatNumber(totals.totalCriticalWithinSla)}
                     </Heading>
                   </VStack>
                 </Box>
@@ -176,25 +155,10 @@ export default function TeamMemberView() {
                 >
                   <VStack gap="space-8">
                     <BodyShort size="small" weight="semibold">
-                      {t("whenTime")}
+                      {t("nonCriticalWithinSla")}
                     </BodyShort>
                     <Heading size="large" level="3">
-                      {statistics.lowPriority}
-                    </Heading>
-                  </VStack>
-                </Box>
-
-                <Box
-                  padding="space-16"
-                  borderRadius="4"
-                  background="neutral-soft"
-                >
-                  <VStack gap="space-8">
-                    <BodyShort size="small" weight="semibold">
-                      {t("lowPriority")}
-                    </BodyShort>
-                    <Heading size="large" level="3">
-                      {statistics.veryLowPriority}
+                      {formatNumber(totals.totalNonCriticalWithinSla)}
                     </Heading>
                   </VStack>
                 </Box>
@@ -202,7 +166,7 @@ export default function TeamMemberView() {
             </VStack>
           </Box>
 
-          {statistics.highPriority === 0 && (
+          {totals.totalCriticalOverdue === 0 && (
             <Box
               padding="space-24"
               borderRadius="8"
@@ -210,13 +174,109 @@ export default function TeamMemberView() {
               style={{ textAlign: "center" }}
             >
               <Heading size="medium" level="2">
-                {t("noCriticalVulnerabilities")}
+                {t("noCriticalOverdue")}
               </Heading>
               <BodyShort>
-                {t("noCriticalDescription")}
+                {t("noCriticalOverdueDescription")}
               </BodyShort>
             </Box>
           )}
+
+          {slaData.teams.map((team) => (
+            <Box
+              key={team.teamSlug}
+              padding="space-24"
+              borderRadius="8"
+              background="default"
+              borderWidth="1"
+              borderColor="neutral-subtle"
+            >
+              <VStack gap="space-16">
+                <Heading size="medium" level="2">
+                  {t("team")}: {team.teamSlug}
+                </Heading>
+
+                <HGrid columns={{ xs: 2, sm: 3, md: 4 }} gap="space-12">
+                  <Box>
+                    <Detail>{t("criticalOverdue")}</Detail>
+                    <BodyShort weight="semibold">{formatNumber(team.criticalOverdue)}</BodyShort>
+                  </Box>
+                  <Box>
+                    <Detail>{t("nonCriticalOverdue")}</Detail>
+                    <BodyShort weight="semibold">{formatNumber(team.nonCriticalOverdue)}</BodyShort>
+                  </Box>
+                  <Box>
+                    <Detail>{t("repositoriesOutOfSla")}</Detail>
+                    <BodyShort weight="semibold">{formatNumber(team.repositoriesOutOfSla)}</BodyShort>
+                  </Box>
+                  <Box>
+                    <Detail>{t("maxDaysOverdue")}</Detail>
+                    <BodyShort weight="semibold">{formatNumber(team.maxDaysOverdue)} {t("days")}</BodyShort>
+                  </Box>
+                </HGrid>
+
+                {team.criticalOverdueItems.length > 0 && (
+                  <Box>
+                    <Heading size="small" level="3" spacing>
+                      {t("criticalOverdueItemsTitle")}
+                    </Heading>
+                    <Table size="small">
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.HeaderCell>{t("cveId")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("application")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("severity")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("daysOverdue")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("workdaysOverdue")}</Table.HeaderCell>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        {team.criticalOverdueItems.map((item, idx) => (
+                          <Table.Row key={`${item.cveId}-${idx}`}>
+                            <Table.DataCell>{item.cveId}</Table.DataCell>
+                            <Table.DataCell>{item.applicationName}</Table.DataCell>
+                            <Table.DataCell>{item.severity}</Table.DataCell>
+                            <Table.DataCell>{formatNumber(item.daysOverdue)}</Table.DataCell>
+                            <Table.DataCell>{formatNumber(item.workdaysOverdue)}</Table.DataCell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table>
+                  </Box>
+                )}
+
+                {team.nonCriticalOverdueItems.length > 0 && (
+                  <Box>
+                    <Heading size="small" level="3" spacing>
+                      {t("nonCriticalOverdueItemsTitle")}
+                    </Heading>
+                    <Table size="small">
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.HeaderCell>{t("cveId")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("application")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("severity")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("daysOverdue")}</Table.HeaderCell>
+                          <Table.HeaderCell>{t("workdaysOverdue")}</Table.HeaderCell>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        {team.nonCriticalOverdueItems.map((item, idx) => (
+                          <Table.Row key={`${item.cveId}-${idx}`}>
+                            <Table.DataCell>{item.cveId}</Table.DataCell>
+                            <Table.DataCell>{item.applicationName}</Table.DataCell>
+                            <Table.DataCell>{item.severity}</Table.DataCell>
+                            <Table.DataCell>{formatNumber(item.daysOverdue)}</Table.DataCell>
+                            <Table.DataCell>{formatNumber(item.workdaysOverdue)}</Table.DataCell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table>
+                  </Box>
+                )}
+              </VStack>
+            </Box>
+          ))}
         </VStack>
       </main>
     </Box>
