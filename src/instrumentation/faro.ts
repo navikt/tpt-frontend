@@ -2,38 +2,58 @@ import { initializeFaro, getWebInstrumentations, Faro } from '@grafana/faro-web-
 import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
 let faro: Faro | null = null;
+let initPromise: Promise<void> | null = null;
 
 export function initInstrumentation(): void {
-  if (typeof window === 'undefined' || faro !== null) return;
+  if (typeof window === 'undefined' || faro !== null || initPromise !== null) return;
 
-  getFaro();
+  initPromise = getFaro();
 }
 
-export function getFaro(): Faro | null {
+async function getFaro(): Promise<void> {
   if (faro !== null || typeof window === 'undefined') {
-    return faro;
+    return;
   }
 
-  const telemetryUrl = process.env.NEXT_PUBLIC_TELEMETRY_URL;
+  try {
+    // Fetch telemetry config from runtime API endpoint
+    const response = await fetch('/api/telemetry-config');
+    if (!response.ok) {
+      console.warn('Failed to fetch telemetry config:', response.statusText);
+      return;
+    }
 
-  if (!telemetryUrl) {
-    console.warn('NEXT_PUBLIC_TELEMETRY_URL is not set, Faro instrumentation will not be initialized');
-    return null;
+    const config = await response.json();
+    const telemetryUrl = config.url;
+
+    if (!telemetryUrl) {
+      console.warn(
+        'TELEMETRY_URL is not set. Faro instrumentation will not be initialized.\n' +
+        'Set the TELEMETRY_URL environment variable in your deployment.'
+      );
+      return;
+    }
+
+    console.info('Initializing Faro telemetry:', { url: telemetryUrl });
+
+    faro = initializeFaro({
+      url: telemetryUrl,
+      app: {
+        name: 'tpt-frontend',
+        version: process.env.NEXT_PUBLIC_VERSION || 'unknown',
+      },
+      instrumentations: [
+        ...getWebInstrumentations({
+          captureConsole: true,
+        }),
+        new TracingInstrumentation(),
+      ],
+    });
+  } catch (error) {
+    console.error('Failed to initialize Faro telemetry:', error);
   }
+}
 
-  faro = initializeFaro({
-    url: telemetryUrl,
-    app: {
-      name: 'tpt-frontend',
-      version: process.env.NEXT_PUBLIC_VERSION || 'unknown',
-    },
-    instrumentations: [
-      ...getWebInstrumentations({
-        captureConsole: true,
-      }),
-      new TracingInstrumentation(),
-    ],
-  });
-
+export function getFaroInstance(): Faro | null {
   return faro;
 }

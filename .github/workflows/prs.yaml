@@ -12,13 +12,17 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10'
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version: '24'
           registry-url: 'https://npm.pkg.github.com/'
-      - run: npm ci
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+      - run: pnpm run lint
+      - run: pnpm test
+      - run: pnpm run build

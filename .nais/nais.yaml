@@ -41,7 +41,8 @@ spec:
       destinations:
         - id: loki
   env:
-    - name: NEXT_PUBLIC_TELEMETRY_URL
+    # Telemetry URL accessed at runtime via server-side API
+    - name: TELEMETRY_URL
       value: https://telemetry.nav.no/collect
   envFrom:
     - secret: tpt-frontend

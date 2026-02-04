@@ -1,4 +1,4 @@
-import { getFaro } from "@/instrumentation/faro";
+import { getFaroInstance } from "@/instrumentation/faro";
 
 export interface ApiError {
   message: string;
@@ -10,7 +10,7 @@ export interface ApiError {
  * Try to get trace ID from Faro's active span
  */
 function getTraceIdFromFaro(): string | undefined {
-  const faro = getFaro();
+  const faro = getFaroInstance();
   if (!faro) return undefined;
 
   try {
@@ -39,7 +39,7 @@ export function handleApiError(
 ): ApiError {
   const traceId = getTraceIdFromFaro();
 
-  const faro = getFaro();
+  const faro = getFaroInstance();
   if (faro) {
     // Convert additional metadata to strings for Faro context
     const contextMeta: Record<string, string> = {};

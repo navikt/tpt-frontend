@@ -10,8 +10,8 @@ import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations } from "next-intl";
 
 export default function Home() {
-  const { data: vulnData, isLoading, error } = useVulnerabilities();
-  const { effectiveRole, isInitialized } = useRoleContext();
+  const { data: vulnData, isLoading: isVulnLoading, error } = useVulnerabilities();
+  const { effectiveRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations("errors");
 
   // Show error state if fetch failed
@@ -24,8 +24,8 @@ export default function Home() {
     );
   }
 
-  // Show loading state while data is being fetched or role context is initializing
-  if (isLoading || !vulnData || !isInitialized) {
+  // Wait for both vulnerabilities data AND role initialization
+  if (isVulnLoading || isRoleLoading || !vulnData || !isInitialized) {
     return (
       <Box
         paddingBlock="space-24"

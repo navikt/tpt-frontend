@@ -7,27 +7,30 @@ import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useUser();
-  const { effectiveRole, actualRole } = useRoleContext();
+  const { user, isLoading: isUserLoading } = useUser();
+  const { effectiveRole, actualRole, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations();
   const locale = useLocale();
 
-  const filteredNavLinks = moduleNavLinks.filter((link) => {
-    if (!link.allowedRoles || link.allowedRoles.length === 0) {
-      return true;
-    }
-    
-    // For ADMIN role, check actualRole (not overridable by context switcher)
-    if (link.allowedRoles.includes("ADMIN")) {
-      return actualRole === "ADMIN";
-    }
-    
-    // For other roles, check effectiveRole (can be overridden)
-    if (!effectiveRole) {
-      return false;
-    }
-    return link.allowedRoles.includes(effectiveRole);
-  });
+  // Don't filter nav links until role data is loaded to avoid hydration mismatch
+  const filteredNavLinks = isRoleLoading 
+    ? []
+    : moduleNavLinks.filter((link) => {
+        if (!link.allowedRoles || link.allowedRoles.length === 0) {
+          return true;
+        }
+        
+        // For ADMIN role, check actualRole (not overridable by context switcher)
+        if (link.allowedRoles.includes("ADMIN")) {
+          return actualRole === "ADMIN";
+        }
+        
+        // For other roles, check effectiveRole (can be overridden)
+        if (!effectiveRole) {
+          return false;
+        }
+        return link.allowedRoles.includes(effectiveRole);
+      });
 
   return (
     <Page>
@@ -46,7 +49,7 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
           ))}
         <Spacer />
         <SettingsPanel />
-        {!isLoading && user && (
+        {!isUserLoading && user && (
           <div style={{ display: "flex", alignItems: "center", paddingLeft: "1rem" }}>
             <InternalHeader.User name={user.email} description="" />
           </div>

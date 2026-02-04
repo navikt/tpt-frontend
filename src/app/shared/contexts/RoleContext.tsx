@@ -11,6 +11,7 @@ interface RoleContextType {
   actualRole: string | undefined;
   effectiveRole: string | undefined;
   isInitialized: boolean;
+  isLoading: boolean;
 }
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
@@ -21,11 +22,10 @@ function getStoredRole(): string | null {
 }
 
 export function RoleContextProvider({ children }: { children: ReactNode }) {
-  const { data: vulnData } = useVulnerabilities();
+  const { data: vulnData, isLoading } = useVulnerabilities();
   const actualRole = vulnData?.userRole;
   
   const [selectedRole, setSelectedRoleState] = useState<string | null>(() => getStoredRole());
-  const [isInitialized] = useState(true);
 
   // Save to localStorage when changed
   const setSelectedRole = (role: string | null) => {
@@ -40,12 +40,16 @@ export function RoleContextProvider({ children }: { children: ReactNode }) {
   // Determine effective role (override or actual)
   const effectiveRole = selectedRole || actualRole;
 
+  // Only consider initialized when we have data
+  const isInitialized = !!vulnData && !isLoading;
+
   const value: RoleContextType = {
     selectedRole,
     setSelectedRole,
     actualRole,
     effectiveRole,
     isInitialized,
+    isLoading,
   };
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

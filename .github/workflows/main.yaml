@@ -19,16 +19,20 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10'
       - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version: '24'
           registry-url: 'https://npm.pkg.github.com/'
-      - run: npm ci
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+      - run: pnpm run lint
+      - run: pnpm test
+      - run: pnpm run build
       - uses: nais/docker-build-push@87f920b0411b987d9a1fd4113aa384e1e3b54f2c
         id: docker-push
         with:

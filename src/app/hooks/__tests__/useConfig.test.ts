@@ -3,7 +3,7 @@ import { useConfig } from '../../shared/hooks/useConfig';
 
 // Mock Faro instrumentation
 jest.mock('@/instrumentation/faro', () => ({
-  getFaro: jest.fn(() => null),
+  getFaroInstance: jest.fn(() => null),
 }));
 
 // Mock the global fetch

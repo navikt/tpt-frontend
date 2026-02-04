@@ -5,7 +5,7 @@ import {
 
 // Mock Faro
 jest.mock("@/instrumentation/faro", () => ({
-  getFaro: jest.fn(() => null),
+  getFaroInstance: jest.fn(() => null),
 }));
 
 describe("errorHandling utilities", () => {

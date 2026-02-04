@@ -1,8 +1,13 @@
+"use client";
+import { Box, Loader } from "@navikt/ds-react";
+
 export default function Loading() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-ax-accent-700"></div>
-      <p className="ml-4 text-lg">Loading applications...</p>
-    </div>
+    <Box
+      paddingBlock="space-24"
+      style={{ display: "flex", justifyContent: "center", minHeight: "50vh", alignItems: "center" }}
+    >
+      <Loader size="large" title="Laster..." />
+    </Box>
   );
 }

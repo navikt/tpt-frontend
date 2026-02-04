@@ -15,29 +15,13 @@ TPT analyserer og rangerer sårbarheter basert på flere faktorer som KEV (Known
 
 ```bash
 # Installer avhengigheter
-npm ci
+pnpm install
 
-# Kjør utviklingsserver
-export MOCKS_ENABLED="true" # For standalone kjøring med mock data
-npm run dev
+# Kjør utviklingsserver med mocks
+pnpm run dev:mocks
 
 # Bygg for produksjon
-npm run build
-
-# Kjør produksjonsbygget
-npm start
-
-# Kjør linter
-npm run lint
-
-# Kjør tester
-npm test
-
-# Kjør tester i watch-modus
-npm run test:watch
-
-# Kjør tester med coverage
-npm run test:coverage
+pnpm run build
 ```
 
 Åpne [http://localhost:3000](http://localhost:3000) i nettleseren.
@@ -49,7 +33,7 @@ For å kjøre frontend mot en lokal backend (f.eks. `http://localhost:8080`):
 1. Start utviklingsserveren:
 
 ```bash
-npm run dev
+pnpm run dev:local
 ```
 
 I lokal utviklingsmodus:
@@ -58,6 +42,20 @@ I lokal utviklingsmodus:
 - API-kall går direkte til den konfigurerte backend-URLen
 
 Du kan endre `LOCAL_DEV_EMAIL` til en annen e-postadresse hvis du vil simulere en annen bruker.
+
+### Miljøvariabler
+
+Applikasjonen bruker følgende miljøvariabler (konfigureres i `.env.local` for lokal utvikling):
+
+| Variabel | Beskrivelse | Standard | Påkrevd |
+|----------|-------------|----------|---------|
+| `LOCAL_DEV` | Aktiverer lokal utviklingsmodus (hopper over autentisering) | `false` | Nei |
+| `LOCAL_DEV_EMAIL` | E-postadresse for mock-bruker i lokal modus | `lokal.utvikler@nav.no` | Nei |
+| `TPT_BACKEND_URL` | URL til TPT backend API | `http://localhost:8080` | Ja |
+| `BACKEND_CACHE_SECONDS` | Cache-varighet for backend-data i sekunder | `300` (5 minutter) | Nei |
+| `TELEMETRY_URL` | URL for Faro telemetri (hentes runtime) | - | Nei |
+
+**Viktig om telemetri:** `TELEMETRY_URL` blir lest ved runtime (ikke build-time) og sendes til klienten via `/api/telemetry-config`. Dette gjør at samme Docker-image kan brukes på tvers av miljøer med ulike telemetri-endepunkter.
 
 ### Pre-commit Hooks
 
