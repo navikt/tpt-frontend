@@ -10,13 +10,21 @@ interface ThresholdConfig {
   deploymentAgeDays?: number;
 }
 
-// Global flag to prevent duplicate fetches across all instances (even in Strict Mode)
+// Global state to share config across all instances
 let globalConfigFetchInProgress = false;
-let globalConfigFetchPromise: Promise<void> | null = null;
+let globalConfigFetchPromise: Promise<ThresholdConfig | null> | null = null;
+let globalConfigData: ThresholdConfig | null = null;
+
+// Export reset function for tests
+export const __resetConfigState = () => {
+  globalConfigFetchInProgress = false;
+  globalConfigFetchPromise = null;
+  globalConfigData = null;
+};
 
 export const useConfig = () => {
-  const [config, setConfig] = useState<ThresholdConfig | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [config, setConfig] = useState<ThresholdConfig | null>(() => globalConfigData);
+  const [isLoading, setIsLoading] = useState(!globalConfigData);
   const [error, setError] = useState<ApiError | null>(null);
   const hasFetchedRef = useRef(false);
 
@@ -26,23 +34,32 @@ export const useConfig = () => {
     hasFetchedRef.current = true;
 
     const fetchConfig = async () => {
-      // Prevent concurrent fetches globally
+      // If fetch is already in progress, wait for it
       if (globalConfigFetchInProgress) {
-        if (globalConfigFetchPromise) {
-          await globalConfigFetchPromise;
+        if (!globalConfigData) {
+          setIsLoading(true);
         }
+        if (globalConfigFetchPromise) {
+          const result = await globalConfigFetchPromise;
+          if (result) {
+            setConfig(result);
+          }
+        }
+        setIsLoading(false);
         return;
       }
 
       globalConfigFetchInProgress = true;
 
-      const fetchPromise = (async () => {
+      const fetchPromise = (async (): Promise<ThresholdConfig | null> => {
         try {
           setError(null);
           const response = await fetch("/api/config");
           if (response.ok) {
             const data = await response.json();
+            globalConfigData = data;
             setConfig(data);
+            return data;
           } else {
             const errorData = await response.json().catch(() => ({}));
             const apiError: ApiError = {
@@ -50,10 +67,12 @@ export const useConfig = () => {
               status: response.status,
             };
             setError(apiError);
+            return null;
           }
         } catch (err) {
           const apiError = handleApiError(err, "useConfig.fetchConfig");
           setError(apiError);
+          return null;
         } finally {
           setIsLoading(false);
           globalConfigFetchInProgress = false;

@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useConfig } from '../../shared/hooks/useConfig';
+import { useConfig, __resetConfigState } from '../../shared/hooks/useConfig';
 
 // Mock Faro instrumentation
 jest.mock('@/instrumentation/faro', () => ({
@@ -12,6 +12,7 @@ global.fetch = jest.fn();
 describe('useConfig hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    __resetConfigState(); // Reset global state between tests
   });
 
   it('should return config data on successful fetch', async () => {

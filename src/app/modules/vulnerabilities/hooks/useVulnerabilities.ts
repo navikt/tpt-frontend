@@ -20,9 +20,17 @@ const LAST_REFRESH_STORAGE_KEY = "tpt-last-refresh-time";
 const VULNERABILITIES_STORAGE_KEY = "tpt-vulnerabilities-data";
 const CACHE_TIMESTAMP_STORAGE_KEY = "tpt-cache-timestamp";
 
-// Global flag to prevent duplicate fetches across all instances (even in Strict Mode)
+// Global state to share fetched data across all instances
 let globalFetchInProgress = false;
-let globalFetchPromise: Promise<void> | null = null;
+let globalFetchPromise: Promise<VulnerabilitiesResponse | null> | null = null;
+let globalCachedData: VulnerabilitiesResponse | null = null;
+
+// Export reset function for tests
+export const __resetVulnerabilitiesState = () => {
+  globalFetchInProgress = false;
+  globalFetchPromise = null;
+  globalCachedData = null;
+};
 
 // Check if cache is expired (older than 30 minutes)
 const isCacheExpired = (): boolean => {
@@ -31,18 +39,22 @@ const isCacheExpired = (): boolean => {
   return Date.now() - cacheTimestamp > CACHE_MAX_AGE_MS;
 };
 
+// Load initial cache
+if (typeof window !== 'undefined' && !globalCachedData) {
+  const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
+  if (cachedData && !isCacheExpired()) {
+    globalCachedData = cachedData;
+  }
+}
+
 export const useVulnerabilities = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Lazy initialization - load cache synchronously before first render
-  const [data, setData] = useState<VulnerabilitiesResponse | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
-    return (cachedData && !isCacheExpired()) ? cachedData : null;
-  });
+  // Initialize with global cached data
+  const [data, setData] = useState<VulnerabilitiesResponse | null>(() => globalCachedData);
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!globalCachedData);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   
@@ -118,17 +130,24 @@ export const useVulnerabilities = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
-    // Prevent concurrent fetches globally
+    // If fetch is already in progress, wait for it
     if (globalFetchInProgress && !isRefresh) {
-      if (globalFetchPromise) {
-        await globalFetchPromise;
+      if (showLoading && !globalCachedData) {
+        setIsLoading(true);
       }
+      if (globalFetchPromise) {
+        const result = await globalFetchPromise;
+        if (result) {
+          setData(result);
+        }
+      }
+      setIsLoading(false);
       return;
     }
 
     globalFetchInProgress = true;
     
-    const fetchPromise = (async () => {
+    const fetchPromise = (async (): Promise<VulnerabilitiesResponse | null> => {
       try {
         if (isRefresh) {
           setIsRefreshing(true);
@@ -147,10 +166,13 @@ export const useVulnerabilities = () => {
             status: response.status,
           };
           setError(apiError);
-          return;
+          return null;
         }
         
         const responseData: VulnerabilitiesResponse = await response.json();
+        
+        // Update global cache
+        globalCachedData = responseData;
         setData(responseData);
         setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
         setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
@@ -167,6 +189,8 @@ export const useVulnerabilities = () => {
           setLastRefreshTime(now);
           setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
         }
+        
+        return responseData;
       } catch (err) {
         const apiError = handleApiError(
           err,
@@ -174,6 +198,7 @@ export const useVulnerabilities = () => {
           { isRefresh, showLoading }
         );
         setError(apiError);
+        return null;
       } finally {
         setIsLoading(false);
         setIsRefreshing(false);
@@ -183,7 +208,7 @@ export const useVulnerabilities = () => {
     })();
 
     globalFetchPromise = fetchPromise;
-    await fetchPromise;
+    return await fetchPromise;
   }, []);
 
   const refresh = useCallback(() => {
@@ -214,7 +239,7 @@ export const useVulnerabilities = () => {
     hasFetchedRef.current = true;
     
     // If we have valid cached data, fetch in background without showing loader
-    const hasValidCache = data && !isCacheExpired();
+    const hasValidCache = globalCachedData && !isCacheExpired();
     fetchData(false, !hasValidCache); // showLoading only if no cache
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
