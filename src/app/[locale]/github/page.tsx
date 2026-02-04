@@ -166,9 +166,9 @@ export default function GitHubPage() {
                       key={team.name}
                       padding="space-12"
                       borderRadius="4"
-                      style={{ 
-                        backgroundColor: "white",
-                        border: "1px solid var(--a-border-subtle)"
+                      background="neutral-soft"
+                      style={{
+                        border: "1px solid var(--a-border-subtle)",
                       }}
                     >
                       <VStack gap="space-4">
@@ -177,7 +177,7 @@ export default function GitHubPage() {
                           {team.repositoryCount} {t("github.overview.repositoriesShort")} · {team.vulnerabilityCount} {t("github.overview.vulnerabilitiesShort")}
                         </BodyShort>
                         <BodyShort size="small">
-                          Avg. risiko: <span style={{ fontWeight: 600 }}>{team.avgRiskScore}</span>
+                          {t("github.overview.avgRisk")}: <span style={{ fontWeight: 600 }}>{team.avgRiskScore}</span>
                         </BodyShort>
                       </VStack>
                     </Box>

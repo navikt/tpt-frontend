@@ -57,7 +57,8 @@
       "noCriticalVulnerabilities": "No critical vulnerabilities!",
       "teamStatistics": "Team Statistics",
       "repositoriesShort": "repos",
-      "vulnerabilitiesShort": "vulns"
+      "vulnerabilitiesShort": "vulns",
+      "avgRisk": "Avg. risk"
     },
     "repository": {
       "riskScore": "Risk score",
@@ -307,6 +308,13 @@
     "teamMember": "Team Member",
     "leader": "Leader",
     "none": "No role"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "themeLys": "☀️ Light",
+    "themeMork": "🌙 Dark",
+    "themeSystem": "💻 System"
   },
   "errors": {
     "title": "An error occurred",

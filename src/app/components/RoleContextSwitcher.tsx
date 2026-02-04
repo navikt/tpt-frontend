@@ -25,22 +25,21 @@ export function RoleContextSwitcher() {
     }
   };
 
+  // Display the effective role, ensuring it always shows a valid value
+  const displayValue = effectiveRole || actualRole || "NONE";
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingRight: "1.5rem" }}>
-      <Select
-        label={t("viewAs")}
-        hideLabel
-        size="small"
-        value={effectiveRole || "NONE"}
-        onChange={handleChange}
-        style={{ minWidth: "150px" }}
-      >
-        {roles.map((role) => (
-          <option key={role.value} value={role.value}>
-            {role.label}
-          </option>
-        ))}
-      </Select>
-    </div>
+    <Select
+      label={t("viewAs")}
+      size="small"
+      value={displayValue}
+      onChange={handleChange}
+    >
+      {roles.map((role) => (
+        <option key={role.value} value={role.value}>
+          {role.label}
+        </option>
+      ))}
+    </Select>
   );
 }

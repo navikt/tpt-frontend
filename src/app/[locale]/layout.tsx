@@ -2,8 +2,7 @@
 import { Page, InternalHeader, GlobalAlert, Spacer } from "@navikt/ds-react";
 import { useUser } from "../shared/hooks/useUser";
 import { useRoleContext, RoleContextProvider } from "../shared/hooks/useRoleContext";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-import { RoleContextSwitcher } from "../components/RoleContextSwitcher";
+import { SettingsPanel } from "../components/SettingsPanel";
 import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 
@@ -46,10 +45,11 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
             </InternalHeader.Title>
           ))}
         <Spacer />
-        <RoleContextSwitcher />
-        <LanguageSwitcher />
+        <SettingsPanel />
         {!isLoading && user && (
-          <InternalHeader.User name={user.email} description="" />
+          <div style={{ display: "flex", alignItems: "center", paddingLeft: "1rem" }}>
+            <InternalHeader.User name={user.email} description="" />
+          </div>
         )}
       </InternalHeader>
       <GlobalAlert status="announcement">

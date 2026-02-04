@@ -57,7 +57,8 @@
       "noCriticalVulnerabilities": "Ingen kritiske sårbarheter!",
       "teamStatistics": "Teamstatistikk",
       "repositoriesShort": "repos",
-      "vulnerabilitiesShort": "sårb."
+      "vulnerabilitiesShort": "sårb.",
+      "avgRisk": "Gj.snitt risiko"
     },
     "repository": {
       "riskScore": "Risikoscore",
@@ -307,6 +308,13 @@
     "teamMember": "Teammedlem",
     "leader": "Leder",
     "none": "Ingen rolle"
+  },
+  "settings": {
+    "title": "Innstillinger",
+    "theme": "Tema",
+    "themeLys": "☀️ Lyst",
+    "themeMork": "🌙 Mørkt",
+    "themeSystem": "💻 System"
   },
   "errors": {
     "title": "Det oppstod en feil",

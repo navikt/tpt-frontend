@@ -1,0 +1,26 @@
+.accordionWrapper {
+    background: var(--ax-bg-neutral-soft);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.accordionWrapper :global(.aksel-accordion) {
+    border: none;
+}
+
+.accordionWrapper :global(.aksel-accordion__item) {
+    border: none !important;
+}
+
+.accordionWrapper :global(.aksel-accordion__item:not(:last-child)) {
+    border-bottom: none !important;
+}
+
+.accordionWrapper :global(.aksel-accordion__header) {
+    border: none !important;
+}
+
+.accordionWrapper :global(.aksel-accordion__header-button) {
+    padding: 0.75rem 1rem;
+    border: none !important;
+}

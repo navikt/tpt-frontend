@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Box, HStack, VStack, BodyShort, Heading, Link as AkselLink, Chips } from "@navikt/ds-react";
-import { ChevronDownIcon, ChevronUpIcon, CheckmarkCircleFillIcon, XMarkOctagonFillIcon, QuestionmarkDiamondFillIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
+import { Box, HStack, VStack, BodyShort, Heading, Link as AkselLink, Chips, Accordion } from "@navikt/ds-react";
+import { CheckmarkCircleFillIcon, XMarkOctagonFillIcon, QuestionmarkDiamondFillIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
 import { useTranslations } from "next-intl";
+import styles from "./GitHubRepositoryListItem.module.css";
 
 interface GitHubRepositoryListItemProps {
   repository: RepositoryMetrics;
@@ -73,7 +73,6 @@ function SecurityMetricItem({
 
 export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListItemProps) {
   const t = useTranslations("github");
-  const [isExpanded, setIsExpanded] = useState(false);
   const riskLevel = getRiskLevel(repository.aggregateRiskScore);
   const riskColor = getRiskColor(riskLevel);
   const riskLabel = getRiskLabel(riskLevel, t);
@@ -108,99 +107,69 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
   const hasSecurityMetrics = repository.usesDistroless !== undefined && repository.usesDistroless !== null;
 
   return (
-    <Box
-      borderRadius="8"
+    <div 
+      className={styles.accordionWrapper}
       style={{
-        border: "3px solid #2E3A47",
         borderLeft: `6px solid ${riskColor}`,
-        transition: "all 0.2s ease",
-        backgroundColor: "#F9FAFB",
-        boxShadow: "0 3px 8px rgba(0,0,0,0.2)",
       }}
     >
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        style={{
-          width: "100%",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          textAlign: "left",
-        }}
-      >
-        <Box padding="space-8">
-          <HStack justify="space-between" align="center" gap="space-12">
-            <VStack gap="space-4">
-              <Heading size="small" level="3">
-                {repository.nameWithOwner}
-              </Heading>
+      <Accordion>
+        <Accordion.Item>
+          <Accordion.Header>
+            <HStack justify="space-between" align="center" gap="space-12" style={{ width: "100%" }}>
+              <VStack gap="space-4">
+                <Heading size="small" level="3">
+                  {repository.nameWithOwner}
+                </Heading>
 
-              <HStack gap="space-16" align="center">
-                <HStack gap="space-4" align="center">
-                  <BodyShort size="small" weight="semibold">
-                    {t("repository.riskScore")}:
-                  </BodyShort>
-                  <BodyShort
-                    size="small"
-                    style={{
-                      color: riskColor,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {formatNumber(repository.aggregateRiskScore)}
-                  </BodyShort>
-                  <BodyShort
-                    size="small"
-                    style={{
-                      color: "var(--a-text-subtle)",
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    ({riskLabel})
-                  </BodyShort>
+                <HStack gap="space-16" align="center">
+                  <HStack gap="space-4" align="center">
+                    <BodyShort size="small" weight="semibold">
+                      {t("repository.riskScore")}:
+                    </BodyShort>
+                    <BodyShort
+                      size="small"
+                      style={{
+                        color: riskColor,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {formatNumber(repository.aggregateRiskScore)}
+                    </BodyShort>
+                    <BodyShort
+                      size="small"
+                      style={{
+                        color: "var(--a-text-subtle)",
+                        fontSize: "0.75rem",
+                      }}
+                    >
+                      ({riskLabel})
+                    </BodyShort>
+                  </HStack>
+
+                  <HStack gap="space-4" align="center">
+                    <BodyShort size="small" weight="semibold">
+                      {t("repository.vulnerabilities")}:
+                    </BodyShort>
+                    <BodyShort size="small">
+                      {repository.vulnerabilityCount}
+                    </BodyShort>
+                  </HStack>
                 </HStack>
-
-                <HStack gap="space-4" align="center">
-                  <BodyShort size="small" weight="semibold">
-                    {t("repository.vulnerabilities")}:
-                  </BodyShort>
-                  <BodyShort size="small">
-                    {repository.vulnerabilityCount}
-                  </BodyShort>
-                </HStack>
-              </HStack>
-            </VStack>
-
-            <Box style={{ flexShrink: 0 }}>
-              {isExpanded ? (
-                <ChevronUpIcon fontSize="1.5rem" />
-              ) : (
-                <ChevronDownIcon fontSize="1.5rem" />
-              )}
-            </Box>
-          </HStack>
-        </Box>
-      </button>
-
-      {isExpanded && (
-        <Box
-          padding="space-8"
-          style={{
-            borderTop: "2px solid var(--a-border-default)",
-            backgroundColor: "var(--a-surface-subtle)",
-          }}
-        >
-          <VStack gap="space-12">
-            {/* Security Metrics */}
-            <Box
-              padding="space-8"
-              borderRadius="8"
-              style={{
-                backgroundColor: "#E0F2FE",
-                border: "3px solid #0369A1",
-                boxShadow: "0 2px 4px rgba(3, 105, 161, 0.2)",
-              }}
-            >
+              </VStack>
+            </HStack>
+          </Accordion.Header>
+          <Accordion.Content>
+            <VStack gap="space-12">
+              {/* Security Metrics */}
+              <Box
+                padding="space-8"
+                borderRadius="8"
+                background="neutral-soft"
+                style={{
+                  borderLeft: "4px solid var(--a-border-info)",
+                }}
+              >
               <VStack gap="space-8">
                 <Heading size="xsmall" level="4">
                   {t("repository.securityMetrics")}
@@ -239,10 +208,7 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
             <Box
               padding="space-8"
               borderRadius="8"
-              style={{
-                backgroundColor: "var(--a-surface-neutral-subtle)",
-                border: "2px solid var(--a-border-strong)",
-              }}
+              background="neutral-soft"
             >
               <VStack gap="space-8">
                 <Heading size="xsmall" level="4">
@@ -260,9 +226,9 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
                           key={vuln.identifier}
                           padding="space-8"
                           borderRadius="4"
+                          background="neutral-soft"
                           style={{
-                            backgroundColor: "var(--a-surface-neutral-subtle)",
-                            border: "2px solid var(--a-border-strong)",
+                            borderLeft: "3px solid var(--a-border-strong)",
                           }}
                         >
                           <VStack gap="space-4">
@@ -328,9 +294,10 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
                 </VStack>
               </VStack>
             </Box>
-          </VStack>
-        </Box>
-      )}
-    </Box>
+            </VStack>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
+    </div>
   );
 }

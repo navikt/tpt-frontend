@@ -36,22 +36,18 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingRight: "1.5rem" }}>
-      <Select
-        label={t("language")}
-        value={locale}
-        onChange={handleChange}
-        size="small"
-        hideLabel
-        disabled={isPending}
-        style={{ minWidth: "150px" }}
-      >
-        {languages.map((lang) => (
-          <option key={lang.code} value={lang.code}>
-            {lang.flag} {lang.name}
-          </option>
-        ))}
-      </Select>
-    </div>
+    <Select
+      label={t("language")}
+      value={locale}
+      onChange={handleChange}
+      size="small"
+      disabled={isPending}
+    >
+      {languages.map((lang) => (
+        <option key={lang.code} value={lang.code}>
+          {lang.flag} {lang.name}
+        </option>
+      ))}
+    </Select>
   );
 }

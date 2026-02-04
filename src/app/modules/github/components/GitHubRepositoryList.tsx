@@ -58,8 +58,8 @@ export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps
     <VStack gap="space-24">
       <Box
         padding="space-16"
-        background="neutral-soft"
         borderRadius="8"
+        style={{ backgroundColor: "var(--a-surface-subtle)" }}
       >
         <VStack gap="space-8">
           <Heading size="medium" level="2">
@@ -153,9 +153,8 @@ export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps
       {repositories.length === 0 && (
         <Box
           padding="space-24"
-          background="neutral-soft"
           borderRadius="8"
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", backgroundColor: "var(--a-surface-subtle)" }}
         >
           <BodyShort>{t("noRepositories")}</BodyShort>
         </Box>
@@ -164,9 +163,8 @@ export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps
       {repositories.length > 0 && filteredRepositories.length === 0 && (
         <Box
           padding="space-24"
-          background="neutral-soft"
           borderRadius="8"
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", backgroundColor: "var(--a-surface-subtle)" }}
         >
           <BodyShort>No repositories match your search</BodyShort>
         </Box>
