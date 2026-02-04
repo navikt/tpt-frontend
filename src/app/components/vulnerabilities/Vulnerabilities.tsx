@@ -1,5 +1,5 @@
 "use client";
-import { useVulnerabilities } from "../../modules/vulnerabilities/hooks/useVulnerabilities";
+import { useVulnerabilitiesContext } from "../../contexts/VulnerabilitiesContext";
 import VulnerabilitiesTable from "./table/VulnerabilitiesTable";
 import FilterActionMenu from "./filteractionmenu/FilterActionMenu";
 
@@ -22,7 +22,7 @@ const Vulnerabilities = () => {
     availableApplications,
     availableCves,
     availablePackageNames,
-  } = useVulnerabilities();
+  } = useVulnerabilitiesContext();
 
   if (isLoading) {
     return <div>Loading vulnerabilities...</div>;

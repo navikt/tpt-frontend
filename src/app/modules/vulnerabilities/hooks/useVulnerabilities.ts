@@ -20,6 +20,10 @@ const LAST_REFRESH_STORAGE_KEY = "tpt-last-refresh-time";
 const VULNERABILITIES_STORAGE_KEY = "tpt-vulnerabilities-data";
 const CACHE_TIMESTAMP_STORAGE_KEY = "tpt-cache-timestamp";
 
+// Global flag to prevent duplicate fetches across all instances (even in Strict Mode)
+let globalFetchInProgress = false;
+let globalFetchPromise: Promise<void> | null = null;
+
 // Check if cache is expired (older than 30 minutes)
 const isCacheExpired = (): boolean => {
   const cacheTimestamp = getStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY);
@@ -114,55 +118,72 @@ export const useVulnerabilities = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
-    try {
-      if (isRefresh) {
-        setIsRefreshing(true);
-      } else if (showLoading) {
-        setIsLoading(true);
+    // Prevent concurrent fetches globally
+    if (globalFetchInProgress && !isRefresh) {
+      if (globalFetchPromise) {
+        await globalFetchPromise;
       }
-      
-      setError(null); // Clear any previous errors
-      
-      const response = await fetch("/api/applications");
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const apiError: ApiError = {
-          message: errorData.error || "errors.fetchApplicationsError",
-          status: response.status,
-        };
-        setError(apiError);
-        return;
-      }
-      
-      const responseData: VulnerabilitiesResponse = await response.json();
-      setData(responseData);
-      setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
-      setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
-      
-      // Only clear filters when doing a manual refresh (not initial load)
-      if (isRefresh) {
-        setTeamFilters({});
-        setApplicationFilters({});
-        setEnvironmentFilters({});
-        setCveFilters({});
-        setPackageNameFilters({});
-        
-        const now = Date.now();
-        setLastRefreshTime(now);
-        setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
-      }
-    } catch (err) {
-      const apiError = handleApiError(
-        err,
-        "useVulnerabilities.fetchData",
-        { isRefresh, showLoading }
-      );
-      setError(apiError);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      return;
     }
+
+    globalFetchInProgress = true;
+    
+    const fetchPromise = (async () => {
+      try {
+        if (isRefresh) {
+          setIsRefreshing(true);
+        } else if (showLoading) {
+          setIsLoading(true);
+        }
+        
+        setError(null); // Clear any previous errors
+        
+        const response = await fetch("/api/applications");
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const apiError: ApiError = {
+            message: errorData.error || "errors.fetchApplicationsError",
+            status: response.status,
+          };
+          setError(apiError);
+          return;
+        }
+        
+        const responseData: VulnerabilitiesResponse = await response.json();
+        setData(responseData);
+        setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
+        setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
+        
+        // Only clear filters when doing a manual refresh (not initial load)
+        if (isRefresh) {
+          setTeamFilters({});
+          setApplicationFilters({});
+          setEnvironmentFilters({});
+          setCveFilters({});
+          setPackageNameFilters({});
+          
+          const now = Date.now();
+          setLastRefreshTime(now);
+          setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
+        }
+      } catch (err) {
+        const apiError = handleApiError(
+          err,
+          "useVulnerabilities.fetchData",
+          { isRefresh, showLoading }
+        );
+        setError(apiError);
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        globalFetchInProgress = false;
+        globalFetchPromise = null;
+      }
+    })();
+
+    globalFetchPromise = fetchPromise;
+    await fetchPromise;
   }, []);
 
   const refresh = useCallback(() => {
@@ -196,7 +217,7 @@ export const useVulnerabilities = () => {
     const hasValidCache = data && !isCacheExpired();
     fetchData(false, !hasValidCache); // showLoading only if no cache
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, []);
 
   const allTeams = useMemo(
     () => data?.teams.map((team) => team.team) || [],

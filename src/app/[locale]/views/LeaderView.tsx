@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
-import { useConfig } from "@/app/shared/hooks/useConfig";
-import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import { useConfigContext } from "@/app/contexts/ConfigContext";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import {
   BodyShort,
   Loader,
@@ -26,8 +26,8 @@ interface TeamStats {
 
 export default function LeaderView() {
   const t = useTranslations("leaderView");
-  const { config, isLoading: configLoading } = useConfig();
-  const { data: vulnData, isLoading: dataLoading } = useVulnerabilities();
+  const { config, isLoading: configLoading } = useConfigContext();
+  const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
   const [sortBy, setSortBy] = useState<keyof TeamStats>("highPriority");
   const [sortDesc, setSortDesc] = useState(true);
 

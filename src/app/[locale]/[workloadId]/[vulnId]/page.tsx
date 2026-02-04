@@ -1,5 +1,5 @@
 "use client";
-import {useVulnerabilities} from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import {useVulnerabilitiesContext} from "@/app/contexts/VulnerabilitiesContext";
 import {useParams} from "next/navigation";
 import {
     Heading,
@@ -54,7 +54,7 @@ export default function WorkloadDetailPage() {
     const params = useParams();
     const workloadId = params.workloadId as string;
     const vulnId = params.vulnId as string;
-    const {data, isLoading} = useVulnerabilities();
+    const {data, isLoading} = useVulnerabilitiesContext();
 
     const workloadData = data?.teams
         .flatMap((team) =>

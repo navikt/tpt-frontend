@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useVulnerabilities } from "../hooks/useVulnerabilities";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { Vulnerability, Workload } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
@@ -24,7 +24,7 @@ interface VulnerabilitiesToLookAtProps {
 
 const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams }: VulnerabilitiesToLookAtProps) => {
     const t = useTranslations();
-    const { data, isLoading } = useVulnerabilities();
+    const { data, isLoading } = useVulnerabilitiesContext();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
     const toggleAll = () => {

@@ -5,6 +5,7 @@ import { useRoleContext, RoleContextProvider } from "../shared/hooks/useRoleCont
 import { SettingsPanel } from "../components/SettingsPanel";
 import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
+import { Providers } from "../contexts/Providers";
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isLoading: isUserLoading } = useUser();
@@ -75,8 +76,10 @@ export default function LocaleLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RoleContextProvider>
-      <LocaleLayoutContent>{children}</LocaleLayoutContent>
-    </RoleContextProvider>
+    <Providers>
+      <RoleContextProvider>
+        <LocaleLayoutContent>{children}</LocaleLayoutContent>
+      </RoleContextProvider>
+    </Providers>
   );
 }

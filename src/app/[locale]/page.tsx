@@ -1,5 +1,5 @@
 "use client";
-import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import DeveloperView from "./views/DeveloperView";
 import TeamMemberView from "./views/TeamMemberView";
@@ -10,7 +10,7 @@ import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations } from "next-intl";
 
 export default function Home() {
-  const { data: vulnData, isLoading: isVulnLoading, error } = useVulnerabilities();
+  const { data: vulnData, isLoading: isVulnLoading, error } = useVulnerabilitiesContext();
   const { effectiveRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations("errors");
 

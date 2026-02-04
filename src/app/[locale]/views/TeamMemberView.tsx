@@ -1,8 +1,8 @@
 "use client";
 import { useMemo } from "react";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
-import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
-import { useConfig } from "@/app/shared/hooks/useConfig";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
+import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
@@ -11,8 +11,8 @@ import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
-  const { data: vulnData, isLoading: vulnLoading } = useVulnerabilities();
-  const { config, isLoading: configLoading } = useConfig();
+  const { data: vulnData, isLoading: vulnLoading } = useVulnerabilitiesContext();
+  const { config, isLoading: configLoading } = useConfigContext();
   
   const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
 

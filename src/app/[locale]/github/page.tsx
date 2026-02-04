@@ -5,7 +5,7 @@ import { GitHubRepositoryList } from "../../modules/github/components/GitHubRepo
 import { GitHubTeamFilterModal } from "../../modules/github/components/GitHubTeamFilterModal";
 import { useGitHubVulnerabilities } from "../../modules/github/hooks/useGitHubVulnerabilities";
 import { useRepositoryMetrics } from "../../modules/github/hooks/useRepositoryMetrics";
-import { useConfig } from "../../shared/hooks/useConfig";
+import { useConfigContext } from "../../contexts/ConfigContext";
 import { useTranslations } from "next-intl";
 import { Box, HStack, BodyShort, Loader, Button, VStack, Heading, HGrid } from "@navikt/ds-react";
 import { useState } from "react";
@@ -13,7 +13,7 @@ import { useState } from "react";
 export default function GitHubPage() {
   const t = useTranslations();
   const { data, teamFilters, setTeamFilters } = useGitHubVulnerabilities();
-  const { config, isLoading } = useConfig();
+  const { config, isLoading } = useConfigContext();
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   
   // Compute selected teams from teamFilters

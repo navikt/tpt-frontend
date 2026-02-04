@@ -9,7 +9,7 @@ import {
   BodyShort,
   Loader,
 } from "@navikt/ds-react";
-import { useVulnerabilities } from "../hooks/useVulnerabilities";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useTranslations } from "next-intl";
 
 interface TeamFilterModalProps {
@@ -30,7 +30,7 @@ const TeamFilterModal = ({
   onShowAllBucketsChange,
 }: TeamFilterModalProps) => {
   const t = useTranslations("teamFilter");
-  const { data, isLoading } = useVulnerabilities();
+  const { data, isLoading } = useVulnerabilitiesContext();
   const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(selectedTeams);
 
   // Get unique teams from data

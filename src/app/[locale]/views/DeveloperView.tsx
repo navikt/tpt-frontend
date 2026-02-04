@@ -2,16 +2,16 @@
 import { useState, useMemo } from "react";
 import VulnerabilitiesToLookAt from "@/app/modules/vulnerabilities/components/VulnerabilitiesToLookAt";
 import VulnerabilitySummary, { BucketThreshold } from "@/app/modules/vulnerabilities/components/VulnerabilitySummary";
-import { useConfig } from "@/app/shared/hooks/useConfig";
-import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import { useConfigContext } from "@/app/contexts/ConfigContext";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useUserPreferences } from "@/app/shared/hooks/useUserPreferences";
 import { BodyShort, Loader, Box } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 
 export default function DeveloperView() {
   const t = useTranslations();
-  const { config, isLoading } = useConfig();
-  const { data: vulnData, teamFilters, setTeamFilters } = useVulnerabilities();
+  const { config, isLoading } = useConfigContext();
+  const { data: vulnData, teamFilters, setTeamFilters } = useVulnerabilitiesContext();
   const { preferences, updatePreferences } = useUserPreferences();
   
   const selectedTeams = useMemo(() => {
