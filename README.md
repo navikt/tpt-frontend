@@ -1,74 +1,77 @@
 # Titt på Ting (TPT) Frontend
 
-Frontend-applikasjon for Titt på Ting - et prioriteringsverktøy for sårbarheter i applikasjoner.
+Frontend application for Titt på Ting - a vulnerability prioritization tool for applications.
 
-TPT analyserer og rangerer sårbarheter basert på flere faktorer som KEV (Known Exploited Vulnerabilities), EPSS (Exploit Prediction Scoring System), eksponering, produksjonsmiljø og byggets alder. Dette gir teams mulighet til å fokusere på de mest kritiske sårbarhetene som faktisk utgjør en reell risiko.
+TPT analyzes and ranks vulnerabilities based on multiple factors such as KEV (Known Exploited Vulnerabilities), EPSS (Exploit Prediction Scoring System), exposure, production environment, and build age. This enables teams to focus on the most critical vulnerabilities that pose actual risk.
 
-## Komme i gang
+## Getting Started
 
-### Forutsetninger
+### Prerequisites
 
-- Node.js (versjon 24 eller nyere)
-- npm
+- Node.js (version 24 or newer)
+- pnpm
 
-### Installasjon og kjøring
+### Installation and Running
 
 ```bash
-# Installer avhengigheter
+# Install dependencies
 pnpm install
 
-# Kjør utviklingsserver med mocks
+# Run development server with mocks
 pnpm run dev:mocks
 
-# Bygg for produksjon
+# Build for production
 pnpm run build
 ```
 
-Åpne [http://localhost:3000](http://localhost:3000) i nettleseren.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Lokal utvikling mot backend
+### Local Development Against Backend
 
-For å kjøre frontend mot en lokal backend (f.eks. `http://localhost:8080`):
+To run the frontend against a local backend (e.g., `http://localhost:8080`):
 
-1. Start utviklingsserveren:
+1. Start the development server:
 
 ```bash
 pnpm run dev:local
 ```
 
-I lokal utviklingsmodus:
-- Autentisering med TokenX/OBO blir hoppet over
-- En mock JWT token genereres automatisk med `lokal.utvikler@nav.no` som bruker
-- API-kall går direkte til den konfigurerte backend-URLen
+In local development mode:
+- TokenX/OBO authentication is bypassed
+- A mock JWT token is automatically generated with `lokal.utvikler@nav.no` as the user
+- API calls go directly to the configured backend URL
 
-Du kan endre `LOCAL_DEV_EMAIL` til en annen e-postadresse hvis du vil simulere en annen bruker.
+You can change `LOCAL_DEV_EMAIL` to a different email address if you want to simulate a different user.
 
-### Miljøvariabler
+The backend is available at (navikt/tpt-backend)[https://github.com/navikt/tpt-backend]. 
+Requires docker to be running and can be started with `./gradlew runLocalDev`.
 
-Applikasjonen bruker følgende miljøvariabler (konfigureres i `.env.local` for lokal utvikling):
+### Environment Variables
 
-| Variabel | Beskrivelse | Standard | Påkrevd |
-|----------|-------------|----------|---------|
-| `LOCAL_DEV` | Aktiverer lokal utviklingsmodus (hopper over autentisering) | `false` | Nei |
-| `LOCAL_DEV_EMAIL` | E-postadresse for mock-bruker i lokal modus | `lokal.utvikler@nav.no` | Nei |
-| `TPT_BACKEND_URL` | URL til TPT backend API | `http://localhost:8080` | Ja |
-| `BACKEND_CACHE_SECONDS` | Cache-varighet for backend-data i sekunder | `300` (5 minutter) | Nei |
-| `TELEMETRY_URL` | URL for Faro telemetri (hentes runtime) | - | Nei |
+The application uses the following environment variables (configured in `.env.local` for local development):
 
-**Viktig om telemetri:** `TELEMETRY_URL` blir lest ved runtime (ikke build-time) og sendes til klienten via `/api/telemetry-config`. Dette gjør at samme Docker-image kan brukes på tvers av miljøer med ulike telemetri-endepunkter.
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `LOCAL_DEV` | Enables local development mode (bypasses authentication) | `false` | No |
+| `LOCAL_DEV_EMAIL` | Email address for mock user in local mode | `lokal.utvikler@nav.no` | No |
+| `TPT_BACKEND_URL` | URL to TPT backend API | `http://localhost:8080` | Yes |
+| `BACKEND_CACHE_SECONDS` | Cache duration for backend data in seconds | `300` (5 minutes) | No |
+| `TELEMETRY_URL` | URL for Faro telemetry (fetched at runtime) | - | No |
+
+**Important about telemetry:** `TELEMETRY_URL` is read at runtime (not build-time) and sent to the client via `/api/telemetry-config`. This allows the same Docker image to be used across environments with different telemetry endpoints.
 
 ### Pre-commit Hooks
 
-Prosjektet bruker Husky for å kjøre automatiske sjekker før hver commit:
-- Linter kjører på alle filer
-- Tester kjører på filer som er endret
+The project uses Husky to run automatic checks before each commit:
+- Linter runs on all files
+- Tests run on changed files
 
-Dette sikrer kodekvalitet før kode pushes til repository.
+This ensures code quality before code is pushed to the repository.
 
-## Henvendelser
+## Contact
 
-Spørsmål knyttet til koden eller repositoryet kan stilles som issues her på GitHub.
+Questions related to the code or repository can be submitted as issues here on GitHub.
 
-### For Nav-ansatte
+### For NAV Employees
 
-Interne henvendelser kan sendes via Slack i kanalen **#appsec**.
+Internal inquiries can be sent via Slack in the **#appsec** channel.
