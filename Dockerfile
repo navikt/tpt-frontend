@@ -30,6 +30,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
+RUN ln -sfn /tmp/cache /app/.next/cache
 
 EXPOSE 3000
 
