@@ -12,7 +12,7 @@ RUN pnpm config set @navikt:registry=https://npm.pkg.github.com
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY next.config.ts tsconfig.json ./
+COPY next.config.ts tsconfig.json cache-handler.js ./
 COPY src/ ./src/
 COPY messages/ ./messages/
 COPY public/ ./public/
