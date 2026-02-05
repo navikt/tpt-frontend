@@ -62,10 +62,23 @@ export const useConfig = () => {
             return data;
           } else {
             const errorData = await response.json().catch(() => ({}));
-            const apiError: ApiError = {
-              message: errorData.error || "errors.fetchConfigError",
-              status: response.status,
-            };
+            
+            // Check if response contains Problem Details or our error format
+            const apiError: ApiError = errorData.type || errorData.title || errorData.detail
+              ? {
+                  message: errorData.title || "errors.fetchConfigError",
+                  status: response.status,
+                  details: errorData.detail,
+                  isReportable: errorData.isReportable ?? (response.status >= 500),
+                  problemDetails: errorData,
+                }
+              : {
+                  message: errorData.error || "errors.fetchConfigError",
+                  status: response.status,
+                  details: errorData.details,
+                  isReportable: errorData.isReportable ?? (response.status >= 500),
+                };
+            
             setError(apiError);
             return null;
           }

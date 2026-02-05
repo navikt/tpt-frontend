@@ -6,7 +6,8 @@
     "loading": "Loading",
     "applications": "applications",
     "application": "application",
-    "in": "in"
+    "in": "in",
+    "statusCode": "Status code"
   },
   "metadata": {
     "description": "Vulnerability prioritization tool that filters out noise"
@@ -325,6 +326,18 @@
     "fetchVulnerabilitiesError": "Could not load vulnerability data",
     "fetchTeamsOverviewError": "Could not fetch teams overview",
     "fetchTeamsSlaError": "Could not fetch teams SLA data",
+    "badRequest": "Invalid request. Please check your input.",
+    "unauthorized": "You are not authorized. Please log in again.",
+    "forbidden": "You don't have permission to access this resource.",
+    "notFound": "The requested resource was not found.",
+    "tooManyRequests": "Too many requests. Please try again later.",
+    "clientError": "There was a problem with your request.",
+    "internalServerError": "The server encountered an error. Please try again later.",
+    "badGateway": "The backend service is temporarily unavailable.",
+    "serviceUnavailable": "The service is temporarily unavailable. Please try again later.",
+    "gatewayTimeout": "The request took too long. Please try again.",
+    "serverError": "A server error occurred. Our team has been notified.",
+    "shouldReport": "If this problem persists, please report it with the trace ID below.",
     "traceId": "Trace ID",
     "copyId": "Copy ID",
     "copiedId": "Copied!"

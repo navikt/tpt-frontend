@@ -3,6 +3,7 @@ import { getToken, requestOboToken } from "@navikt/oasis";
 import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 import { getBackendCacheTime } from "@/app/utils/backendCache";
+import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/errorHandling";
 
 // Environment validation helper
 function getServerEnv() {
@@ -67,11 +68,40 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      
       console.error(
-        `Failed to fetch applications: ${response.status} ${response.statusText}`
+        `Backend error: ${response.status} ${response.statusText}`,
+        errorBody
       );
+      
+      // Try to parse RFC 9457 Problem Details
+      const problemDetails = parseProblemDetails(errorBody);
+      
+      if (problemDetails) {
+        // Backend returned Problem Details - use them directly
+        return NextResponse.json(
+          {
+            ...problemDetails,
+            isReportable: response.status >= 500,
+          },
+          { status: response.status }
+        );
+      }
+      
+      // Fallback to generic error handling
+      const errorMessage = getErrorMessageKey(
+        response.status,
+        "errors.fetchApplicationsError"
+      );
+      
       return NextResponse.json(
-        { error: "errors.fetchApplicationsError" },
+        { 
+          error: errorMessage,
+          status: response.status,
+          details: errorBody?.message || errorBody?.error,
+          isReportable: response.status >= 500,
+        },
         { status: response.status }
       );
     }

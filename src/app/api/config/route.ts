@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getBackendCacheTime } from "@/app/utils/backendCache";
+import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/errorHandling";
 
 // Hardcoded fallback values
 const FALLBACK_THRESHOLDS = {
@@ -34,9 +35,46 @@ export async function GET() {
           deploymentAgeDays: data.deploymentAgeDays ?? FALLBACK_DEPLOYMENT_AGE_DAYS,
         });
       } else {
+        const errorBody = await response.json().catch(() => null);
+        
         console.warn(
-          `Failed to fetch config from backend: ${response.status} ${response.statusText}. Using fallback values.`
+          `Backend config error: ${response.status} ${response.statusText}. Using fallback values.`,
+          errorBody
         );
+        
+        // For non-critical config fetch, still return fallback but log the issue
+        // Only return error response for severe failures (5xx)
+        if (response.status >= 500) {
+          // Try to parse RFC 9457 Problem Details
+          const problemDetails = parseProblemDetails(errorBody);
+          
+          if (problemDetails) {
+            // Backend returned Problem Details - use them directly
+            return NextResponse.json(
+              {
+                ...problemDetails,
+                isReportable: true,
+              },
+              { status: response.status }
+            );
+          }
+          
+          // Fallback to generic error
+          const errorMessage = getErrorMessageKey(
+            response.status,
+            "errors.fetchConfigError"
+          );
+          
+          return NextResponse.json(
+            {
+              error: errorMessage,
+              status: response.status,
+              details: errorBody?.message || errorBody?.error,
+              isReportable: true,
+            },
+            { status: response.status }
+          );
+        }
       }
     } catch (error) {
       console.warn("Error fetching config from backend, using fallback values:", error);

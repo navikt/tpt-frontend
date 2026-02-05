@@ -6,7 +6,8 @@
     "loading": "Laster",
     "applications": "applikasjoner",
     "application": "applikasjon",
-    "in": "i"
+    "in": "i",
+    "statusCode": "Statuskode"
   },
   "metadata": {
     "description": "Prioriteringsverktøy for sårbarheter som filtrerer bort støy"
@@ -325,6 +326,18 @@
     "fetchVulnerabilitiesError": "Kunne ikke laste sårbarhetsdata",
     "fetchTeamsOverviewError": "Kunne ikke hente teamoversikt",
     "fetchTeamsSlaError": "Kunne ikke hente team SLA-data",
+    "badRequest": "Ugyldig forespørsel. Vennligst sjekk inndata.",
+    "unauthorized": "Du er ikke autorisert. Vennligst logg inn på nytt.",
+    "forbidden": "Du har ikke tilgang til denne ressursen.",
+    "notFound": "Den forespurte ressursen ble ikke funnet.",
+    "tooManyRequests": "For mange forespørsler. Vennligst prøv igjen senere.",
+    "clientError": "Det oppstod et problem med forespørselen din.",
+    "internalServerError": "Serveren oppdaget en feil. Vennligst prøv igjen senere.",
+    "badGateway": "Backend-tjenesten er midlertidig utilgjengelig.",
+    "serviceUnavailable": "Tjenesten er midlertidig utilgjengelig. Vennligst prøv igjen senere.",
+    "gatewayTimeout": "Forespørselen tok for lang tid. Vennligst prøv igjen.",
+    "serverError": "En serverfeil oppstod. Teamet vårt er varslet.",
+    "shouldReport": "Hvis problemet vedvarer, vennligst rapporter det med sporings-ID-en nedenfor.",
     "traceId": "Sporings-ID",
     "copyId": "Kopier ID",
     "copiedId": "Kopiert!"
