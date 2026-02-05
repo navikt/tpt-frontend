@@ -8,8 +8,10 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   // Enable standalone output for Docker deployment
   output: "standalone",
-  // Use in-memory cache only (no filesystem writes in read-only container)
+  // Use in-memory cache for fetch() calls (no filesystem writes)
   cacheMaxMemorySize: 50 * 1024 * 1024, // 50MB
+  // No-op cache handler to prevent ISR filesystem writes
+  cacheHandler: require.resolve("./cache-handler.js"),
 };
 
 export default withNextIntl(nextConfig);
