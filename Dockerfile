@@ -12,7 +12,7 @@ RUN pnpm config set @navikt:registry=https://npm.pkg.github.com
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY next.config.ts tsconfig.json cache-handler.js ./
+COPY next.config.ts tsconfig.json ./
 COPY src/ ./src/
 COPY messages/ ./messages/
 COPY public/ ./public/
@@ -29,8 +29,6 @@ ENV NODE_ENV=production \
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/cache-handler.js ./
 
 EXPOSE 3000
 

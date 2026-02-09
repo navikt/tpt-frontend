@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getBackendCacheTime } from "@/app/utils/backendCache";
 import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/errorHandling";
 
 // Hardcoded fallback values
@@ -21,7 +20,7 @@ export async function GET() {
         headers: {
           "Content-Type": "application/json",
         },
-        next: { revalidate: getBackendCacheTime() },
+        cache: "no-store",
       });
 
       if (response.ok) {

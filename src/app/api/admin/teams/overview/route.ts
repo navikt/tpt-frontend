@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
-import { getBackendCacheTime } from "@/app/utils/backendCache";
 
 function getServerEnv() {
   const tptBackendUrl = process.env.TPT_BACKEND_URL;
@@ -55,7 +54,7 @@ export async function GET(request: NextRequest) {
         Authorization: `Bearer ${backendToken}`,
         "Content-Type": "application/json",
       },
-      next: { revalidate: getBackendCacheTime() },
+      cache: "no-store",
     });
 
     if (!response.ok) {

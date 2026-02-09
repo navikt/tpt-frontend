@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
-import { getBackendCacheTime } from "@/app/utils/backendCache";
 import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/errorHandling";
 
 // Environment validation helper
@@ -64,7 +63,7 @@ export async function GET(request: NextRequest) {
         Authorization: `Bearer ${backendToken}`,
         "Content-Type": "application/json",
       },
-      next: { revalidate: getBackendCacheTime() },
+      cache: "no-store",
     });
 
     if (!response.ok) {
