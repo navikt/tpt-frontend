@@ -229,6 +229,7 @@
   "teamMemberView": {
     "title": "Security Status",
     "description": "Overview of security status for your teams.",
+    "basedOnRequirement": "Targets are based on compliance requirement",
     "loadingData": "Loading data",
     "overview": "Overview",
     "totalTeams": "Total teams",

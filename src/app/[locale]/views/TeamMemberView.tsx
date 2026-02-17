@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
-import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion } from "@navikt/ds-react";
+import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion, Link } from "@navikt/ds-react";
+import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
@@ -158,6 +159,18 @@ export default function TeamMemberView() {
             <BodyShort spacing>
               {t("description")}
             </BodyShort>
+            <Box
+              padding="space-12"
+              borderRadius="8"
+              background="info-soft"
+            >
+              <BodyShort size="small">
+                {t("basedOnRequirement")}{" "}
+                <Link href="https://etterlevelse.ansatt.nav.no/krav/267/1" target="_blank">
+                  K267.1 <ExternalLinkIcon aria-hidden />
+                </Link>
+              </BodyShort>
+            </Box>
           </div>
 
           <Box

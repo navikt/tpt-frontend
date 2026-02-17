@@ -1,7 +1,8 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
+import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
 import {
   BodyShort,
   Loader,
@@ -9,117 +10,102 @@ import {
   Heading,
   VStack,
   HGrid,
+  Detail,
+  Link,
   Table,
-  Tag,
 } from "@navikt/ds-react";
+import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
+import { formatNumber } from "@/lib/format";
+import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 
 interface TeamStats {
   teamName: string;
   workloadCount: number;
-  totalVulnerabilities: number;
-  highPriority: number;
-  mediumPriority: number;
-  lowPriority: number;
-  veryLowPriority: number;
+  criticalOverdue: number;
+  nonCriticalOverdue: number;
+  repositoriesOutOfSla: number;
+  maxDaysOverdue: number;
+  deploymentsNeedingUpdate: number;
 }
 
 export default function LeaderView() {
   const t = useTranslations("leaderView");
+  const tTeam = useTranslations("teamMemberView");
   const { config, isLoading: configLoading } = useConfigContext();
   const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
-  const [sortBy, setSortBy] = useState<keyof TeamStats>("highPriority");
-  const [sortDesc, setSortDesc] = useState(true);
+  const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
+  
+  const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
 
   const teamStatistics = useMemo(() => {
-    if (!vulnData || !config) return [];
+    if (!vulnData || !slaData) return [];
 
     return vulnData.teams.map((team) => {
-      const allVulnerabilities = team.workloads.flatMap((workload) =>
-        workload.vulnerabilities
-      );
+      // Find corresponding SLA data
+      const teamSla = slaData.teams.find(t => t.teamSlug === team.team);
 
-      const highPriority = allVulnerabilities.filter(
-        (v) => v.riskScore >= config.thresholds.high
-      ).length;
-
-      const mediumPriority = allVulnerabilities.filter(
-        (v) =>
-          v.riskScore >= config.thresholds.medium &&
-          v.riskScore < config.thresholds.high
-      ).length;
-
-      const lowPriority = allVulnerabilities.filter(
-        (v) =>
-          v.riskScore >= config.thresholds.low &&
-          v.riskScore < config.thresholds.medium
-      ).length;
-
-      const veryLowPriority = allVulnerabilities.filter(
-        (v) => v.riskScore < config.thresholds.low
-      ).length;
+      // Calculate deployment compliance
+      let deploymentsNeedingUpdate = 0;
+      team.workloads?.forEach((workload) => {
+        const ageInfo = calculateDeploymentAge(workload.lastDeploy, deploymentAgeDays);
+        if (ageInfo.hasDeploymentInfo && !ageInfo.isCompliant) {
+          deploymentsNeedingUpdate++;
+        }
+      });
 
       return {
         teamName: team.team,
-        workloadCount: team.workloads.length,
-        totalVulnerabilities: allVulnerabilities.length,
-        highPriority,
-        mediumPriority,
-        lowPriority,
-        veryLowPriority,
+        workloadCount: team.workloads?.length || 0,
+        criticalOverdue: teamSla?.criticalOverdue || 0,
+        nonCriticalOverdue: teamSla?.nonCriticalOverdue || 0,
+        repositoriesOutOfSla: teamSla?.repositoriesOutOfSla || 0,
+        maxDaysOverdue: teamSla?.maxDaysOverdue || 0,
+        deploymentsNeedingUpdate,
       };
     });
-  }, [vulnData, config]);
+  }, [vulnData, slaData, deploymentAgeDays]);
 
   const sortedTeams = useMemo(() => {
+    // Sort by critical overdue first, then by non-critical overdue
     const sorted = [...teamStatistics];
     sorted.sort((a, b) => {
-      const aVal = a[sortBy];
-      const bVal = b[sortBy];
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        return sortDesc
-          ? bVal.localeCompare(aVal)
-          : aVal.localeCompare(bVal);
+      if (b.criticalOverdue !== a.criticalOverdue) {
+        return b.criticalOverdue - a.criticalOverdue;
       }
-      return sortDesc ? (bVal as number) - (aVal as number) : (aVal as number) - (bVal as number);
+      if (b.nonCriticalOverdue !== a.nonCriticalOverdue) {
+        return b.nonCriticalOverdue - a.nonCriticalOverdue;
+      }
+      return a.teamName.localeCompare(b.teamName);
     });
     return sorted;
-  }, [teamStatistics, sortBy, sortDesc]);
-
-  const aggregateStats = useMemo(() => {
-    return teamStatistics.reduce(
-      (acc, team) => ({
-        totalTeams: acc.totalTeams + 1,
-        totalWorkloads: acc.totalWorkloads + team.workloadCount,
-        totalVulnerabilities:
-          acc.totalVulnerabilities + team.totalVulnerabilities,
-        highPriority: acc.highPriority + team.highPriority,
-        mediumPriority: acc.mediumPriority + team.mediumPriority,
-        lowPriority: acc.lowPriority + team.lowPriority,
-        veryLowPriority: acc.veryLowPriority + team.veryLowPriority,
-      }),
-      {
-        totalTeams: 0,
-        totalWorkloads: 0,
-        totalVulnerabilities: 0,
-        highPriority: 0,
-        mediumPriority: 0,
-        lowPriority: 0,
-        veryLowPriority: 0,
-      }
-    );
   }, [teamStatistics]);
 
-  const handleSort = (column: keyof TeamStats) => {
-    if (sortBy === column) {
-      setSortDesc(!sortDesc);
-    } else {
-      setSortBy(column);
-      setSortDesc(true);
-    }
-  };
+  const aggregateStats = useMemo(() => {
+    if (!slaData) return null;
 
-  if (configLoading || dataLoading) {
+    const totalCriticalOverdue = slaData.teams.reduce((sum, team) => sum + (team.criticalOverdue || 0), 0);
+    const totalNonCriticalOverdue = slaData.teams.reduce((sum, team) => sum + (team.nonCriticalOverdue || 0), 0);
+    const totalRepositoriesOutOfSla = slaData.teams.reduce((sum, team) => sum + (team.repositoriesOutOfSla || 0), 0);
+    const totalDeploymentsNeedingUpdate = teamStatistics.reduce((sum, team) => sum + team.deploymentsNeedingUpdate, 0);
+    const totalWorkloads = teamStatistics.reduce((sum, team) => sum + team.workloadCount, 0);
+
+    return {
+      totalTeams: teamStatistics.length,
+      totalWorkloads,
+      totalCriticalOverdue,
+      totalNonCriticalOverdue,
+      totalRepositoriesOutOfSla,
+      totalDeploymentsNeedingUpdate,
+      percentageNeedingAttention: 
+        (totalCriticalOverdue + totalNonCriticalOverdue) > 0 
+          ? Math.round(((totalCriticalOverdue + totalNonCriticalOverdue) / 
+              (slaData.teams.reduce((sum, t) => sum + (t.totalVulnerabilities || 0), 0))) * 100)
+          : 0,
+    };
+  }, [teamStatistics, slaData]);
+
+  if (configLoading || dataLoading || slaLoading || !aggregateStats) {
     return (
       <Box paddingBlock={{ xs: "space-16", md: "space-24" }}>
         <main>
@@ -155,163 +141,177 @@ export default function LeaderView() {
             <BodyShort spacing>
               {t("description")}
             </BodyShort>
+            <Box
+              padding="space-12"
+              borderRadius="8"
+              background="info-soft"
+            >
+              <BodyShort size="small">
+                {tTeam("basedOnRequirement")}{" "}
+                <Link href="https://etterlevelse.ansatt.nav.no/krav/267/1" target="_blank">
+                  K267.1 <ExternalLinkIcon aria-hidden />
+                </Link>
+              </BodyShort>
+            </Box>
           </div>
 
           {/* Aggregate Summary */}
           <Box
-            padding="space-24"
+            padding="space-16"
             borderRadius="8"
             background="neutral-soft"
           >
-            <VStack gap="space-16">
-              <Heading size="medium" level="2">
-                {t("total")}
+            <VStack gap="space-12">
+              <Heading size="small" level="2">
+                {tTeam("overview")}
               </Heading>
-              <HGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="space-16">
-                <div>
-                  <BodyShort size="small" textColor="subtle">
-                    {t("teams")}
-                  </BodyShort>
-                  <Heading size="large" level="3">
-                    {aggregateStats.totalTeams}
+              <HGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="space-12">
+                <Box>
+                  <Detail>{tTeam("totalTeams")}</Detail>
+                  <Heading size="medium" level="3">
+                    {formatNumber(aggregateStats.totalTeams)}
                   </Heading>
-                </div>
-                <div>
-                  <BodyShort size="small" textColor="subtle">
-                    {t("applications")}
-                  </BodyShort>
-                  <Heading size="large" level="3">
-                    {aggregateStats.totalWorkloads}
+                </Box>
+                <Box>
+                  <Detail>{tTeam("totalWorkloads")}</Detail>
+                  <Heading size="medium" level="3">
+                    {formatNumber(aggregateStats.totalWorkloads)}
                   </Heading>
-                </div>
-                <div>
-                  <BodyShort size="small" textColor="subtle">
-                    {t("vulnerabilities")}
-                  </BodyShort>
-                  <Heading size="large" level="3">
-                    {aggregateStats.totalVulnerabilities}
+                </Box>
+                <Box>
+                  <Detail>{tTeam("percentageNeedingAttention")}</Detail>
+                  <Heading 
+                    size="medium" 
+                    level="3"
+                    style={{ 
+                      color: aggregateStats.percentageNeedingAttention > 20 
+                        ? "var(--a-text-danger)" 
+                        : aggregateStats.percentageNeedingAttention > 5 
+                          ? "var(--a-text-warning)" 
+                          : "var(--a-text-success)" 
+                    }}
+                  >
+                    {formatNumber(aggregateStats.percentageNeedingAttention)}%
                   </Heading>
-                </div>
-                <div>
-                  <BodyShort size="small" textColor="subtle">
-                    {t("highPriority")}
-                  </BodyShort>
-                  <Heading size="large" level="3" style={{ color: "var(--ax-text-danger-subtle)" }}>
-                    {aggregateStats.highPriority}
+                </Box>
+                <Box>
+                  <Detail>{tTeam("criticalNeedsAttention")}</Detail>
+                  <Heading 
+                    size="medium" 
+                    level="3"
+                    style={{ 
+                      color: aggregateStats.totalCriticalOverdue > 0 
+                        ? "var(--a-text-danger)" 
+                        : undefined
+                    }}
+                  >
+                    {formatNumber(aggregateStats.totalCriticalOverdue)}
                   </Heading>
-                </div>
-                <div>
-                  <BodyShort size="small" textColor="subtle">
-                    {t("mediumPriority")}
-                  </BodyShort>
-                  <Heading size="large" level="3" style={{ color: "var(--a-text-warning)" }}>
-                    {aggregateStats.mediumPriority}
+                </Box>
+                <Box>
+                  <Detail>{tTeam("nonCriticalNeedsAttention")}</Detail>
+                  <Heading 
+                    size="medium" 
+                    level="3"
+                    style={{ 
+                      color: aggregateStats.totalNonCriticalOverdue > 0 
+                        ? "var(--a-text-warning)" 
+                        : undefined
+                    }}
+                  >
+                    {formatNumber(aggregateStats.totalNonCriticalOverdue)}
                   </Heading>
-                </div>
+                </Box>
               </HGrid>
             </VStack>
           </Box>
 
-          {/* Team Breakdown Table */}
+          {/* Team Table */}
           <Box
-            padding="space-24"
+            padding="space-16"
             borderRadius="8"
             background="default"
             borderWidth="1"
             borderColor="neutral-subtle"
           >
-            <VStack gap="space-16">
+            <VStack gap="space-12">
               <Heading size="medium" level="2">
                 {t("teamsSection")}
               </Heading>
               <Table size="small">
                 <Table.Header>
                   <Table.Row>
-                    <Table.HeaderCell
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleSort("teamName")}
-                    >
-                      {t("teamName")} {sortBy === "teamName" && (sortDesc ? "↓" : "↑")}
-                    </Table.HeaderCell>
-                    <Table.HeaderCell
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleSort("workloadCount")}
-                    >
-                      {t("apps")} {sortBy === "workloadCount" && (sortDesc ? "↓" : "↑")}
-                    </Table.HeaderCell>
-                    <Table.HeaderCell
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleSort("totalVulnerabilities")}
-                    >
-                      {t("totalVulns")} {sortBy === "totalVulnerabilities" && (sortDesc ? "↓" : "↑")}
-                    </Table.HeaderCell>
-                    <Table.HeaderCell
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleSort("highPriority")}
-                    >
-                      {t("high")} {sortBy === "highPriority" && (sortDesc ? "↓" : "↑")}
-                    </Table.HeaderCell>
-                    <Table.HeaderCell
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleSort("mediumPriority")}
-                    >
-                      {t("medium")} {sortBy === "mediumPriority" && (sortDesc ? "↓" : "↑")}
-                    </Table.HeaderCell>
-                    <Table.HeaderCell
-                      scope="col"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleSort("lowPriority")}
-                    >
-                      {t("low")} {sortBy === "lowPriority" && (sortDesc ? "↓" : "↑")}
-                    </Table.HeaderCell>
-                    <Table.HeaderCell scope="col">{t("status")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col">{tTeam("team")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col" align="right">{tTeam("totalWorkloads")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col" align="right">{tTeam("criticalNeedsAttention")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col" align="right">{tTeam("nonCriticalNeedsAttention")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col" align="right">{tTeam("repositoriesNeedingAttention")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col" align="right">{tTeam("deploymentsNeedingUpdate")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col" align="right">{tTeam("maxWorkdaysOverdue")}</Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
                   {sortedTeams.map((team) => (
-                    <Table.Row key={team.teamName}>
+                    <Table.Row 
+                      key={team.teamName}
+                      style={{
+                        borderLeft: team.criticalOverdue > 0 || team.nonCriticalOverdue > 0 
+                          ? `4px solid ${team.criticalOverdue > 0 ? 'var(--a-border-danger)' : 'var(--a-border-warning)'}` 
+                          : undefined,
+                      }}
+                    >
                       <Table.DataCell>
-                        <strong>{team.teamName}</strong>
+                        <BodyShort weight="semibold">{team.teamName}</BodyShort>
                       </Table.DataCell>
-                      <Table.DataCell>{team.workloadCount}</Table.DataCell>
-                      <Table.DataCell>{team.totalVulnerabilities}</Table.DataCell>
-                      <Table.DataCell>
-                        {team.highPriority > 0 ? (
-                          <span style={{ color: "var(--ax-text-danger-subtle)", fontWeight: "600" }}>
-                            {team.highPriority}
-                          </span>
+                      <Table.DataCell align="right">
+                        {formatNumber(team.workloadCount)}
+                      </Table.DataCell>
+                      <Table.DataCell align="right">
+                        <BodyShort 
+                          weight={team.criticalOverdue > 0 ? "semibold" : undefined}
+                          style={{ 
+                            color: team.criticalOverdue > 0 
+                              ? "var(--a-text-danger)" 
+                              : undefined
+                          }}
+                        >
+                          {formatNumber(team.criticalOverdue)}
+                        </BodyShort>
+                      </Table.DataCell>
+                      <Table.DataCell align="right">
+                        <BodyShort 
+                          weight={team.nonCriticalOverdue > 0 ? "semibold" : undefined}
+                          style={{ 
+                            color: team.nonCriticalOverdue > 0 
+                              ? "var(--a-text-warning)" 
+                              : undefined
+                          }}
+                        >
+                          {formatNumber(team.nonCriticalOverdue)}
+                        </BodyShort>
+                      </Table.DataCell>
+                      <Table.DataCell align="right">
+                        {formatNumber(team.repositoriesOutOfSla)}
+                      </Table.DataCell>
+                      <Table.DataCell align="right">
+                        {team.deploymentsNeedingUpdate > 0 ? (
+                          <BodyShort 
+                            weight="semibold"
+                            style={{ color: "var(--a-text-warning)" }}
+                          >
+                            {formatNumber(team.deploymentsNeedingUpdate)}
+                          </BodyShort>
                         ) : (
-                          team.highPriority
+                          formatNumber(team.deploymentsNeedingUpdate)
                         )}
                       </Table.DataCell>
-                      <Table.DataCell>
-                        {team.mediumPriority > 0 ? (
-                          <span style={{ color: "var(--a-text-warning)", fontWeight: "600" }}>
-                            {team.mediumPriority}
-                          </span>
+                      <Table.DataCell align="right">
+                        {team.maxDaysOverdue > 0 ? (
+                          <BodyShort size="small">
+                            {formatNumber(team.maxDaysOverdue)} {tTeam("workdays")}
+                          </BodyShort>
                         ) : (
-                          team.mediumPriority
-                        )}
-                      </Table.DataCell>
-                      <Table.DataCell>{team.lowPriority + team.veryLowPriority}</Table.DataCell>
-                      <Table.DataCell>
-                        {team.highPriority > 0 ? (
-                          <Tag data-color="danger" variant="outline" size="small">
-                            {t("statusRequiresAction")}
-                          </Tag>
-                        ) : team.mediumPriority > 0 ? (
-                          <Tag data-color="warning" variant="outline" size="small">
-                            {t("statusFollowUp")}
-                          </Tag>
-                        ) : (
-                          <Tag data-color="success" variant="outline" size="small">
-                            {t("statusOk")}
-                          </Tag>
+                          "-"
                         )}
                       </Table.DataCell>
                     </Table.Row>
@@ -321,7 +321,7 @@ export default function LeaderView() {
             </VStack>
           </Box>
 
-          {aggregateStats.highPriority === 0 && (
+          {aggregateStats.totalCriticalOverdue === 0 && aggregateStats.totalNonCriticalOverdue === 0 && (
             <Box
               padding="space-24"
               borderRadius="8"
@@ -329,10 +329,10 @@ export default function LeaderView() {
               style={{ textAlign: "center" }}
             >
               <Heading size="medium" level="2">
-                {t("noCriticalVulnerabilities")}
+                {tTeam("noCriticalOverdue")}
               </Heading>
               <BodyShort>
-                {t("noCriticalDescription")}
+                {tTeam("noCriticalOverdueDescription")}
               </BodyShort>
             </Box>
           )}

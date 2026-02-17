@@ -229,6 +229,7 @@
   "teamMemberView": {
     "title": "Sikkerhetsstatus",
     "description": "Oversikt over sikkerhetsstatus for teamene dine.",
+    "basedOnRequirement": "Målsettinger er basert på etterlevelseskrav",
     "loadingData": "Laster data",
     "overview": "Oversikt",
     "totalTeams": "Antall team",
