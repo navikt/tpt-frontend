@@ -1,6 +1,6 @@
 "use client";
 
-import { Table, BodyShort, Box } from "@navikt/ds-react";
+import { Table, BodyShort, Box, Search } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { TeamSla } from "@/app/types/admin";
 import { formatNumber } from "@/lib/format";
@@ -13,15 +13,28 @@ interface TeamsSlaTableProps {
 type SortField = "teamSlug" | "totalVulnerabilities" | "criticalOverdue" | "nonCriticalOverdue";
 type SortDirection = "ascending" | "descending";
 
+const DEFAULT_PAGE_SIZE = 20;
+
 export function TeamsSlaTable({ teams }: TeamsSlaTableProps) {
   const t = useTranslations("admin");
   const [sort, setSort] = useState<{ orderBy: SortField; direction: SortDirection }>({
     orderBy: "criticalOverdue",
     direction: "descending",
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
-  const sortedTeams = useMemo(() => {
-    const sorted = [...teams];
+  const filteredAndSortedTeams = useMemo(() => {
+    let filtered = teams;
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = teams.filter((team) =>
+        team.teamSlug.toLowerCase().includes(query)
+      );
+    }
+
+    const sorted = [...filtered];
     sorted.sort((a, b) => {
       let aVal = a[sort.orderBy];
       let bVal = b[sort.orderBy];
@@ -36,7 +49,12 @@ export function TeamsSlaTable({ teams }: TeamsSlaTableProps) {
       return 0;
     });
     return sorted;
-  }, [teams, sort]);
+  }, [teams, sort, searchQuery]);
+
+  const displayedTeams = useMemo(() => {
+    if (showAll) return filteredAndSortedTeams;
+    return filteredAndSortedTeams.slice(0, DEFAULT_PAGE_SIZE);
+  }, [filteredAndSortedTeams, showAll]);
 
   const handleSort = (sortKey: string | undefined) => {
     if (!sortKey) return;
@@ -59,65 +77,130 @@ export function TeamsSlaTable({ teams }: TeamsSlaTableProps) {
   }
 
   return (
-    <Table size="small" sort={sort} onSortChange={handleSort}>
-      <Table.Header>
-        <Table.Row>
-          <Table.ColumnHeader sortKey="teamSlug" sortable>
-            {t("teamSlug")}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader sortKey="totalVulnerabilities" sortable align="right">
-            {t("total")}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader sortKey="criticalOverdue" sortable align="right">
-            {t("criticalOverdue")}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader sortKey="nonCriticalOverdue" sortable align="right">
-            {t("nonCriticalOverdue")}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader align="right">
-            {t("criticalWithinSla")}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader align="right">
-            {t("nonCriticalWithinSla")}
-          </Table.ColumnHeader>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {sortedTeams.map((team) => (
-          <Table.Row key={team.teamSlug}>
-            <Table.DataCell>{team.teamSlug}</Table.DataCell>
-            <Table.DataCell align="right">
-              {formatNumber(team.totalVulnerabilities)}
-            </Table.DataCell>
-            <Table.DataCell
-              align="right"
-              style={{
-                backgroundColor: team.criticalOverdue > 0
-                  ? "var(--a-surface-danger-subtle)"
-                  : undefined,
-              }}
-            >
-              {formatNumber(team.criticalOverdue)}
-            </Table.DataCell>
-            <Table.DataCell
-              align="right"
-              style={{
-                backgroundColor: team.nonCriticalOverdue > 0
-                  ? "var(--a-surface-warning-subtle)"
-                  : undefined,
-              }}
-            >
-              {formatNumber(team.nonCriticalOverdue)}
-            </Table.DataCell>
-            <Table.DataCell align="right">
-              {formatNumber(team.criticalWithinSla)}
-            </Table.DataCell>
-            <Table.DataCell align="right">
-              {formatNumber(team.nonCriticalWithinSla)}
-            </Table.DataCell>
-          </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+    <Box>
+      <Box paddingBlock="space-12">
+        <Search
+          label={t("searchTeams")}
+          hideLabel
+          placeholder={t("searchTeamsPlaceholder")}
+          value={searchQuery}
+          onChange={setSearchQuery}
+          size="small"
+        />
+      </Box>
+      
+      {filteredAndSortedTeams.length === 0 ? (
+        <Box padding="space-16">
+          <BodyShort>{t("noTeamsFound")}</BodyShort>
+        </Box>
+      ) : (
+        <>
+          <Table size="small" sort={sort} onSortChange={handleSort}>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader sortKey="teamSlug" sortable>
+                  {t("teamSlug")}
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortKey="totalVulnerabilities" sortable align="right">
+                  {t("total")}
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortKey="criticalOverdue" sortable align="right">
+                  {t("criticalOverdue")}
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortKey="nonCriticalOverdue" sortable align="right">
+                  {t("nonCriticalOverdue")}
+                </Table.ColumnHeader>
+                <Table.ColumnHeader align="right">
+                  {t("criticalWithinSla")}
+                </Table.ColumnHeader>
+                <Table.ColumnHeader align="right">
+                  {t("nonCriticalWithinSla")}
+                </Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {displayedTeams.map((team) => (
+                <Table.Row key={team.teamSlug}>
+                  <Table.DataCell>{team.teamSlug}</Table.DataCell>
+                  <Table.DataCell align="right">
+                    {formatNumber(team.totalVulnerabilities)}
+                  </Table.DataCell>
+                  <Table.DataCell
+                    align="right"
+                    style={{
+                      backgroundColor: team.criticalOverdue > 0
+                        ? "var(--a-surface-danger-subtle)"
+                        : undefined,
+                    }}
+                  >
+                    {formatNumber(team.criticalOverdue)}
+                  </Table.DataCell>
+                  <Table.DataCell
+                    align="right"
+                    style={{
+                      backgroundColor: team.nonCriticalOverdue > 0
+                        ? "var(--a-surface-warning-subtle)"
+                        : undefined,
+                    }}
+                  >
+                    {formatNumber(team.nonCriticalOverdue)}
+                  </Table.DataCell>
+                  <Table.DataCell align="right">
+                    {formatNumber(team.criticalWithinSla)}
+                  </Table.DataCell>
+                  <Table.DataCell align="right">
+                    {formatNumber(team.nonCriticalWithinSla)}
+                  </Table.DataCell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+          
+          {!showAll && filteredAndSortedTeams.length > DEFAULT_PAGE_SIZE && (
+            <Box paddingBlock="space-12" style={{ textAlign: "center" }}>
+              <BodyShort>
+                {t("showingResults", { 
+                  shown: displayedTeams.length, 
+                  total: filteredAndSortedTeams.length 
+                })}{" "}
+                <button
+                  onClick={() => setShowAll(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--a-text-action)",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    padding: 0,
+                    font: "inherit",
+                  }}
+                >
+                  {t("showAll")}
+                </button>
+              </BodyShort>
+            </Box>
+          )}
+          
+          {showAll && filteredAndSortedTeams.length > DEFAULT_PAGE_SIZE && (
+            <Box paddingBlock="space-12" style={{ textAlign: "center" }}>
+              <button
+                onClick={() => setShowAll(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--a-text-action)",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  padding: 0,
+                  font: "inherit",
+                }}
+              >
+                {t("showLess")}
+              </button>
+            </Box>
+          )}
+        </>
+      )}
+    </Box>
   );
 }
