@@ -133,14 +133,6 @@
     "riskScoreCalculation": "Risk score utregning",
     "fromCVE": "Fra CVE:",
     "exposedIngress": "Eksponert ingress:",
-    "kev": "KEV:",
-    "epss": "EPSS:",
-    "production": "I produksjon:",
-    "oldBuild": "Gammelt bygg:",
-    "daysSinceLastBuild": "Dager siden sist bygg:",
-    "calculationDataUnavailable": "Beregningsdata ikke tilgjengelig",
-    "moreFactors": "+{count} flere",
-    "explanationTitle": "Forklaring av termer og risikoskåring",
     "kev": {
       "heading": "KEV (Known Exploited Vulnerabilities)",
       "description": "KEV er en liste fra CISA (Cybersecurity and Infrastructure Security Agency) over sårbarheter som er aktivt utnyttet på nettet. KEV-oppføringer representerer en reell, dokumentert trussel."
@@ -149,6 +141,12 @@
       "heading": "EPSS (Exploit Prediction Scoring System)",
       "description": "EPSS er et datastyrt system som beregner sannsynligheten for at en sårbarhet vil bli utnyttet de neste 30 dagene. Høyere EPSS-verdi indikerer større sannsynlighet for aktiv utnyttelse."
     },
+    "production": "I produksjon:",
+    "oldBuild": "Gammelt bygg:",
+    "daysSinceLastBuild": "Dager siden sist bygg:",
+    "calculationDataUnavailable": "Beregningsdata ikke tilgjengelig",
+    "moreFactors": "+{count} flere",
+    "explanationTitle": "Forklaring av termer og risikoskåring",
     "ingressTypes": {
       "heading": "Ingress Types",
       "external": "External: Applikasjonen er eksponert mot internett uten autentisering. Dette gir størst angrepsflate.",
@@ -177,7 +175,16 @@
     "github": "GitHub",
     "naisConsole": "Nais Console",
     "descriptionShowMore": "Se resten av beskrivelsen...",
-    "noRiskFactors": "Ingen risikofaktorer er identifisert for denne sårbarheten."
+    "noRiskFactors": "Ingen risikofaktorer er identifisert for denne sårbarheten.",
+    "remediation": {
+      "title": "AI-generert utbedringsguide",
+      "generateButton": "Generer utbedringsguide",
+      "regenerateButton": "Generer på nytt",
+      "retryButton": "Prøv igjen",
+      "generating": "Genererer utbedringsguide...",
+      "genericError": "Noe gikk galt. Prøv igjen.",
+      "connectionError": "Tilkoblingsfeil. Prøv igjen."
+    }
   },
   "vulnerabilitiesTable": {
     "team": "Team",
