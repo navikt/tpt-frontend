@@ -133,14 +133,6 @@
     "riskScoreCalculation": "Risk score calculation",
     "fromCVE": "From CVE:",
     "exposedIngress": "Exposed ingress:",
-    "kev": "KEV:",
-    "epss": "EPSS:",
-    "production": "In production:",
-    "oldBuild": "Old build:",
-    "daysSinceLastBuild": "Days since last build:",
-    "calculationDataUnavailable": "Calculation data not available",
-    "moreFactors": "+{count} more",
-    "explanationTitle": "Explanation of terms and risk scoring",
     "kev": {
       "heading": "KEV (Known Exploited Vulnerabilities)",
       "description": "KEV is a list from CISA (Cybersecurity and Infrastructure Security Agency) of vulnerabilities that are actively exploited on the internet. KEV entries represent a real, documented threat."
@@ -149,6 +141,12 @@
       "heading": "EPSS (Exploit Prediction Scoring System)",
       "description": "EPSS is a data-driven system that calculates the probability that a vulnerability will be exploited within the next 30 days. A higher EPSS score indicates greater likelihood of active exploitation."
     },
+    "production": "In production:",
+    "oldBuild": "Old build:",
+    "daysSinceLastBuild": "Days since last build:",
+    "calculationDataUnavailable": "Calculation data not available",
+    "moreFactors": "+{count} more",
+    "explanationTitle": "Explanation of terms and risk scoring",
     "ingressTypes": {
       "heading": "Ingress Types",
       "external": "External: The application is exposed to the internet without authentication. This provides the largest attack surface.",
@@ -177,7 +175,16 @@
     "github": "GitHub",
     "naisConsole": "Nais Console",
     "descriptionShowMore": "See the rest of the description...",
-    "noRiskFactors": "No risk factors are identified for this vulnerability."
+    "noRiskFactors": "No risk factors are identified for this vulnerability.",
+    "remediation": {
+      "title": "AI-generated remediation guide",
+      "generateButton": "Generate remediation guide",
+      "regenerateButton": "Regenerate",
+      "retryButton": "Try again",
+      "generating": "Generating remediation guide...",
+      "genericError": "Something went wrong. Please try again.",
+      "connectionError": "Connection error. Please try again."
+    }
   },
   "vulnerabilitiesTable": {
     "team": "Team",

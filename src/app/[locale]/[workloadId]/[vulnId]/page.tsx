@@ -29,6 +29,7 @@ import {
     getSeverityIconColor
 } from "@/app/shared/utils/riskFactors";
 import {useTranslations} from "next-intl";
+import {RemediationSection} from "@/app/modules/vulnerabilities/components/RemediationSection";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -312,6 +313,13 @@ export default function WorkloadDetailPage() {
                     </Box>
                 </>
             )}
+            <RemediationSection
+                cveId={vulnerabilityData.identifier}
+                workloadName={workloadData.name}
+                environment={workloadData.environment}
+                packageName={vulnerabilityData.packageName}
+                packageEcosystem={vulnerabilityData.packageEcosystem}
+            />
         </div>
     );
 }
