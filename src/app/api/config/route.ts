@@ -32,6 +32,7 @@ export async function GET() {
             low: data.thresholds.low,
           },
           deploymentAgeDays: data.deploymentAgeDays ?? FALLBACK_DEPLOYMENT_AGE_DAYS,
+          aiEnabled: data.aiEnabled ?? false,
         });
       } else {
         const errorBody = await response.json().catch(() => null);
