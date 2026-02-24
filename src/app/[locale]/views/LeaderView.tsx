@@ -19,15 +19,6 @@ import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 
-interface TeamStats {
-  teamName: string;
-  workloadCount: number;
-  criticalOverdue: number;
-  nonCriticalOverdue: number;
-  repositoriesOutOfSla: number;
-  maxDaysOverdue: number;
-  deploymentsNeedingUpdate: number;
-}
 
 export default function LeaderView() {
   const t = useTranslations("leaderView");
