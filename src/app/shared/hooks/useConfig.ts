@@ -8,6 +8,7 @@ interface ThresholdConfig {
     low: number;
   };
   deploymentAgeDays?: number;
+  aiEnabled?: boolean;
 }
 
 // Global state to share config across all instances

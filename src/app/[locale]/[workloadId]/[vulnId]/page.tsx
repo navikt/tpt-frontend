@@ -30,6 +30,7 @@ import {
 } from "@/app/shared/utils/riskFactors";
 import {useTranslations} from "next-intl";
 import {RemediationSection} from "@/app/modules/vulnerabilities/components/RemediationSection";
+import {useConfigContext} from "@/app/contexts/ConfigContext";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -56,6 +57,7 @@ export default function WorkloadDetailPage() {
     const workloadId = params.workloadId as string;
     const vulnId = params.vulnId as string;
     const {data, isLoading} = useVulnerabilitiesContext();
+    const {config} = useConfigContext();
 
     const workloadData = data?.teams
         .flatMap((team) =>
@@ -313,13 +315,15 @@ export default function WorkloadDetailPage() {
                     </Box>
                 </>
             )}
-            <RemediationSection
-                cveId={vulnerabilityData.identifier}
-                workloadName={workloadData.name}
-                environment={workloadData.environment}
-                packageName={vulnerabilityData.packageName}
-                packageEcosystem={vulnerabilityData.packageEcosystem}
-            />
+            {config?.aiEnabled && (
+                <RemediationSection
+                    cveId={vulnerabilityData.identifier}
+                    workloadName={workloadData.name}
+                    environment={workloadData.environment}
+                    packageName={vulnerabilityData.packageName}
+                    packageEcosystem={vulnerabilityData.packageEcosystem}
+                />
+            )}
         </div>
     );
 }
