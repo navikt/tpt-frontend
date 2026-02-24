@@ -90,7 +90,7 @@ export function RemediationSection({
               setIsDone(true);
               return;
             } else if (eventType === "error") {
-              setError(data || t("genericError"));
+              setError(t("genericError"));
               setIsLoading(false);
               return;
             } else if (data) {
