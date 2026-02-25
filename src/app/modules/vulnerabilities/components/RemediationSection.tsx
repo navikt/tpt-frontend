@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Button, Heading, Box, Alert } from "@navikt/ds-react";
+import { Button, Heading, Box, Alert, BodyShort } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
+import ReactMarkdown from "react-markdown";
 
 interface RemediationSectionProps {
   cveId: string;
@@ -144,23 +145,14 @@ export function RemediationSection({
           style={{ position: "relative" }}
         >
           {isLoading && !content && (
-            <span style={{ color: "var(--ax-text-neutral-subtle)" }}>
+            <BodyShort style={{ color: "var(--ax-text-neutral-subtle)" }}>
               {t("generating")}
-            </span>
+            </BodyShort>
           )}
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-              fontFamily: "inherit",
-              margin: 0,
-              fontSize: "0.875rem",
-              lineHeight: 1.6,
-            }}
-          >
-            {content}
-            {isLoading && <span className="remediation-cursor">▋</span>}
-          </pre>
+          <div style={{ fontSize: "1rem", lineHeight: 1.6 }}>
+            <ReactMarkdown>{content}</ReactMarkdown>
+            {isLoading && <span>▋</span>}
+          </div>
           {isDone && (
             <Button
               variant="tertiary"
