@@ -31,6 +31,7 @@ import {
 import {useTranslations} from "next-intl";
 import {RemediationSection} from "@/app/modules/vulnerabilities/components/RemediationSection";
 import {useConfigContext} from "@/app/contexts/ConfigContext";
+import {useRoleContext} from "@/app/shared/contexts/RoleContext";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -58,6 +59,7 @@ export default function WorkloadDetailPage() {
     const vulnId = params.vulnId as string;
     const {data, isLoading} = useVulnerabilitiesContext();
     const {config} = useConfigContext();
+    const {actualRole} = useRoleContext();
 
     const workloadData = data?.teams
         .flatMap((team) =>
@@ -315,7 +317,7 @@ export default function WorkloadDetailPage() {
                     </Box>
                 </>
             )}
-            {config?.aiEnabled && (
+            {config?.aiEnabled && actualRole === "ADMIN" && (
                 <RemediationSection
                     cveId={vulnerabilityData.identifier}
                     workloadName={workloadData.name}
