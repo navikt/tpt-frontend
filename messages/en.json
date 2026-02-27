@@ -183,7 +183,10 @@
       "retryButton": "Try again",
       "generating": "Generating remediation guide...",
       "genericError": "Something went wrong. Please try again.",
-      "connectionError": "Connection error. Please try again."
+      "connectionError": "Connection error. Please try again.",
+      "aiServiceError": "The AI service is unavailable. Please try again.",
+      "dataFetchError": "Could not fetch the required data. Please try again.",
+      "internalError": "An internal error occurred. Please try again."
     }
   },
   "vulnerabilitiesTable": {

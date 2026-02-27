@@ -91,7 +91,19 @@ export function RemediationSection({
               setIsDone(true);
               return;
             } else if (eventType === "error") {
-              setError(t("genericError"));
+              let errorKey = "genericError";
+              try {
+                const parsed = JSON.parse(data);
+                const errorKeyMap: Record<string, string> = {
+                  ai_service_error: "aiServiceError",
+                  data_fetch_error: "dataFetchError",
+                  internal_error: "internalError",
+                };
+                errorKey = errorKeyMap[parsed.code] ?? "genericError";
+              } catch {
+                // malformed payload — use generic error
+              }
+              setError(t(errorKey as Parameters<typeof t>[0]));
               setIsLoading(false);
               return;
             } else if (data) {

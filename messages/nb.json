@@ -183,7 +183,10 @@
       "retryButton": "Prøv igjen",
       "generating": "Genererer utbedringsguide...",
       "genericError": "Noe gikk galt. Prøv igjen.",
-      "connectionError": "Tilkoblingsfeil. Prøv igjen."
+      "connectionError": "Tilkoblingsfeil. Prøv igjen.",
+      "aiServiceError": "AI-tjenesten er utilgjengelig. Prøv igjen.",
+      "dataFetchError": "Kunne ikke hente nødvendig data. Prøv igjen.",
+      "internalError": "Intern feil. Prøv igjen."
     }
   },
   "vulnerabilitiesTable": {
