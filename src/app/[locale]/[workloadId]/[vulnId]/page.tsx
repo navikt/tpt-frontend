@@ -146,9 +146,10 @@ export default function WorkloadDetailPage() {
                         const displayText = isTruncated
                             ? lines.slice(0, DESCRIPTION_PREVIEW_LINES).join("\n")
                             : vulnerabilityData.description;
+                        console.log("[vulnId] desc lines:", lines.length, "isTruncated:", isTruncated, "displayText:", JSON.stringify(displayText.slice(0, 200)));
                         return (
                             <div>
-                                <div className="navds-body-short">
+                                <div style={{ fontSize: "var(--a-font-size-medium)", lineHeight: "var(--a-line-height-medium)" }}>
                                     <ReactMarkdown>{displayText}</ReactMarkdown>
                                 </div>
                                 {isTruncated && (
