@@ -104,7 +104,6 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
   };
 
   const distrolessStatus = getDistrolessStatus();
-  const hasSecurityMetrics = repository.usesDistroless !== undefined && repository.usesDistroless !== null;
 
   return (
     <div 
@@ -174,33 +173,17 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
                 <Heading size="xsmall" level="4">
                   {t("repository.securityMetrics")}
                 </Heading>
-                
-                {hasSecurityMetrics ? (
-                  <HStack gap="space-16" wrap>
-                    <SecurityMetricItem
-                      label={distrolessStatus.label}
-                      value={distrolessStatus.value}
-                      icon={distrolessStatus.icon}
-                      color={distrolessStatus.color}
-                    />
-                    <SecurityMetricItem
-                      label={t("repository.codeScanning")}
-                      value={t("repository.comingSoon")}
-                      icon={<QuestionmarkDiamondFillIcon fontSize="1.25rem" />}
-                      color="var(--a-icon-info)"
-                    />
-                    <SecurityMetricItem
-                      label={t("repository.lockFiles")}
-                      value={t("repository.comingSoon")}
-                      icon={<QuestionmarkDiamondFillIcon fontSize="1.25rem" />}
-                      color="var(--a-icon-info)"
-                    />
-                  </HStack>
-                ) : (
-                  <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                    {t("repository.comingSoon")}: {t("repository.codeScanning")}, {t("repository.distrolessImage")}, {t("repository.lockFiles")}
-                  </BodyShort>
-                )}
+                <HStack gap="space-16" wrap>
+                  <SecurityMetricItem
+                    label={distrolessStatus.label}
+                    value={distrolessStatus.value}
+                    icon={distrolessStatus.icon}
+                    color={distrolessStatus.color}
+                  />
+                </HStack>
+                <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
+                  {t("repository.comingSoon")}: {t("repository.codeScanning")}, {t("repository.lockFiles")}
+                </BodyShort>
               </VStack>
             </Box>
 

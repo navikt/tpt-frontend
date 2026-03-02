@@ -1,6 +1,7 @@
 "use client";
 import {useVulnerabilitiesContext} from "@/app/contexts/VulnerabilitiesContext";
 import {useParams} from "next/navigation";
+import {useState} from "react";
 import {
     Heading,
     BodyShort,
@@ -10,8 +11,9 @@ import {
     HStack,
     Tag,
     Alert,
-    ReadMore,
+    Button,
 } from "@navikt/ds-react";
+import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import {
     XMarkOctagonFillIcon,
@@ -52,9 +54,13 @@ function getIconForFactor(iconName: string): React.ReactNode {
     }
 }
 
+const DESCRIPTION_LINE_THRESHOLD = 12;
+const DESCRIPTION_PREVIEW_LINES = 8;
+
 export default function WorkloadDetailPage() {
     const t = useTranslations();
     const params = useParams();
+    const [showFullDescription, setShowFullDescription] = useState(false);
     const workloadId = params.workloadId as string;
     const vulnId = params.vulnId as string;
     const {data, isLoading} = useVulnerabilitiesContext();
@@ -134,21 +140,25 @@ export default function WorkloadDetailPage() {
                         <Heading size="small">{vulnerabilityData.name}</Heading>
                     )}
 
-                    {vulnerabilityData.description && (
-                        <BodyShort style={{whiteSpace: "pre-wrap"}}>
-                            {vulnerabilityData.description.matchAll(/\n/g).toArray().length < 12
-                                ? (
-                                    vulnerabilityData.description
-                                ) : (
-                                    <>
-                                        {vulnerabilityData.description.split("\n", 8).join("\n")}
-                                            <ReadMore header={t("vulnerabilityDetail.descriptionShowMore")}>
-                                            {vulnerabilityData.description.split("\n").slice(8).join("\n")}
-                                        </ReadMore>
-                                    </>
+                    {vulnerabilityData.description && (() => {
+                        const lines = vulnerabilityData.description.split("\n");
+                        const isTruncated = !showFullDescription && lines.length >= DESCRIPTION_LINE_THRESHOLD;
+                        const displayText = isTruncated
+                            ? lines.slice(0, DESCRIPTION_PREVIEW_LINES).join("\n")
+                            : vulnerabilityData.description;
+                        return (
+                            <div>
+                                <div className="navds-body-short">
+                                    <ReactMarkdown>{displayText}</ReactMarkdown>
+                                </div>
+                                {isTruncated && (
+                                    <Button variant="tertiary" size="small" onClick={() => setShowFullDescription(true)}>
+                                        {t("vulnerabilityDetail.descriptionShowMore")}
+                                    </Button>
                                 )}
-                        </BodyShort>
-                    )}
+                            </div>
+                        );
+                    })()}
 
                     <HStack gap="space-16" wrap>
                         <BodyShort size="small">

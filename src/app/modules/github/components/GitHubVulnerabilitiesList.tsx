@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useGitHubVulnerabilities } from "../hooks/useGitHubVulnerabilities";
 import { Vulnerability, Repository } from "@/app/shared/types/vulnerabilities";
-import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
+import { Heading, BodyShort, HStack, VStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./GitHubVulnerabilitiesList.module.css";
@@ -184,52 +184,38 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                           <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}>
                             {scope} / {ecosystem} ({vulnerabilities.length} {t("common.vulnerabilities")})
                           </BodyShort>
-                          {vulnerabilities.map((vuln, vulnIndex) => {
-                            const displayText = vuln.summary || vuln.description;
-                            const maxDescriptionLength = 200;
-                            const truncatedText = displayText 
-                              ? (displayText.replace(/\n/g, " ").length > maxDescriptionLength 
-                                ? displayText.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
-                                : displayText.replace(/\n/g, " "))
-                              : null;
-                            const isCritical = vuln.cvssScore && vuln.cvssScore >= 9.0;
-                            return (
-                              <LinkCard
-                                key={`${vuln.identifier}-${vulnIndex}`}
-                                style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
-                              >
-                                <LinkCard.Title>
-                                  <HStack gap="space-8" align="center" justify="space-between" wrap>
-                                    <LinkCard.Anchor asChild>
-                                      <Link href={`/github/${encodeURIComponent(repoGroup.repository.nameWithOwner)}/${vuln.identifier}`}>
-                                        {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""} ({vuln.packageName})
-                                      </Link>
-                                    </LinkCard.Anchor>
-                                    <HStack gap="space-8" align="center">
-                                      {isCritical && (
-                                        <Tag data-color="danger" variant="outline" size="small">
-                                          CVSS {vuln.cvssScore?.toFixed(1)}
-                                        </Tag>
-                                      )}
-                                      {vuln.dependabotUpdatePullRequestUrl && (
-                                        <Tag data-color="success" variant="outline" size="small">
-                                          Fix available
-                                        </Tag>
-                                      )}
-                                      <WorkloadRiskScoreTags 
-                                        vuln={vuln}
-                                      />
-                                    </HStack>
+                          <VStack gap="space-4">
+                            {vulnerabilities.map((vuln, vulnIndex) => {
+                              const isCritical = vuln.cvssScore && vuln.cvssScore >= 9.0;
+                              return (
+                                <HStack
+                                  key={`${vuln.identifier}-${vulnIndex}`}
+                                  gap="space-8"
+                                  align="center"
+                                  justify="space-between"
+                                  wrap
+                                  style={{ marginLeft: "1rem", padding: "0.25rem 0" }}
+                                >
+                                  <BodyShort>
+                                    {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""} ({vuln.packageName})
+                                  </BodyShort>
+                                  <HStack gap="space-8" align="center">
+                                    {isCritical && (
+                                      <Tag data-color="danger" variant="outline" size="small">
+                                        CVSS {vuln.cvssScore?.toFixed(1)}
+                                      </Tag>
+                                    )}
+                                    {vuln.dependabotUpdatePullRequestUrl && (
+                                      <Tag data-color="success" variant="outline" size="small">
+                                        Fix available
+                                      </Tag>
+                                    )}
+                                    <WorkloadRiskScoreTags vuln={vuln} />
                                   </HStack>
-                                </LinkCard.Title>
-                                {truncatedText && (
-                                  <LinkCard.Description>
-                                    {truncatedText}
-                                  </LinkCard.Description>
-                                )}
-                              </LinkCard>
-                            );
-                          })}
+                                </HStack>
+                              );
+                            })}
+                          </VStack>
                         </div>
                       );
                     })}
