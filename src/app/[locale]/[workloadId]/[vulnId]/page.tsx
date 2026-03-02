@@ -142,9 +142,11 @@ export default function WorkloadDetailPage() {
 
                     {vulnerabilityData.description && (() => {
                         const isTruncated = !showFullDescription && vulnerabilityData.description.length > DESCRIPTION_CHAR_THRESHOLD;
-                        const displayText = isTruncated
+                        const rawText = isTruncated
                             ? vulnerabilityData.description.slice(0, DESCRIPTION_CHAR_PREVIEW).trimEnd()
                             : vulnerabilityData.description;
+                        // Normalize single newlines to double so markdown renders them as paragraph breaks
+                        const displayText = rawText.replace(/\n(?!\n)/g, "\n\n");
                         return (
                             <div>
                                 <div style={{ fontSize: "var(--a-font-size-medium)", lineHeight: "var(--a-line-height-medium)" }}>
