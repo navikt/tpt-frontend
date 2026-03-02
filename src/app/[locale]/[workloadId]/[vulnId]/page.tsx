@@ -54,8 +54,8 @@ function getIconForFactor(iconName: string): React.ReactNode {
     }
 }
 
-const DESCRIPTION_LINE_THRESHOLD = 12;
-const DESCRIPTION_PREVIEW_LINES = 8;
+const DESCRIPTION_CHAR_THRESHOLD = 600;
+const DESCRIPTION_CHAR_PREVIEW = 500;
 
 export default function WorkloadDetailPage() {
     const t = useTranslations();
@@ -141,12 +141,10 @@ export default function WorkloadDetailPage() {
                     )}
 
                     {vulnerabilityData.description && (() => {
-                        const lines = vulnerabilityData.description.split("\n");
-                        const isTruncated = !showFullDescription && lines.length >= DESCRIPTION_LINE_THRESHOLD;
+                        const isTruncated = !showFullDescription && vulnerabilityData.description.length > DESCRIPTION_CHAR_THRESHOLD;
                         const displayText = isTruncated
-                            ? lines.slice(0, DESCRIPTION_PREVIEW_LINES).join("\n")
+                            ? vulnerabilityData.description.slice(0, DESCRIPTION_CHAR_PREVIEW).trimEnd()
                             : vulnerabilityData.description;
-                        console.log("[vulnId] desc lines:", lines.length, "isTruncated:", isTruncated, "displayText:", JSON.stringify(displayText.slice(0, 200)));
                         return (
                             <div>
                                 <div style={{ fontSize: "var(--a-font-size-medium)", lineHeight: "var(--a-line-height-medium)" }}>
