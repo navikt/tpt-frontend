@@ -273,3 +273,35 @@ export function InteractiveComponent() {
 - Ignore accessibility requirements
 - Skip responsive props
 - Add code comments unless explicitly requested
+
+## Data Types
+
+Vulnerability data uses two distinct types:
+
+```typescript
+// Slim summary — used in list/workload context (GET /vulnerabilities/user)
+interface VulnerabilitySummary {
+  identifier: string;
+  name?: string;
+  packageName: string;
+  description?: string;
+  riskScore: number;
+}
+
+// Full detail — fetched on demand (GET /vulnerabilities/workload/{workloadId}/{identifier})
+interface VulnerabilityDetail extends VulnerabilitySummary {
+  packageEcosystem?: string;
+  summary?: string;
+  vulnerabilityDetailsLink?: string;
+  riskScoreBreakdown?: RiskScoreBreakdown;
+  dependencyScope?: string;
+  dependabotUpdatePullRequestUrl?: string;
+  publishedAt?: string;
+  cvssScore?: number;
+}
+```
+
+- `Workload.vulnerabilities` is `VulnerabilitySummary[]` — no detail fields
+- Detail fields are only available after fetching from `/api/vulnerabilities/workload/[workloadId]/[identifier]`
+- The `getRiskFactors()` utility accepts `{ riskScoreBreakdown?: RiskScoreBreakdown }` and returns `[]` when breakdown is absent
+- Add code comments unless explicitly requested

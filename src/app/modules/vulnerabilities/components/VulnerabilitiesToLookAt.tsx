@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
-import { Vulnerability, Workload } from "@/app/shared/types/vulnerabilities";
+import { VulnerabilitySummary, Workload } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 interface WorkloadWithVulns {
     workload: Workload;
     team: string;
-    vulnerabilities: Vulnerability[];
+    vulnerabilities: VulnerabilitySummary[];
     environments: string[]; // Track all environments for merged workloads
 }
 
@@ -193,7 +193,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                                 }
                                                 acc[packageName].push(vuln);
                                                 return acc;
-                                            }, {} as Record<string, Vulnerability[]>)
+                                            }, {} as Record<string, VulnerabilitySummary[]>)
                                         )
                                         .sort((a, b) => b[1].length - a[1].length) // Sort by vulnerability count descending
                                         .map(([packageName, vulnerabilities]) => (

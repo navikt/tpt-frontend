@@ -6,10 +6,10 @@ import {
     getTagVariantFromSeverity,
     RiskFactor
 } from "@/app/shared/utils/riskFactors";
-import type {Vulnerability} from "@/app/shared/types/vulnerabilities";
+import type {VulnerabilitySummary} from "@/app/shared/types/vulnerabilities";
 
 const WorkloadRiskScoreTags = ({vuln}: {
-    vuln: Vulnerability
+    vuln: VulnerabilitySummary
 }) => {
     const t = useTranslations("workload");
     const rootT = useTranslations(); // Root-level translations for riskFactors

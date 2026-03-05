@@ -1,4 +1,4 @@
-import type {Vulnerability, RiskScoreFactor} from "../types/vulnerabilities";
+import type {RiskScoreBreakdown, RiskScoreFactor} from "../types/vulnerabilities";
 
 export interface RiskFactor {
     name: string;
@@ -13,7 +13,7 @@ export interface RiskFactor {
     severity: "high" | "medium" | "low" | "info";
 }
 
-export function getRiskFactors(vuln: Vulnerability, translate?: (key: string) => string): RiskFactor[] {
+export function getRiskFactors(vuln: { riskScoreBreakdown?: RiskScoreBreakdown }, translate?: (key: string) => string): RiskFactor[] {
     const breakdown = vuln.riskScoreBreakdown;
 
     if (!breakdown?.factors) return [];
