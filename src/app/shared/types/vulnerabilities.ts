@@ -13,15 +13,20 @@ export interface RiskScoreBreakdown {
   totalScore: number;
 }
 
-export interface Vulnerability {
+/** Slim summary returned by GET /vulnerabilities/user */
+export interface VulnerabilitySummary {
   identifier: string;
   name?: string;
   packageName: string;
-  packageEcosystem?: string;
   description?: string;
+  riskScore: number;
+}
+
+/** Full detail returned by GET /vulnerabilities/workload/{workloadId}/{identifier} */
+export interface VulnerabilityDetail extends VulnerabilitySummary {
+  packageEcosystem?: string;
   summary?: string;
   vulnerabilityDetailsLink?: string;
-  riskScore: number;
   riskScoreBreakdown?: RiskScoreBreakdown;
   dependencyScope?: string;
   dependabotUpdatePullRequestUrl?: string;
@@ -38,12 +43,12 @@ export interface Workload {
   ingressTypes?: string[];
   buildTime?: string;
   lastDeploy?: string;
-  vulnerabilities: Vulnerability[];
+  vulnerabilities: VulnerabilitySummary[];
 }
 
 export interface Repository {
   nameWithOwner: string;
-  vulnerabilities: Vulnerability[];
+  vulnerabilities: VulnerabilitySummary[];
   usesDistroless?: boolean | null;
 }
 

@@ -1,7 +1,7 @@
 "use client";
 import {useVulnerabilitiesContext} from "@/app/contexts/VulnerabilitiesContext";
 import {useParams} from "next/navigation";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {
     Heading,
     BodyShort,
@@ -34,6 +34,7 @@ import {useTranslations} from "next-intl";
 import {RemediationSection} from "@/app/modules/vulnerabilities/components/RemediationSection";
 import {useConfigContext} from "@/app/contexts/ConfigContext";
 import {useRoleContext} from "@/app/shared/contexts/RoleContext";
+import type {VulnerabilityDetail} from "@/app/shared/types/vulnerabilities";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -67,6 +68,12 @@ export default function WorkloadDetailPage() {
     const {config} = useConfigContext();
     const {actualRole} = useRoleContext();
 
+    const [detailState, setDetailState] = useState<{
+        loading: boolean;
+        data: VulnerabilityDetail | null;
+        error: string | null;
+    }>({ loading: true, data: null, error: null });
+
     const workloadData = data?.teams
         .flatMap((team) =>
             team.workloads.map((workload) => ({
@@ -76,21 +83,39 @@ export default function WorkloadDetailPage() {
         )
         .find((w) => w.id === workloadId);
 
-    const vulnerabilityData = workloadData?.vulnerabilities.find(
-        (v) => v.identifier === vulnId
-    );
+    useEffect(() => {
+        if (!workloadId || !vulnId) return;
 
-    if (isLoading) {
+        let cancelled = false;
+
+        fetch(`/api/vulnerabilities/workload/${encodeURIComponent(workloadId)}/${encodeURIComponent(vulnId)}`)
+            .then(async (res) => {
+                if (cancelled) return;
+                if (!res.ok) {
+                    setDetailState({ loading: false, data: null, error: res.status === 404 ? "notFound" : "generic" });
+                    return;
+                }
+                const json: VulnerabilityDetail = await res.json();
+                if (!cancelled) setDetailState({ loading: false, data: json, error: null });
+            })
+            .catch(() => {
+                if (!cancelled) setDetailState({ loading: false, data: null, error: "generic" });
+            });
+
+        return () => { cancelled = true; };
+    }, [workloadId, vulnId]);
+
+    const { loading: isDetailLoading, data: detail, error: detailError } = detailState;
+
+    if (isLoading || isDetailLoading) {
         return <div>{t("common.loading")}...</div>;
     }
 
-    if (!workloadData || !vulnerabilityData) {
+    if (!workloadData) {
         return (
             <div style={{marginTop: "2rem"}}>
                 <Heading size="large" spacing>
-                    {!workloadData
-                        ? t("vulnerabilityDetail.workloadNotFound")
-                        : t("vulnerabilityDetail.vulnerabilityNotFound")}
+                    {t("vulnerabilityDetail.workloadNotFound")}
                 </Heading>
                 <BodyShort>
                     <Link href="/">{t("vulnerabilityDetail.backToHome")}</Link>
@@ -99,11 +124,24 @@ export default function WorkloadDetailPage() {
         );
     }
 
-    const riskFactors = getRiskFactors(vulnerabilityData, (key: string) => t(key));
+    if (detailError || !detail) {
+        return (
+            <div style={{marginTop: "2rem"}}>
+                <Heading size="large" spacing>
+                    {t("vulnerabilityDetail.vulnerabilityNotFound")}
+                </Heading>
+                <BodyShort>
+                    <Link href="/">{t("vulnerabilityDetail.backToHome")}</Link>
+                </BodyShort>
+            </div>
+        );
+    }
 
-    const riscSumColorVariant = vulnerabilityData.riskScore >= 100
+    const riskFactors = getRiskFactors(detail, (key: string) => t(key));
+
+    const riscSumColorVariant = detail.riskScore >= 100
         ? "danger"
-        : vulnerabilityData.riskScore >= 50
+        : detail.riskScore >= 50
             ? "warning"
             : "success";
 
@@ -121,30 +159,30 @@ export default function WorkloadDetailPage() {
             >
                 <VStack gap="space-16">
                     <HStack gap="space-16" align="center" justify="space-between" wrap>
-                        <Heading size="large">{vulnerabilityData.identifier}</Heading>
+                        <Heading size="large">{detail.identifier}</Heading>
                         <Tag
                             variant={
-                                vulnerabilityData.riskScore >= 100
+                                detail.riskScore >= 100
                                     ? "error"
-                                    : vulnerabilityData.riskScore >= 50
+                                    : detail.riskScore >= 50
                                         ? "warning"
                                         : "success"
                             }
                             size="medium"
                         >
-                            {t("vulnerabilityDetail.riskScoreLabel")} {Math.round(vulnerabilityData.riskScore)}
+                            {t("vulnerabilityDetail.riskScoreLabel")} {Math.round(detail.riskScore)}
                         </Tag>
                     </HStack>
 
-                    {vulnerabilityData.name && (
-                        <Heading size="small">{vulnerabilityData.name}</Heading>
+                    {detail.name && (
+                        <Heading size="small">{detail.name}</Heading>
                     )}
 
-                    {vulnerabilityData.description && (() => {
-                        const isTruncated = !showFullDescription && vulnerabilityData.description.length > DESCRIPTION_CHAR_THRESHOLD;
+                    {detail.description && (() => {
+                        const isTruncated = !showFullDescription && detail.description!.length > DESCRIPTION_CHAR_THRESHOLD;
                         const rawText = isTruncated
-                            ? vulnerabilityData.description.slice(0, DESCRIPTION_CHAR_PREVIEW).trimEnd()
-                            : vulnerabilityData.description;
+                            ? detail.description!.slice(0, DESCRIPTION_CHAR_PREVIEW).trimEnd()
+                            : detail.description!;
                         // Normalize single newlines to double so markdown renders them as paragraph breaks
                         const displayText = rawText.replace(/\n(?!\n)/g, "\n\n");
                         return (
@@ -163,11 +201,11 @@ export default function WorkloadDetailPage() {
 
                     <HStack gap="space-16" wrap>
                         <BodyShort size="small">
-                            <b>{t("vulnerabilityDetail.package")}</b> {vulnerabilityData.packageName}
+                            <b>{t("vulnerabilityDetail.package")}</b> {detail.packageName}
                         </BodyShort>
-                        {vulnerabilityData.vulnerabilityDetailsLink && (
+                        {detail.vulnerabilityDetailsLink && (
                             <DSLink
-                                href={vulnerabilityData.vulnerabilityDetailsLink}
+                                href={detail.vulnerabilityDetailsLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -227,7 +265,7 @@ export default function WorkloadDetailPage() {
                 {t("vulnerabilityDetail.riskScoreWhy")}
             </Heading>
             {/* Base Score Box */}
-            {vulnerabilityData.riskScoreBreakdown && (
+            {detail.riskScoreBreakdown && (
                 <>
                     <Box
                         padding="space-16"
@@ -246,7 +284,7 @@ export default function WorkloadDetailPage() {
                                 </BodyShort>
                             </VStack>
                             <Heading size="large" level="3">
-                                {Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
+                                {Math.round(detail.riskScoreBreakdown.baseScore)}</Heading>
                         </HStack>
                     </Box>
 
@@ -323,18 +361,18 @@ export default function WorkloadDetailPage() {
                                 </BodyShort>
                             </VStack>
                             <Heading size="large" level="3">
-                                {Math.round(vulnerabilityData.riskScore)}</Heading>
+                                {Math.round(detail.riskScore)}</Heading>
                         </HStack>
                     </Box>
                 </>
             )}
             {config?.aiEnabled && actualRole === "ADMIN" && (
                 <RemediationSection
-                    cveId={vulnerabilityData.identifier}
+                    cveId={detail.identifier}
                     workloadName={workloadData.name}
                     environment={workloadData.environment}
-                    packageName={vulnerabilityData.packageName}
-                    packageEcosystem={vulnerabilityData.packageEcosystem}
+                    packageName={detail.packageName}
+                    packageEcosystem={detail.packageEcosystem}
                 />
             )}
         </div>

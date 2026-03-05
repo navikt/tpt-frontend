@@ -1,4 +1,4 @@
-import type { Workload } from '../../types/vulnerabilities';
+import type { Workload, VulnerabilitySummary } from '@/app/shared/types/vulnerabilities';
 
 describe('Vulnerability Types', () => {
   it('should create valid Workload objects', () => {
@@ -16,7 +16,7 @@ describe('Vulnerability Types', () => {
           riskScore: 100,
           name: 'Test Vulnerability',
           description: 'A test vulnerability',
-        },
+        } satisfies VulnerabilitySummary,
       ],
     };
 

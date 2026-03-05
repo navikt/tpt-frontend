@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useGitHubVulnerabilities } from "../hooks/useGitHubVulnerabilities";
-import { Vulnerability, Repository } from "@/app/shared/types/vulnerabilities";
+import { VulnerabilitySummary, Repository } from "@/app/shared/types/vulnerabilities";
 import { Heading, BodyShort, HStack, VStack, Accordion, Button, Tag } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
@@ -12,7 +12,7 @@ import { BucketThreshold } from "./GitHubVulnerabilitySummary";
 interface RepositoryWithVulns {
   repository: Repository;
   team: string;
-  vulnerabilities: Vulnerability[];
+  vulnerabilities: VulnerabilitySummary[];
 }
 
 interface GitHubVulnerabilitiesListProps {
@@ -174,7 +174,7 @@ const GitHubVulnerabilitiesList = ({ selectedBucket, selectedTeams }: GitHubVuln
                         }
                         acc[key].push(vuln);
                         return acc;
-                      }, {} as Record<string, Vulnerability[]>)
+                      }, {} as Record<string, VulnerabilitySummary[]>)
                     )
                     .sort((a, b) => b[1].length - a[1].length) // Sort by vulnerability count descending
                     .map(([key, vulnerabilities]) => {
