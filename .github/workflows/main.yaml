@@ -22,7 +22,7 @@ jobs:
       - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # ratchet:pnpm/action-setup@v4
         with:
           version: '10'
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: '24'
           registry-url: 'https://npm.pkg.github.com/'
@@ -33,7 +33,7 @@ jobs:
       - run: pnpm run lint
       - run: pnpm test
       - run: pnpm run build
-      - uses: nais/docker-build-push@87f920b0411b987d9a1fd4113aa384e1e3b54f2c
+      - uses: nais/docker-build-push@078e460885ed0424b60d45ce9220b4be1748be9d
         id: docker-push
         with:
           team: appsec
@@ -54,11 +54,11 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: nais/login@e7cf2c159677dc7c7d599feff5f808f2bf59c7cf
+      - uses: nais/login@c88ada9ce583928e1c84d2fd5c45cfacdd18d5de
         with:
           team: appsec
       - name: Scan docker image for secrets
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
         with:
           image-ref: '${{ needs.build-and-push.outputs.image }}'
           format: 'sarif'
