@@ -7,8 +7,8 @@ describe('Vulnerability Types', () => {
       name: 'Test Application',
       environment: 'production',
       repository: 'https://github.com/test/test-app',
-      ingressTypes: ['external'],
-      buildTime: '2024-01-13T10:00:00Z',
+      workloadType: 'app',
+      lastDeploy: '2024-01-13T10:00:00Z',
       vulnerabilities: [
         {
           identifier: 'CVE-2024-1234',
@@ -34,7 +34,7 @@ describe('Vulnerability Types', () => {
     };
 
     expect(workload.repository).toBeUndefined();
-    expect(workload.ingressTypes).toBeUndefined();
-    expect(workload.buildTime).toBeUndefined();
+    expect(workload.workloadType).toBeUndefined();
+    expect(workload.lastDeploy).toBeUndefined();
   });
 });

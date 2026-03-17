@@ -15,7 +15,7 @@ export default function TeamMemberView() {
   const { data: vulnData, isLoading: vulnLoading } = useVulnerabilitiesContext();
   const { config, isLoading: configLoading } = useConfigContext();
   
-  const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
+  const deploymentAgeDays = 90;
 
   const overview = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;

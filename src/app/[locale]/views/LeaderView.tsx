@@ -27,7 +27,7 @@ export default function LeaderView() {
   const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   
-  const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
+  const deploymentAgeDays = 90;
 
   const teamStatistics = useMemo(() => {
     if (!vulnData || !slaData) return [];

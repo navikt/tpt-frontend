@@ -3,12 +3,10 @@ import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/erro
 
 // Hardcoded fallback values
 const FALLBACK_THRESHOLDS = {
-  high: 150,
-  medium: 75,
-  low: 30,
+  high: 75,
+  medium: 50,
+  low: 25,
 };
-
-const FALLBACK_DEPLOYMENT_AGE_DAYS = 90;
 
 export async function GET() {
   const tptBackendUrl = process.env.TPT_BACKEND_URL;
@@ -31,7 +29,7 @@ export async function GET() {
             medium: data.thresholds.medium,
             low: data.thresholds.low,
           },
-          deploymentAgeDays: data.deploymentAgeDays ?? FALLBACK_DEPLOYMENT_AGE_DAYS,
+          scoring: data.scoring,
           aiEnabled: data.aiEnabled ?? false,
         });
       } else {
@@ -86,6 +84,5 @@ export async function GET() {
   // Fallback to hardcoded values
   return NextResponse.json({
     thresholds: FALLBACK_THRESHOLDS,
-    deploymentAgeDays: FALLBACK_DEPLOYMENT_AGE_DAYS,
   });
 }
