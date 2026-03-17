@@ -23,7 +23,7 @@ import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 export default function LeaderView() {
   const t = useTranslations("leaderView");
   const tTeam = useTranslations("teamMemberView");
-  const { config, isLoading: configLoading } = useConfigContext();
+  const { isLoading: configLoading } = useConfigContext();
   const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   

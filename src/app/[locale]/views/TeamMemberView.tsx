@@ -13,7 +13,7 @@ export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   const { data: vulnData, isLoading: vulnLoading } = useVulnerabilitiesContext();
-  const { config, isLoading: configLoading } = useConfigContext();
+  const { isLoading: configLoading } = useConfigContext();
   
   const deploymentAgeDays = 90;
 
