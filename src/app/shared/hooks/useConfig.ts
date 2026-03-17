@@ -3,9 +3,9 @@ import { ApiError, handleApiError } from "@/app/shared/utils/errorHandling";
 
 interface ThresholdConfig {
   thresholds: {
+    critical: number;
     high: number;
     medium: number;
-    low: number;
   };
   scoring?: {
     severityMax: number;

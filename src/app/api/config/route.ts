@@ -3,9 +3,9 @@ import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/erro
 
 // Hardcoded fallback values
 const FALLBACK_THRESHOLDS = {
-  high: 75,
-  medium: 50,
-  low: 25,
+  critical: 75,
+  high: 50,
+  medium: 25,
 };
 
 export async function GET() {
@@ -25,9 +25,9 @@ export async function GET() {
         const data = await response.json();
         return NextResponse.json({
           thresholds: {
+            critical: data.thresholds.critical,
             high: data.thresholds.high,
             medium: data.thresholds.medium,
-            low: data.thresholds.low,
           },
           scoring: data.scoring,
           aiEnabled: data.aiEnabled ?? false,

@@ -18,9 +18,9 @@ describe('useConfig hook', () => {
   it('should return config data on successful fetch', async () => {
     const mockConfig = {
       thresholds: {
-        high: 75,
-        medium: 50,
-        low: 25,
+        critical: 75,
+        high: 50,
+        medium: 25,
       },
       scoring: {
         severityMax: 25,
