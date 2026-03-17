@@ -101,9 +101,12 @@ export default function WorkloadDetailPage() {
 
     const riskFactors = getRiskFactors(vulnerabilityData, (key: string) => t(key));
 
-    const riscSumColorVariant = vulnerabilityData.riskScore >= 75
+    const criticalThreshold = config?.thresholds.critical ?? 75;
+    const highThreshold = config?.thresholds.high ?? 50;
+
+    const riscSumColorVariant = vulnerabilityData.riskScore >= criticalThreshold
         ? "danger"
-        : vulnerabilityData.riskScore >= 50
+        : vulnerabilityData.riskScore >= highThreshold
             ? "warning"
             : "success";
 
@@ -124,9 +127,9 @@ export default function WorkloadDetailPage() {
                         <Heading size="large">{vulnerabilityData.identifier}</Heading>
                         <Tag
                             variant={
-                                vulnerabilityData.riskScore >= 75
+                                vulnerabilityData.riskScore >= criticalThreshold
                                     ? "error"
-                                    : vulnerabilityData.riskScore >= 50
+                                    : vulnerabilityData.riskScore >= highThreshold
                                         ? "warning"
                                         : "success"
                             }

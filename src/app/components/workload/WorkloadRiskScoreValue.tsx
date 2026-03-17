@@ -1,5 +1,5 @@
 "use client";
-import {Tag, Popover, Button, Table} from "@navikt/ds-react";
+import {Tag, Popover, Button, Table, BodyShort} from "@navikt/ds-react";
 import {useState} from "react";
 import { useTranslations } from "next-intl";
 import type {Vulnerability} from "@/app/shared/types/vulnerabilities";
@@ -8,6 +8,7 @@ const WorkloadRiskScoreValue = ({vuln}: {
     vuln: Vulnerability;
 }) => {
     const t = useTranslations("workload");
+    const tFactors = useTranslations("riskFactors");
     const [openState, setOpenState] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -47,7 +48,14 @@ const WorkloadRiskScoreValue = ({vuln}: {
                             <Table.Body>
                                 {vuln.riskScoreBreakdown.factors.map((factor) => (
                                     <Table.Row key={factor.name}>
-                                        <Table.DataCell>{factor.name}</Table.DataCell>
+                                        <Table.DataCell>
+                                            <span>{tFactors(factor.name as Parameters<typeof tFactors>[0])}</span>
+                                            {factor.explanation && (
+                                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                                    {factor.explanation}
+                                                </BodyShort>
+                                            )}
+                                        </Table.DataCell>
                                         <Table.DataCell>{factor.points}/{factor.maxPoints}</Table.DataCell>
                                     </Table.Row>
                                 ))}

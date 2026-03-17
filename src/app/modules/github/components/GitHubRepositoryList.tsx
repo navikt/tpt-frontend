@@ -47,11 +47,11 @@ export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps
   );
 
   const criticalRepositories = repositories.filter(
-    (r) => r.aggregateRiskScore >= 300
+    (r) => r.aggregateRiskScore >= 75
   ).length;
 
   const highRiskRepositories = repositories.filter(
-    (r) => r.aggregateRiskScore >= 150 && r.aggregateRiskScore < 300
+    (r) => r.aggregateRiskScore >= 50 && r.aggregateRiskScore < 75
   ).length;
 
   return (

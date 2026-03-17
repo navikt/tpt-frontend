@@ -17,7 +17,6 @@ export function getRiskFactors(vuln: Vulnerability, translate?: (key: string) =>
     if (!breakdown?.factors) return [];
 
     return breakdown.factors
-        .filter((factor: RiskScoreFactor) => { return factor.name != "severity" })
         .map((factor: RiskScoreFactor) => {
             const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
 

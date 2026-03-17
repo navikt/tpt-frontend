@@ -25,9 +25,9 @@ export async function GET() {
         const data = await response.json();
         return NextResponse.json({
           thresholds: {
-            critical: data.thresholds.critical,
-            high: data.thresholds.high,
-            medium: data.thresholds.medium,
+            critical: data.thresholds?.critical ?? FALLBACK_THRESHOLDS.critical,
+            high: data.thresholds?.high ?? FALLBACK_THRESHOLDS.high,
+            medium: data.thresholds?.medium ?? FALLBACK_THRESHOLDS.medium,
           },
           scoring: data.scoring,
           aiEnabled: data.aiEnabled ?? false,

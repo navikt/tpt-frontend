@@ -194,7 +194,7 @@ export const mockVulnerabilitiesPayload = {
           id: "workload-004",
           name: "util-thing",
           workloadType: "job",
-          environment: null,
+          environment: "dev",
           repository: "navikt/util-thing",
           vulnerabilities: [
             {

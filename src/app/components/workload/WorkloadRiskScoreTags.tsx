@@ -30,7 +30,7 @@ const WorkloadRiskScoreTags = ({vuln}: {
                                 // Sort CRITICAL before HIGH
                                 if (a.impact === "CRITICAL" && b.impact !== "CRITICAL") return -1;
                                 if (b.impact === "CRITICAL" && a.impact !== "CRITICAL") return 1;
-                                // Then sort by contribution descending
+                                // Then sort by points descending
                                 return b.points - a.points;
                             });
                         

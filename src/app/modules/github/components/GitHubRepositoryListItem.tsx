@@ -14,10 +14,10 @@ interface GitHubRepositoryListItemProps {
 function getRiskLevel(
   score: number
 ): "critical" | "high" | "medium" | "low" | "none" {
-  if (score >= 300) return "critical";
-  if (score >= 150) return "high";
-  if (score >= 75) return "medium";
-  if (score >= 30) return "low";
+  if (score >= 75) return "critical";
+  if (score >= 50) return "high";
+  if (score >= 25) return "medium";
+  if (score > 0) return "low";
   return "none";
 }
 
