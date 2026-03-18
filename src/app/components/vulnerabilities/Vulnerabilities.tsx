@@ -2,6 +2,7 @@
 import { useVulnerabilitiesContext } from "../../contexts/VulnerabilitiesContext";
 import VulnerabilitiesTable from "./table/VulnerabilitiesTable";
 import FilterActionMenu from "./filteractionmenu/FilterActionMenu";
+import { Loader, Box } from "@navikt/ds-react";
 
 const Vulnerabilities = () => {
   const {
@@ -25,7 +26,11 @@ const Vulnerabilities = () => {
   } = useVulnerabilitiesContext();
 
   if (isLoading) {
-    return <div>Loading vulnerabilities...</div>;
+    return (
+      <Box paddingBlock="space-24" style={{ textAlign: "center" }}>
+        <Loader size="large" title="Laster sårbarheter..." />
+      </Box>
+    );
   }
 
   return (

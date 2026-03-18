@@ -1,5 +1,5 @@
 import {VulnerabilitiesResponse, Workload} from "@/app/shared/types/vulnerabilities";
-import {Accordion, Link, LinkCard, Tag} from "@navikt/ds-react";
+import {Accordion, Link, LinkCard, Loader, Tag} from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 
 interface CompleteVulnerability {
@@ -55,7 +55,7 @@ const VulnerableList = ({
             {
                 isLoading ? (
                     <Accordion.Content>
-                        <div>Laster {vulnerabilitiesName} sårbarheter...</div>
+                        <Loader size="small" title={`Laster ${vulnerabilitiesName} sårbarheter...`} />
                     </Accordion.Content>
                 ) : null
             }
