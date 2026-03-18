@@ -101,9 +101,12 @@ export default function WorkloadDetailPage() {
 
     const riskFactors = getRiskFactors(vulnerabilityData, (key: string) => t(key));
 
-    const riscSumColorVariant = vulnerabilityData.riskScore >= 100
+    const criticalThreshold = config?.thresholds.critical ?? 75;
+    const highThreshold = config?.thresholds.high ?? 50;
+
+    const riscSumColorVariant = vulnerabilityData.riskScore >= criticalThreshold
         ? "danger"
-        : vulnerabilityData.riskScore >= 50
+        : vulnerabilityData.riskScore >= highThreshold
             ? "warning"
             : "success";
 
@@ -124,9 +127,9 @@ export default function WorkloadDetailPage() {
                         <Heading size="large">{vulnerabilityData.identifier}</Heading>
                         <Tag
                             variant={
-                                vulnerabilityData.riskScore >= 100
+                                vulnerabilityData.riskScore >= criticalThreshold
                                     ? "error"
-                                    : vulnerabilityData.riskScore >= 50
+                                    : vulnerabilityData.riskScore >= highThreshold
                                         ? "warning"
                                         : "success"
                             }
@@ -226,30 +229,8 @@ export default function WorkloadDetailPage() {
             <Heading size="medium" spacing>
                 {t("vulnerabilityDetail.riskScoreWhy")}
             </Heading>
-            {/* Base Score Box */}
             {vulnerabilityData.riskScoreBreakdown && (
                 <>
-                    <Box
-                        padding="space-16"
-                        borderRadius="4"
-                        style={{
-                            backgroundColor: "var(--ax-bg-info-soft)",
-                            border: "2px solid var(--ax-border-info)",
-                            marginBottom: "1rem",
-                        }}
-                    >
-                        <HStack gap="space-16" align="center" justify="space-between">
-                            <VStack gap="space-4">
-                                <BodyShort weight="semibold" size="large">{t("vulnerabilityDetail.baseScoreTitle")}</BodyShort>
-                                <BodyShort size="small" style={{color: "var(--ax-text-neutral-subtle)"}}>
-                                    {t("vulnerabilityDetail.baseScoreDescription")}
-                                </BodyShort>
-                            </VStack>
-                            <Heading size="large" level="3">
-                                {Math.round(vulnerabilityData.riskScoreBreakdown.baseScore)}</Heading>
-                        </HStack>
-                    </Box>
-
                     {riskFactors.length > 0 ? (
                         <VStack gap="space-12" style={{marginBottom: "1.5rem"}}>
                             {riskFactors
@@ -278,21 +259,17 @@ export default function WorkloadDetailPage() {
                                                     </BodyShort>
                                                     <Tag
                                                         variant={
-                                                            !factor.isNegative
-                                                                ? "success" // Reducing risk
-                                                                : factor.severity === "high"
-                                                                    ? "error" // High negative impact
-                                                                    : factor.severity === "medium"
-                                                                        ? "warning" // Medium negative impact
+                                                            factor.severity === "high"
+                                                                ? "error"
+                                                                : factor.severity === "medium"
+                                                                    ? "warning"
+                                                                    : factor.severity === "low"
+                                                                        ? "success"
                                                                         : "info"
                                                         }
                                                         size="xsmall"
-                                                        style={{width: "4em"}}
                                                     >
-                                                        {factor.contribution > 0 ? "+" : ""}{Math.round(factor.contribution)}
-                                                    </Tag>
-                                                    <Tag data-color="info" variant="outline" size="xsmall" style={{width: "4em"}}>
-                                                        {factor.multiplier}x
+                                                        {factor.points}/{factor.maxPoints}
                                                     </Tag>
                                                 </HStack>
                                                 <BodyShort size="small">{factor.description}</BodyShort>

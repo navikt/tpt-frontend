@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
+import { DEPLOYMENT_AGE_DAYS } from "@/app/shared/constants/deploymentAge";
 import {
   BodyShort,
   Loader,
@@ -23,11 +24,11 @@ import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 export default function LeaderView() {
   const t = useTranslations("leaderView");
   const tTeam = useTranslations("teamMemberView");
-  const { config, isLoading: configLoading } = useConfigContext();
+  const { isLoading: configLoading } = useConfigContext();
   const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   
-  const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
+  const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
   const teamStatistics = useMemo(() => {
     if (!vulnData || !slaData) return [];

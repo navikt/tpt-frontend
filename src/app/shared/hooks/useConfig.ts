@@ -3,11 +3,17 @@ import { ApiError, handleApiError } from "@/app/shared/utils/errorHandling";
 
 interface ThresholdConfig {
   thresholds: {
+    critical: number;
     high: number;
     medium: number;
-    low: number;
   };
-  deploymentAgeDays?: number;
+  scoring?: {
+    severityMax: number;
+    exploitationMax: number;
+    exposureMax: number;
+    environmentMax: number;
+    actionabilityMax: number;
+  };
   aiEnabled?: boolean;
 }
 

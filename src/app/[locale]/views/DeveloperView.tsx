@@ -31,7 +31,7 @@ export default function DeveloperView() {
     if (!config) return null;
     return {
       name: t("buckets.highPriority"),
-      minThreshold: config.thresholds.high,
+      minThreshold: config.thresholds.critical,
       maxThreshold: Number.MAX_VALUE,
     };
   }, [config, t]);

@@ -6,10 +6,10 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-001",
           name: "TPT Frontend Application",
+          workloadType: "app",
           environment: "prod-gcp",
           repository: "navikt/tpt-frontend",
-          ingressTypes: ["external"],
-          buildTime: "2025-11-27",
+          lastDeploy: "2025-11-27T10:00:00Z",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0001",
@@ -18,15 +18,16 @@ export const mockVulnerabilitiesPayload = {
                 "A buffer overflow vulnerability in the X.509 certificate parser could allow remote code execution",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0001",
-              riskScore: 200,
-              riskScoreMultipliers: {
-                base_high: 70,
-                exposure: 2,
-                kev: 1.5,
-                epss: 1.2,
-                production: 1.1,
-                old_build_days: 45,
-                old_build: 1.05,
+              riskScore: 88,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 25, maxPoints: 25, explanation: "Base severity: CRITICAL (25/25 points)", impact: "CRITICAL" },
+                  { name: "exploitation_evidence", points: 30, maxPoints: 30, explanation: "Listed in CISA KEV catalog", impact: "CRITICAL" },
+                  { name: "exposure", points: 20, maxPoints: 25, explanation: "External ingress without authentication", impact: "HIGH" },
+                  { name: "environment", points: 10, maxPoints: 15, explanation: "Production environment", impact: "HIGH" },
+                  { name: "actionability", points: 3, maxPoints: 10, explanation: "No patch available", impact: "LOW" },
+                ],
+                totalScore: 88,
               },
             },
             {
@@ -36,15 +37,16 @@ export const mockVulnerabilitiesPayload = {
                 "Prototype pollution vulnerability allowing arbitrary property injection",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0002",
-              riskScore: 45,
-              riskScoreMultipliers: {
-                base_high: 50,
-                exposure: 1,
-                kev: 1,
-                epss: 1.1,
-                production: 1.1,
-                old_build_days: 20,
-                old_build: 1.02,
+              riskScore: 42,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 15, maxPoints: 25, explanation: "Base severity: HIGH (15/25 points)", impact: "HIGH" },
+                  { name: "exploitation_evidence", points: 10, maxPoints: 30, explanation: "High EPSS score", impact: "MEDIUM" },
+                  { name: "exposure", points: 10, maxPoints: 25, explanation: "External ingress with authentication", impact: "MEDIUM" },
+                  { name: "environment", points: 5, maxPoints: 15, explanation: "Production environment", impact: "MEDIUM" },
+                  { name: "actionability", points: 2, maxPoints: 10, explanation: "No patch available", impact: "LOW" },
+                ],
+                totalScore: 42,
               },
             },
           ],
@@ -52,10 +54,10 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002",
           name: "TPT Frontend Application",
+          workloadType: "app",
           environment: "dev-gcp",
           repository: "navikt/tpt-frontend",
-          ingressTypes: ["external"],
-          buildTime: "2025-11-27",
+          lastDeploy: "2025-11-27T10:00:00Z",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0001",
@@ -64,15 +66,16 @@ export const mockVulnerabilitiesPayload = {
                 "A buffer overflow vulnerability in the X.509 certificate parser could allow remote code execution",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0001",
-              riskScore: 200,
-              riskScoreMultipliers: {
-                base_high: 70,
-                exposure: 2,
-                kev: 1.5,
-                epss: 1.2,
-                production: 1.1,
-                old_build_days: 45,
-                old_build: 1.05,
+              riskScore: 68,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 25, maxPoints: 25, explanation: "Base severity: CRITICAL (25/25 points)", impact: "CRITICAL" },
+                  { name: "exploitation_evidence", points: 30, maxPoints: 30, explanation: "Listed in CISA KEV catalog", impact: "CRITICAL" },
+                  { name: "exposure", points: 10, maxPoints: 25, explanation: "External ingress with authentication", impact: "MEDIUM" },
+                  { name: "environment", points: 0, maxPoints: 15, explanation: "Development environment", impact: "NONE" },
+                  { name: "actionability", points: 3, maxPoints: 10, explanation: "No patch available", impact: "LOW" },
+                ],
+                totalScore: 68,
               },
             },
             {
@@ -82,15 +85,16 @@ export const mockVulnerabilitiesPayload = {
                 "Prototype pollution vulnerability allowing arbitrary property injection",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0002",
-              riskScore: 45,
-              riskScoreMultipliers: {
-                base_high: 50,
-                exposure: 1,
-                kev: 1,
-                epss: 1.1,
-                production: 1.1,
-                old_build_days: 20,
-                old_build: 1.02,
+              riskScore: 32,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 15, maxPoints: 25, explanation: "Base severity: HIGH (15/25 points)", impact: "HIGH" },
+                  { name: "exploitation_evidence", points: 10, maxPoints: 30, explanation: "High EPSS score", impact: "MEDIUM" },
+                  { name: "exposure", points: 5, maxPoints: 25, explanation: "Internal ingress", impact: "LOW" },
+                  { name: "environment", points: 0, maxPoints: 15, explanation: "Development environment", impact: "NONE" },
+                  { name: "actionability", points: 2, maxPoints: 10, explanation: "No patch available", impact: "LOW" },
+                ],
+                totalScore: 32,
               },
             },
           ],
@@ -98,10 +102,10 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002",
           name: "API Gateway",
+          workloadType: "app",
           environment: "dev-gcp",
           repository: "navikt/api-gateway",
-          ingressTypes: ["internal"],
-          buildTime: "2025-11-26",
+          lastDeploy: "2025-11-26T10:00:00Z",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0003",
@@ -110,15 +114,16 @@ export const mockVulnerabilitiesPayload = {
                 "Remote code execution via JNDI lookup in log messages",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0003",
-              riskScore: 98,
-              riskScoreMultipliers: {
-                base_high: 90,
-                exposure: 1.5,
-                kev: 1.8,
-                epss: 1.5,
-                production: 1,
-                old_build_days: 10,
-                old_build: 1.01,
+              riskScore: 78,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 25, maxPoints: 25, explanation: "Base severity: CRITICAL (25/25 points)", impact: "CRITICAL" },
+                  { name: "exploitation_evidence", points: 30, maxPoints: 30, explanation: "Listed in CISA KEV catalog", impact: "CRITICAL" },
+                  { name: "exposure", points: 15, maxPoints: 25, explanation: "Internal ingress", impact: "MEDIUM" },
+                  { name: "environment", points: 0, maxPoints: 15, explanation: "Development environment", impact: "NONE" },
+                  { name: "actionability", points: 8, maxPoints: 10, explanation: "Patch available, ransomware use known", impact: "HIGH" },
+                ],
+                totalScore: 78,
               },
             },
           ],
@@ -126,10 +131,10 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-002-prod",
           name: "API Gateway",
+          workloadType: "app",
           environment: "prod-gcp",
           repository: "navikt/api-gateway",
-          ingressTypes: ["internal"],
-          buildTime: "2025-11-26",
+          lastDeploy: "2025-11-26T10:00:00Z",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0003",
@@ -138,15 +143,16 @@ export const mockVulnerabilitiesPayload = {
                 "Remote code execution via JNDI lookup in log messages",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0003",
-              riskScore: 98,
-              riskScoreMultipliers: {
-                base_high: 90,
-                exposure: 1.5,
-                kev: 1.8,
-                epss: 1.5,
-                production: 1.1,
-                old_build_days: 10,
-                old_build: 1.01,
+              riskScore: 93,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 25, maxPoints: 25, explanation: "Base severity: CRITICAL (25/25 points)", impact: "CRITICAL" },
+                  { name: "exploitation_evidence", points: 30, maxPoints: 30, explanation: "Listed in CISA KEV catalog", impact: "CRITICAL" },
+                  { name: "exposure", points: 15, maxPoints: 25, explanation: "Internal ingress", impact: "MEDIUM" },
+                  { name: "environment", points: 15, maxPoints: 15, explanation: "Production environment, old deploy", impact: "HIGH" },
+                  { name: "actionability", points: 8, maxPoints: 10, explanation: "Patch available, ransomware use known", impact: "HIGH" },
+                ],
+                totalScore: 93,
               },
             },
           ],
@@ -159,10 +165,10 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-003",
           name: "User Service",
+          workloadType: "app",
           environment: "prod-gcp",
           repository: "navikt/user-service",
-          ingressTypes: [""],
-          buildTime: "2025-11-25",
+          lastDeploy: "2025-11-25T10:00:00Z",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0004",
@@ -170,15 +176,16 @@ export const mockVulnerabilitiesPayload = {
               description: "SQL injection vulnerability in parameter binding",
               vulnerabilityDetailsLink:
                 "https://nvd.nist.gov/vuln/detail/CVE-2025-0004",
-              riskScore: 20,
-              riskScoreMultipliers: {
-                base_high: 30,
-                exposure: 1,
-                kev: 1,
-                epss: 1,
-                production: 1.1,
-                old_build_days: 5,
-                old_build: 1,
+              riskScore: 18,
+              riskScoreBreakdown: {
+                factors: [
+                  { name: "severity", points: 8, maxPoints: 25, explanation: "Base severity: MEDIUM (8/25 points)", impact: "MEDIUM" },
+                  { name: "exploitation_evidence", points: 0, maxPoints: 30, explanation: "No exploitation evidence", impact: "NONE" },
+                  { name: "exposure", points: 0, maxPoints: 25, explanation: "No ingress", impact: "NONE" },
+                  { name: "environment", points: 5, maxPoints: 15, explanation: "Production environment", impact: "MEDIUM" },
+                  { name: "actionability", points: 5, maxPoints: 10, explanation: "Patch available", impact: "MEDIUM" },
+                ],
+                totalScore: 18,
               },
             },
           ],
@@ -186,72 +193,43 @@ export const mockVulnerabilitiesPayload = {
         {
           id: "workload-004",
           name: "util-thing",
-          environment: null,
+          workloadType: "job",
+          environment: "dev",
           repository: "navikt/util-thing",
           vulnerabilities: [
             {
               identifier: "CVE-2025-61727",
               packageName: "pkg:golang/stdlib@v1.25.4",
-              description: "An excluded subdomain constraint in a certificate chain does not restrict the usage of wildcard SANs in the leaf certificate. For example a constraint that excludes the subdomain test.example.com does not prevent a leaf certificate from claiming the SAN *.example.com.",
+              description: "An excluded subdomain constraint in a certificate chain does not restrict the usage of wildcard SANs in the leaf certificate.",
               vulnerabilityDetailsLink: "https://nvd.nist.gov/vuln/detail/CVE-2025-61727",
-              riskScore: 18,
-              riskScoreMultipliers: {
-                base_medium: 40,
-                exposure: 0.5,
-                patch_available: 0.9
-              },
+              riskScore: 15,
               riskScoreBreakdown: {
-                baseScore: 40,
                 factors: [
-                  {
-                    name: "exposure",
-                    contribution: -18,
-                    percentage: -100,
-                    explanation: "Application has no ingress (reduced exposure)",
-                    impact: "MEDIUM"
-                  },
-                  {
-                    name: "patch_available",
-                    contribution: -2,
-                    percentage: -11.11111111111111,
-                    explanation: "Patch is available",
-                    impact: "MEDIUM"
-                  }
+                  { name: "severity", points: 8, maxPoints: 25, explanation: "Base severity: MEDIUM (8/25 points)", impact: "MEDIUM" },
+                  { name: "exploitation_evidence", points: 0, maxPoints: 30, explanation: "No exploitation evidence", impact: "NONE" },
+                  { name: "exposure", points: 0, maxPoints: 25, explanation: "No ingress", impact: "NONE" },
+                  { name: "environment", points: 0, maxPoints: 15, explanation: "No environment context", impact: "NONE" },
+                  { name: "actionability", points: 7, maxPoints: 10, explanation: "Patch available", impact: "HIGH" },
                 ],
-                totalScore: 18
-              }
+                totalScore: 15,
+              },
             },
             {
               identifier: "CVE-2025-61729",
               packageName: "pkg:golang/stdlib@v1.25.4",
-              description: "Within HostnameError.Error(), when constructing an error string, there is no limit to the number of hosts that will be printed out. Furthermore, the error string is constructed by repeated string concatenation, leading to quadratic runtime. Therefore, a certificate provided by a malicious actor can result in excessive resource consumption.",
+              description: "Within HostnameError.Error(), when constructing an error string, there is no limit to the number of hosts that will be printed out.",
               vulnerabilityDetailsLink: "https://nvd.nist.gov/vuln/detail/CVE-2025-61729",
-              riskScore: 31.5,
-              riskScoreMultipliers: {
-                base_high: 70,
-                exposure: 0.5,
-                patch_available: 0.9
-              },
+              riskScore: 28,
               riskScoreBreakdown: {
-                baseScore: 70,
                 factors: [
-                  {
-                    name: "exposure",
-                    contribution: -31.5,
-                    percentage: -100,
-                    explanation: "Application has no ingress (reduced exposure)",
-                    impact: "MEDIUM"
-                  },
-                  {
-                    name: "patch_available",
-                    contribution: -3.5,
-                    percentage: -11.11111111111111,
-                    explanation: "Patch is available",
-                    impact: "MEDIUM"
-                  }
+                  { name: "severity", points: 18, maxPoints: 25, explanation: "Base severity: HIGH (18/25 points)", impact: "HIGH" },
+                  { name: "exploitation_evidence", points: 0, maxPoints: 30, explanation: "No exploitation evidence", impact: "NONE" },
+                  { name: "exposure", points: 0, maxPoints: 25, explanation: "No ingress", impact: "NONE" },
+                  { name: "environment", points: 0, maxPoints: 15, explanation: "No environment context", impact: "NONE" },
+                  { name: "actionability", points: 10, maxPoints: 10, explanation: "Patch available", impact: "HIGH" },
                 ],
-                totalScore: 31.5
-              }
+                totalScore: 28,
+              },
             }
           ]
         },

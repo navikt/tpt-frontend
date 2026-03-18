@@ -18,9 +18,9 @@ interface UseRepositoryMetricsProps {
 
 export function useRepositoryMetrics({
   repositories,
-  highThreshold = 150,
-  mediumThreshold = 75,
-  lowThreshold = 30,
+  highThreshold = 75,
+  mediumThreshold = 50,
+  lowThreshold = 25,
 }: UseRepositoryMetricsProps): RepositoryMetrics[] {
   return useMemo(() => {
     return repositories.map((repository) => {

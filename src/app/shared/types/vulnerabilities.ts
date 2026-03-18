@@ -1,14 +1,12 @@
 export interface RiskScoreFactor {
   name: string;
-  contribution: number;
-  percentage: number;
-  multiplier: number;
+  points: number;
+  maxPoints: number;
   explanation: string;
-  impact: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  impact: "NONE" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }
 
 export interface RiskScoreBreakdown {
-  baseScore: number;
   factors: RiskScoreFactor[];
   totalScore: number;
 }
@@ -35,8 +33,6 @@ export interface Workload {
   workloadType?: string;
   environment: string;
   repository?: string;
-  ingressTypes?: string[];
-  buildTime?: string;
   lastDeploy?: string;
   vulnerabilities: Vulnerability[];
 }

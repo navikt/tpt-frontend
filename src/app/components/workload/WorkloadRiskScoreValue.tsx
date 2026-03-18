@@ -1,25 +1,14 @@
 "use client";
-import {Tag, Popover, Button, Table} from "@navikt/ds-react";
+import {Tag, Popover, Button, Table, BodyShort} from "@navikt/ds-react";
 import {useState} from "react";
 import { useTranslations } from "next-intl";
-
-interface VulnerabilityWithMultipliers {
-    riskScore: number;
-    riskScoreMultipliers?: {
-        severity: number;
-        exposure: number;
-        kev: number;
-        epss: number;
-        production: number;
-        old_build_days: number;
-        old_build: number;
-    };
-}
+import type {Vulnerability} from "@/app/shared/types/vulnerabilities";
 
 const WorkloadRiskScoreValue = ({vuln}: {
-    vuln: VulnerabilityWithMultipliers;
+    vuln: Vulnerability;
 }) => {
     const t = useTranslations("workload");
+    const tFactors = useTranslations("riskFactors");
     const [openState, setOpenState] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -35,9 +24,9 @@ const WorkloadRiskScoreValue = ({vuln}: {
             >
                 <Tag
                     variant={
-                        vuln.riskScore > 85
+                        vuln.riskScore >= 75
                             ? "error"
-                            : vuln.riskScore > 50
+                            : vuln.riskScore >= 50
                                 ? "warning"
                                 : "success"
                     }
@@ -54,35 +43,22 @@ const WorkloadRiskScoreValue = ({vuln}: {
             >
                 <Popover.Content>
                     <b>{t("riskScoreCalculation")}</b>
-                    {vuln.riskScoreMultipliers ? (
+                    {vuln.riskScoreBreakdown?.factors ? (
                         <Table style={{fontSize: "0.875rem"}}>
                             <Table.Body>
-                                <Table.Row>
-                                    <Table.DataCell>{t("fromCVE")}</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.severity}</Table.DataCell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.DataCell>{t("exposedIngress")}</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.exposure}x</Table.DataCell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.DataCell>{t("kev")}</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.kev}x</Table.DataCell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.DataCell>{t("epss")}</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.epss}x</Table.DataCell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.DataCell>{t("production")}</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.production}x</Table.DataCell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.DataCell>{t("oldBuild")}</Table.DataCell>
-                                    <Table.DataCell>{vuln.riskScoreMultipliers.old_build}x{" "}
-                                        ({t("daysSinceLastBuild")}{" "}{vuln.riskScoreMultipliers.old_build_days})
-                                    </Table.DataCell>
-                                </Table.Row>
+                                {vuln.riskScoreBreakdown.factors.map((factor) => (
+                                    <Table.Row key={factor.name}>
+                                        <Table.DataCell>
+                                            <span>{tFactors(factor.name as Parameters<typeof tFactors>[0])}</span>
+                                            {factor.explanation && (
+                                                <BodyShort size="small" style={{color: "var(--a-text-subtle)"}}>
+                                                    {factor.explanation}
+                                                </BodyShort>
+                                            )}
+                                        </Table.DataCell>
+                                        <Table.DataCell>{factor.points}/{factor.maxPoints}</Table.DataCell>
+                                    </Table.Row>
+                                ))}
                             </Table.Body>
                         </Table>
                     ) : (

@@ -43,9 +43,9 @@ export default function GitHubPage() {
 
   const repositoryMetrics = useRepositoryMetrics({
     repositories: filteredRepositories,
-    highThreshold: config?.thresholds.high ?? 150,
-    mediumThreshold: config?.thresholds.medium ?? 75,
-    lowThreshold: config?.thresholds.low ?? 30,
+    highThreshold: config?.thresholds.critical ?? 75,
+    mediumThreshold: config?.thresholds.high ?? 50,
+    lowThreshold: config?.thresholds.medium ?? 25,
   });
 
   // Calculate team statistics

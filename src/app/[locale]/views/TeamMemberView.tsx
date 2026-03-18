@@ -8,14 +8,15 @@ import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
+import { DEPLOYMENT_AGE_DAYS } from "@/app/shared/constants/deploymentAge";
 
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   const { data: vulnData, isLoading: vulnLoading } = useVulnerabilitiesContext();
-  const { config, isLoading: configLoading } = useConfigContext();
+  const { isLoading: configLoading } = useConfigContext();
   
-  const deploymentAgeDays = config?.deploymentAgeDays ?? 90;
+  const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
   const overview = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;
