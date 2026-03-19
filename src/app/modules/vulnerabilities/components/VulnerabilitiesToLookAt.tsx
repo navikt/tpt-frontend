@@ -1,9 +1,8 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { Vulnerability, Workload } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag, ToggleGroup, Tooltip } from "@navikt/ds-react";
-import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
 import { useTranslations } from "next-intl";
@@ -94,9 +93,9 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         });
         
         return Array.from(workloadMap.values()).sort((a, b) => {
-            const totalRiskA = a.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
-            const totalRiskB = b.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
-            return totalRiskB - totalRiskA;
+            const maxRiskA = Math.max(...a.vulnerabilities.map(v => v.riskScore));
+            const maxRiskB = Math.max(...b.vulnerabilities.map(v => v.riskScore));
+            return maxRiskB - maxRiskA;
         });
     })();
 
@@ -224,7 +223,6 @@ interface ContentProps {
 }
 
 const ActionGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
-    const t = useTranslations();
     const groups = groupByRemediationAction(vulnerabilities);
 
     return (
@@ -335,20 +333,24 @@ const PackageGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
                         return (
                             <LinkCard
                                 key={`${vuln.identifier}-${vulnIndex}`}
-                                style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
+                                style={{
+                                    marginBottom: "0.25rem",
+                                    marginLeft: "1rem",
+                                    "--__axc-link-card-padding-block": "var(--ax-space-8)",
+                                    "--__axc-link-card-padding-inline": "var(--ax-space-12)",
+                                } as React.CSSProperties}
                             >
                                 <LinkCard.Title>
-                                    <HStack gap="space-8" align="center" justify="space-between" wrap>
-                                        <LinkCard.Anchor asChild>
-                                            <Link href={`/${workload.id}/${vuln.identifier}`}>
-                                                {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
-                                            </Link>
-                                        </LinkCard.Anchor>
-                                        <WorkloadRiskScoreTags vuln={vuln} />
-                                    </HStack>
+                                    <LinkCard.Anchor asChild>
+                                        <Link href={`/${workload.id}/${vuln.identifier}`}>
+                                            <BodyShort size="small">{vuln.identifier}</BodyShort>
+                                        </Link>
+                                    </LinkCard.Anchor>
                                 </LinkCard.Title>
                                 {description && (
-                                    <LinkCard.Description>{description}</LinkCard.Description>
+                                    <LinkCard.Description>
+                                        <BodyShort size="small">{description}</BodyShort>
+                                    </LinkCard.Description>
                                 )}
                             </LinkCard>
                         );
