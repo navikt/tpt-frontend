@@ -26,10 +26,10 @@
     "loadingVulnerabilities": "Henter sårbarheter..."
   },
   "buckets": {
-    "highPriority": "Høy prio",
-    "important": "Lurt å ta unna",
-    "whenTime": "Når du har tid",
-    "lowPriority": "Lav prioritet"
+    "highPriority": "Snarest",
+    "important": "Må prioriteres",
+    "whenTime": "Må planlegges",
+    "lowPriority": "Når det passer seg"
   },
   "summary": {
     "priorityWarning": "Prioriteringen er basert på tilgjengelig informasjon. En sårbarhet kan være kritisk selv om den er lavt prioritert, for eksempel hvis den ikke er analysert ennå.",
@@ -66,7 +66,7 @@
       "vulnerabilities": "Sårbarheter",
       "vulnerabilityBreakdown": "Sårbarhetsfordeling",
       "vulnerabilityList": "Alle sårbarheter",
-      "highPriority": "Høy prioritet",
+      "highPriority": "Snarest",
       "mediumPriority": "Middels prioritet",
       "lowPriority": "Lav prioritet",
       "securityMetrics": "Sikkerhetsmålinger",
@@ -112,7 +112,17 @@
     "openAll": "Åpne alle",
     "closeAll": "Lukk alle",
     "vulnerabilitiesInWorkload": "({count} {count, plural, one {sårbarhet} other {sårbarheter}})",
-    "vulnerabilitiesInPackage": "({count} {count, plural, one {sårbarhet} other {sårbarheter}})"
+    "vulnerabilitiesInPackage": "({count} {count, plural, one {sårbarhet} other {sårbarheter}})",
+    "viewByAction": "Grupper etter tiltak",
+    "viewByPackage": "Grupper etter pakke",
+    "rebuildBaseImage": "Bygg base image på nytt",
+    "rebuildBaseImageDescription": "Disse sårbarhetene er i OS-pakker og fikses ved å rebuilde container-imaget med en oppdatert base image.",
+    "updateDependencies": "Oppdater avhengigheter",
+    "updateDependenciesDescription": "Disse sårbarhetene er i applikasjonsavhengigheter og fikses ved å oppdatere pakkeversjonene.",
+    "osPackageSummary": "{vulnCount} {vulnCount, plural, one {sårbarhet} other {sårbarheter}} i {pkgCount} {pkgCount, plural, one {OS-pakke} other {OS-pakker}}",
+    "appPackageSummary": "{vulnCount} {vulnCount, plural, one {sårbarhet} other {sårbarheter}} i {pkgCount} {pkgCount, plural, one {pakke} other {pakker}}",
+    "fixableByRebuild": "{count} {count, plural, one {sårbarhet fikses} other {sårbarheter fikses}} ved å bygge base image på nytt",
+    "actionsLabel": "{count} {count, plural, one {tiltak} other {tiltak}}"
   },
   "teamFilter": {
     "title": "Filter etter team",
@@ -196,7 +206,7 @@
     "applications": "Applikasjoner",
     "vulnerabilities": "Sårbarheter",
     "highPriority": "Høy prioritet",
-    "mediumPriority": "Lurt å ta unna",
+    "mediumPriority": "Må prioriteres",
     "teamsSection": "Team",
     "teamName": "Teamnavn",
     "apps": "Apper",

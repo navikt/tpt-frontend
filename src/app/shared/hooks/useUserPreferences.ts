@@ -5,10 +5,12 @@ const USER_PREFERENCES_KEY = "tpt-user-preferences";
 
 export interface UserPreferences {
   showAllBuckets: boolean;
+  vulnerabilityGrouping: "action" | "package";
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   showAllBuckets: false,
+  vulnerabilityGrouping: "action",
 };
 
 export const useUserPreferences = () => {

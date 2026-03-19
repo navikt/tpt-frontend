@@ -2,17 +2,24 @@
 import { useState } from "react";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { Vulnerability, Workload } from "@/app/shared/types/vulnerabilities";
-import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag } from "@navikt/ds-react";
+import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag, ToggleGroup, Tooltip } from "@navikt/ds-react";
 import WorkloadRiskScoreTags from "@/app/shared/components/WorkloadRiskScoreTags";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
 import { useTranslations } from "next-intl";
+import {
+  groupByRemediationAction,
+  getPackageDisplayName,
+  countOsVulnerabilities,
+  RemediationGroup,
+} from "@/app/shared/utils/packageClassification";
+import { useUserPreferences } from "@/app/shared/hooks/useUserPreferences";
 
 interface WorkloadWithVulns {
     workload: Workload;
     team: string;
     vulnerabilities: Vulnerability[];
-    environments: string[]; // Track all environments for merged workloads
+    environments: string[];
 }
 
 interface VulnerabilitiesToLookAtProps {
@@ -26,16 +33,16 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
     const t = useTranslations();
     const { data, isLoading } = useVulnerabilitiesContext();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+    const { preferences, updatePreferences } = useUserPreferences();
+    const grouping = preferences.vulnerabilityGrouping ?? "action";
 
     const toggleAll = () => {
         const allIds = workloadsWithVulns.map(w => w.workload.id);
         const hasAnyOpen = allIds.some(id => expandedItems[id]);
         
         if (hasAnyOpen) {
-            // Close all
             setExpandedItems({});
         } else {
-            // Open all
             const newExpanded: Record<string, boolean> = {};
             allIds.forEach(id => newExpanded[id] = true);
             setExpandedItems(newExpanded);
@@ -54,10 +61,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         const workloadMap = new Map<string, WorkloadWithVulns>();
         
         data?.teams.forEach((team) => {
-            // Skip teams that are not selected (empty selection => show none)
-            if (!selectedTeams.includes(team.team)) {
-                return;
-            }
+            if (!selectedTeams.includes(team.team)) return;
 
             team.workloads.forEach((workload) => {
                 const filteredVulns = workload.vulnerabilities.filter(
@@ -66,26 +70,19 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                 
                 if (filteredVulns.length === 0) return;
                 
-                // Use workload name as the key for merging
                 const key = workload.name;
                 
                 if (workloadMap.has(key)) {
-                    // Merge with existing workload
                     const existing = workloadMap.get(key)!;
-                    
-                    // Add environment if not already present
                     if (workload.environment && !existing.environments.includes(workload.environment)) {
                         existing.environments.push(workload.environment);
                     }
-                    
-                    // Merge vulnerabilities (deduplicate by identifier)
                     filteredVulns.forEach(vuln => {
                         if (!existing.vulnerabilities.some(v => v.identifier === vuln.identifier)) {
                             existing.vulnerabilities.push(vuln);
                         }
                     });
                 } else {
-                    // Create new entry
                     workloadMap.set(key, {
                         workload,
                         team: team.team,
@@ -97,7 +94,6 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         });
         
         return Array.from(workloadMap.values()).sort((a, b) => {
-            // Sort by total risk score descending
             const totalRiskA = a.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
             const totalRiskB = b.vulnerabilities.reduce((sum, v) => sum + v.riskScore, 0);
             return totalRiskB - totalRiskA;
@@ -106,6 +102,11 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
 
     const totalVulnCount = workloadsWithVulns.reduce(
         (sum, w) => sum + w.vulnerabilities.length,
+        0
+    );
+
+    const totalOsVulnCount = workloadsWithVulns.reduce(
+        (sum, w) => sum + countOsVulnerabilities(w.vulnerabilities),
         0
     );
 
@@ -130,118 +131,230 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
     return (
         <div style={{ marginTop: "1.5rem" }}>
             <HStack justify="space-between" align="center" style={{ marginBottom: "1rem" }}>
-                <Heading size="small">
-                    {bucketName} ({totalVulnCount} {t("common.in")} {workloadsWithVulns.length} {t("common.applications")})
-                </Heading>
-                <Button
-                    variant="tertiary"
-                    size="small"
-                    icon={Object.values(expandedItems).some(Boolean) ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
-                    onClick={toggleAll}
-                >
-                    {Object.values(expandedItems).some(Boolean) ? t("list.closeAll") : t("list.openAll")}
-                </Button>
+                <div>
+                    <Heading size="small">
+                        {bucketName} ({totalVulnCount} {t("common.in")} {workloadsWithVulns.length} {t("common.applications")})
+                    </Heading>
+                    {grouping === "action" && totalOsVulnCount > 0 && (
+                        <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginTop: "0.25rem" }}>
+                            {t("list.fixableByRebuild", { count: totalOsVulnCount })}
+                        </BodyShort>
+                    )}
+                </div>
+                <HStack gap="space-8" align="center">
+                    <ToggleGroup
+                        size="small"
+                        value={grouping}
+                        onChange={(val) => updatePreferences({ vulnerabilityGrouping: val as "action" | "package" })}
+                    >
+                        <Tooltip content={t("list.viewByAction")}>
+                            <ToggleGroup.Item value="action">{t("list.viewByAction")}</ToggleGroup.Item>
+                        </Tooltip>
+                        <Tooltip content={t("list.viewByPackage")}>
+                            <ToggleGroup.Item value="package">{t("list.viewByPackage")}</ToggleGroup.Item>
+                        </Tooltip>
+                    </ToggleGroup>
+                    <Button
+                        variant="tertiary"
+                        size="small"
+                        icon={Object.values(expandedItems).some(Boolean) ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+                        onClick={toggleAll}
+                    >
+                        {Object.values(expandedItems).some(Boolean) ? t("list.closeAll") : t("list.openAll")}
+                    </Button>
+                </HStack>
             </HStack>
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {workloadsWithVulns.map((workloadGroup) => {
-                    return (
-                        <div
-                            key={workloadGroup.workload.id}
-                            className={styles.accordionWrapper}
-                        >
-                            <Accordion>
-                                <Accordion.Item 
-                                    open={expandedItems[workloadGroup.workload.id] || false}
-                                    onOpenChange={() => toggleItem(workloadGroup.workload.id)}
-                                >
-                                    <Accordion.Header>
-                                        <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
-                                            <BodyShort weight="semibold">
-                                                {workloadGroup.workload.name} ({workloadGroup.vulnerabilities.length} {t("common.vulnerabilities")})
-                                            </BodyShort>
-                                            <HStack gap="space-8" align="center">
-                                                {workloadGroup.workload.repository && (
-                                                    <a
-                                                        href={`https://www.github.com/${workloadGroup.workload.repository}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className={styles.githubLink}
-                                                    >
-                                                        GitHub
-                                                    </a>
-                                                )}
-                                                {workloadGroup.environments.map((env) => (
-                                                    <Tag
-                                                        key={env}
-                                                        variant={env.startsWith("prod-") ? "warning" : "info"}
-                                                        size="xsmall"
-                                                    >
-                                                        {env}
-                                                    </Tag>
-                                                ))}
-                                            </HStack>
+                {workloadsWithVulns.map((workloadGroup) => (
+                    <div key={workloadGroup.workload.id} className={styles.accordionWrapper}>
+                        <Accordion>
+                            <Accordion.Item
+                                open={expandedItems[workloadGroup.workload.id] || false}
+                                onOpenChange={() => toggleItem(workloadGroup.workload.id)}
+                            >
+                                <Accordion.Header>
+                                    <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
+                                        <BodyShort weight="semibold">
+                                            {workloadGroup.workload.name} {t("list.vulnerabilitiesInWorkload", { count: workloadGroup.vulnerabilities.length })}
+                                        </BodyShort>
+                                        <HStack gap="space-8" align="center">
+                                            {workloadGroup.workload.repository && (
+                                                <a
+                                                    href={`https://www.github.com/${workloadGroup.workload.repository}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className={styles.githubLink}
+                                                >
+                                                    GitHub
+                                                </a>
+                                            )}
+                                            {workloadGroup.environments.map((env) => (
+                                                <Tag
+                                                    key={env}
+                                                    variant={env.startsWith("prod-") ? "warning" : "info"}
+                                                    size="xsmall"
+                                                >
+                                                    {env}
+                                                </Tag>
+                                            ))}
                                         </HStack>
-                                    </Accordion.Header>
-                                    <Accordion.Content>
-                                        {/* Group vulnerabilities by package name */}
-                                        {Object.entries(
-                                            workloadGroup.vulnerabilities.reduce((acc, vuln) => {
-                                                const packageName = vuln.packageName;
-                                                if (!acc[packageName]) {
-                                                    acc[packageName] = [];
-                                                }
-                                                acc[packageName].push(vuln);
-                                                return acc;
-                                            }, {} as Record<string, Vulnerability[]>)
-                                        )
-                                        .sort((a, b) => b[1].length - a[1].length) // Sort by vulnerability count descending
-                                        .map(([packageName, vulnerabilities]) => (
-                                            <div key={packageName} style={{ marginBottom: "1rem" }}>
-                                                <BodyShort weight="semibold" style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}>
-                                                    {packageName} ({vulnerabilities.length} {t("common.vulnerabilities")})
-                                                </BodyShort>
-                                                {vulnerabilities.map((vuln, vulnIndex) => {
-                                                    const maxDescriptionLength = 200;
-                                                    const description = vuln.description 
-                                                        ? (vuln.description.replace(/\n/g, " ").length > maxDescriptionLength 
-                                                            ? vuln.description.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..." 
-                                                            : vuln.description.replace(/\n/g, " "))
-                                                        : null;
-                                                    return (
-                                                        <LinkCard
-                                                            key={`${vuln.identifier}-${vulnIndex}`}
-                                                            style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
-                                                        >
-                                                            <LinkCard.Title>
-                                                                <HStack gap="space-8" align="center" justify="space-between" wrap>
-                                                                    <LinkCard.Anchor asChild>
-                                                                        <Link href={`/${workloadGroup.workload.id}/${vuln.identifier}`}>
-                                                                            {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
-                                                                        </Link>
-                                                                    </LinkCard.Anchor>
-                                                                    <WorkloadRiskScoreTags 
-                                                                        vuln={vuln}
-                                                                    />
-                                                                </HStack>
-                                                            </LinkCard.Title>
-                                                            {description && (
-                                                                <LinkCard.Description>
-                                                                    {description}
-                                                                </LinkCard.Description>
-                                                            )}
-                                                        </LinkCard>
-                                                    );
-                                                })}
-                                            </div>
-                                        ))}
-                                    </Accordion.Content>
-                                </Accordion.Item>
-                            </Accordion>
-                        </div>
-                    );
-                })}
+                                    </HStack>
+                                </Accordion.Header>
+                                <Accordion.Content>
+                                    {grouping === "action"
+                                        ? <ActionGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} />
+                                        : <PackageGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} />
+                                    }
+                                </Accordion.Content>
+                            </Accordion.Item>
+                        </Accordion>
+                    </div>
+                ))}
             </div>
+        </div>
+    );
+};
+
+// ── Action-grouped view ──────────────────────────────────────────────────────
+
+interface ContentProps {
+    vulnerabilities: Vulnerability[];
+    workload: Workload;
+}
+
+const ActionGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
+    const t = useTranslations();
+    const groups = groupByRemediationAction(vulnerabilities);
+
+    return (
+        <div>
+            {groups.map((group) => (
+                <RemediationGroupSection
+                    key={group.category}
+                    group={group}
+                    workload={workload}
+                />
+            ))}
+        </div>
+    );
+};
+
+interface RemediationGroupSectionProps {
+    group: RemediationGroup;
+    workload: Workload;
+}
+
+const RemediationGroupSection = ({ group, workload }: RemediationGroupSectionProps) => {
+    const t = useTranslations();
+    const [expanded, setExpanded] = useState(group.category === "app-dependency");
+
+    const isOsRebuild = group.category === "os-rebuild";
+    const uniquePackages = Array.from(new Set(group.vulnerabilities.map(v => v.packageName)));
+
+    const label = isOsRebuild ? t("list.rebuildBaseImage") : t("list.updateDependencies");
+    const description = isOsRebuild ? t("list.rebuildBaseImageDescription") : t("list.updateDependenciesDescription");
+    const summaryKey = isOsRebuild ? "list.osPackageSummary" : "list.appPackageSummary";
+
+    return (
+        <div style={{ marginBottom: "1rem" }}>
+            <button
+                onClick={() => setExpanded(prev => !prev)}
+                style={{
+                    width: "100%",
+                    textAlign: "left",
+                    background: "var(--ax-bg-neutral-moderate)",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "0.75rem 1rem",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "0.5rem",
+                }}
+            >
+                <HStack gap="space-8" align="center">
+                    <BodyShort weight="semibold">{label}</BodyShort>
+                    <Tag variant={isOsRebuild ? "warning" : "info"} size="xsmall">
+                        {t(summaryKey, {
+                            vulnCount: group.vulnerabilities.length,
+                            pkgCount: uniquePackages.length,
+                        })}
+                    </Tag>
+                </HStack>
+                {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+            </button>
+
+            {expanded && (
+                <div style={{ marginTop: "0.5rem", paddingLeft: "1rem" }}>
+                    <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginBottom: "0.75rem" }}>
+                        {description}
+                    </BodyShort>
+                    <PackageGroupedContent
+                        vulnerabilities={group.vulnerabilities}
+                        workload={workload}
+                    />
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ── Package-grouped view (existing behaviour) ────────────────────────────────
+
+const PackageGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
+    const t = useTranslations();
+
+    const byPackage = Object.entries(
+        vulnerabilities.reduce((acc, vuln) => {
+            const key = vuln.packageName;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(vuln);
+            return acc;
+        }, {} as Record<string, Vulnerability[]>)
+    ).sort((a, b) => b[1].length - a[1].length);
+
+    return (
+        <div>
+            {byPackage.map(([packageName, vulns]) => (
+                <div key={packageName} style={{ marginBottom: "1rem" }}>
+                    <BodyShort
+                        weight="semibold"
+                        style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}
+                    >
+                        {getPackageDisplayName(packageName)} {t("list.vulnerabilitiesInPackage", { count: vulns.length })}
+                    </BodyShort>
+                    {vulns.map((vuln, vulnIndex) => {
+                        const maxDescriptionLength = 200;
+                        const description = vuln.description
+                            ? (vuln.description.replace(/\n/g, " ").length > maxDescriptionLength
+                                ? vuln.description.replace(/\n/g, " ").substring(0, maxDescriptionLength) + "..."
+                                : vuln.description.replace(/\n/g, " "))
+                            : null;
+                        return (
+                            <LinkCard
+                                key={`${vuln.identifier}-${vulnIndex}`}
+                                style={{ marginBottom: "0.5rem", marginLeft: "1rem" }}
+                            >
+                                <LinkCard.Title>
+                                    <HStack gap="space-8" align="center" justify="space-between" wrap>
+                                        <LinkCard.Anchor asChild>
+                                            <Link href={`/${workload.id}/${vuln.identifier}`}>
+                                                {vuln.identifier}{vuln.name ? ` - ${vuln.name}` : ""}
+                                            </Link>
+                                        </LinkCard.Anchor>
+                                        <WorkloadRiskScoreTags vuln={vuln} />
+                                    </HStack>
+                                </LinkCard.Title>
+                                {description && (
+                                    <LinkCard.Description>{description}</LinkCard.Description>
+                                )}
+                            </LinkCard>
+                        );
+                    })}
+                </div>
+            ))}
         </div>
     );
 };

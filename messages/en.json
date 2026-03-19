@@ -26,10 +26,10 @@
     "loadingVulnerabilities": "Fetching vulnerabilities..."
   },
   "buckets": {
-    "highPriority": "High priority",
-    "important": "Important",
-    "whenTime": "When time permits",
-    "lowPriority": "Low priority"
+    "highPriority": "Immediately",
+    "important": "Must be prioritized",
+    "whenTime": "Must be scheduled",
+    "lowPriority": "When convenient"
   },
   "summary": {
     "priorityWarning": "Prioritization is based on available information. A vulnerability can be critical even if it's prioritized low, for example if it hasn't been analyzed yet.",
@@ -112,7 +112,17 @@
     "openAll": "Open all",
     "closeAll": "Close all",
     "vulnerabilitiesInWorkload": "({count} {count, plural, one {vulnerability} other {vulnerabilities}})",
-    "vulnerabilitiesInPackage": "({count} {count, plural, one {vulnerability} other {vulnerabilities}})"
+    "vulnerabilitiesInPackage": "({count} {count, plural, one {vulnerability} other {vulnerabilities}})",
+    "viewByAction": "Group by action",
+    "viewByPackage": "Group by package",
+    "rebuildBaseImage": "Rebuild base image",
+    "rebuildBaseImageDescription": "These vulnerabilities are in OS packages and are fixed by rebuilding the container image with an updated base image.",
+    "updateDependencies": "Update dependencies",
+    "updateDependenciesDescription": "These vulnerabilities are in application dependencies and are fixed by updating the package versions.",
+    "osPackageSummary": "{vulnCount} {vulnCount, plural, one {vulnerability} other {vulnerabilities}} in {pkgCount} {pkgCount, plural, one {OS package} other {OS packages}}",
+    "appPackageSummary": "{vulnCount} {vulnCount, plural, one {vulnerability} other {vulnerabilities}} in {pkgCount} {pkgCount, plural, one {package} other {packages}}",
+    "fixableByRebuild": "{count} {count, plural, one {vulnerability fixed} other {vulnerabilities fixed}} by rebuilding base image",
+    "actionsLabel": "{count} {count, plural, one {action} other {actions}}"
   },
   "teamFilter": {
     "title": "Filter by team",
@@ -195,10 +205,10 @@
     "teams": "Teams",
     "applications": "Applications",
     "vulnerabilities": "Vulnerabilities",
-    "highPriority": "High priority",
-    "mediumPriority": "Medium priority",
+    "highPriority": "Immediately",
+    "mediumPriority": "Must be prioritized",
     "teamsSection": "Teams",
-    "teamName": "Team name",
+
     "apps": "Apps",
     "totalVulns": "Total",
     "high": "High",
