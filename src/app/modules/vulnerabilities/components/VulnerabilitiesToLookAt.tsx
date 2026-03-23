@@ -9,7 +9,6 @@ import { useTranslations } from "next-intl";
 import {
   groupByRemediationAction,
   getPackageDisplayName,
-  countOsVulnerabilities,
   RemediationGroup,
 } from "@/app/shared/utils/packageClassification";
 import { useUserPreferences } from "@/app/shared/hooks/useUserPreferences";
@@ -104,11 +103,6 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
         0
     );
 
-    const totalOsVulnCount = workloadsWithVulns.reduce(
-        (sum, w) => sum + countOsVulnerabilities(w.vulnerabilities),
-        0
-    );
-
     if (isLoading) {
         return (
             <div style={{ marginTop: "1.5rem" }}>
@@ -134,11 +128,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                     <Heading size="small">
                         {bucketName} ({totalVulnCount} {t("common.in")} {workloadsWithVulns.length} {t("common.applications")})
                     </Heading>
-                    {grouping === "action" && totalOsVulnCount > 0 && (
-                        <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginTop: "0.25rem" }}>
-                            {t("list.fixableByRebuild", { count: totalOsVulnCount })}
-                        </BodyShort>
-                    )}
+
                 </div>
                 <HStack gap="space-8" align="center">
                     <ToggleGroup
