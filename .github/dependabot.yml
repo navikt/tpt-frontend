@@ -25,14 +25,24 @@ updates:
           - "@types/react"
           - "@types/react-dom"
       next:
+        dependency-type: "production"
         patterns:
           - "next"
           - "next-*"
-          - "eslint-config-next"
+      eslint:
+        dependency-type: "development"
+        patterns:
+          - "eslint"
+          - "eslint-*"
       grafana:
         patterns:
           - "@grafana/faro*"
-      npm:
+      production:
+        dependency-type: "production"
+        patterns:
+          - "*"
+      development:
+        dependency-type: "development"
         patterns:
           - "*"
   - package-ecosystem: github-actions
