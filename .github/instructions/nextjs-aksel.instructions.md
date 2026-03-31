@@ -187,18 +187,16 @@ export async function POST(request: Request) {
 
 ## Authentication
 
+Authentication uses Nais OAuth with OBO (On-Behalf-Of) flow via `@navikt/oasis`. User info is fetched client-side:
+
 ```typescript
-import { getUser } from "@/lib/auth";
+import { useUser } from "@/app/shared/hooks/useUser";
 
-// Redirect if not authenticated
-const user = await getUser();
-
-// Return null if not authenticated
-const user = await getUser(false);
-if (!user) {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-}
+const { user, isLoading } = useUser();
+// user.email contains the preferred_username from JWT
 ```
+
+API routes that call the backend use `requestOboToken()` from `@navikt/oasis` to obtain scoped tokens.
 
 ## Testing
 

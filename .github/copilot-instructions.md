@@ -13,22 +13,35 @@
 
 ### 2. Bucket-Based Prioritization
 Vulnerabilities are categorized into buckets based on risk scores:
-- **Høy prio** (≥ highThreshold): Should be handled immediately
-- **Lurt å ta unna** (≥ mediumThreshold, < highThreshold): Should be prioritized
-- **Når du har tid** (≥ lowThreshold, < mediumThreshold): Handle when convenient
-- **Lav prioritet** (< lowThreshold): Can wait
+- **Snarest** (≥ criticalThreshold): Must be handled immediately
+- **Må prioriteres** (≥ highThreshold, < criticalThreshold): Must be prioritized
+- **Må planlegges** (≥ mediumThreshold, < highThreshold): Must be scheduled
+- **Når det passer seg** (< mediumThreshold): Handle when convenient
 
-The **Høy prio** bucket should always be visually emphasized - larger, more prominent, full opacity. Other buckets should appear secondary.
+The **Snarest** bucket should always be visually emphasized - larger, more prominent, full opacity. Other buckets should appear secondary.
 
 ### 3. Group by Workload
 When displaying vulnerabilities, group them by workload to help users understand the scope of work per application.
 
 ## Tech Stack
 
-- **Framework**: Next.js (App Router)
+> ⚠️ **Read `node_modules/next/dist/docs/` before writing Next.js code.** This project uses Next.js 16 — APIs and conventions may differ significantly from training data. Heed deprecation notices.
+
+- **Framework**: Next.js 16 (App Router, Turbopack, React Compiler enabled)
 - **Language**: TypeScript
 - **Design System**: NAV Aksel (`@navikt/ds-react`, `@navikt/aksel-icons`)
-- **Data Source**: Data from from nais console and other sources via tpt-backend.
+- **i18n**: `next-intl` with locales `nb` (default) and `en`. Messages in `messages/nb.json` and `messages/en.json`.
+- **Data Source**: Vulnerability data from Nais and GitHub via `tpt-backend`. Frontend proxies all backend calls through `/api/*` route handlers.
+- **Auth**: Nais OAuth with On-Behalf-Of (OBO) flow via `@navikt/oasis`. User info extracted from JWT `preferred_username` claim.
+- **Observability**: Grafana Faro Web SDK (`src/instrumentation/faro.ts`)
+
+## Clean Code & Best Practices
+
+- Always follow current best practices for the framework and language versions in use. Do not rely on outdated patterns from earlier versions.
+- When migrating or refactoring, fully replace old code. Never keep deprecated APIs, legacy wrappers, or backward-compatibility shims — clean up completely.
+- Remove dead code, unused imports, and obsolete files as part of every change.
+- Prefer small, focused components and functions with a single responsibility.
+- Use TypeScript strictly — avoid `any`, prefer explicit types, and leverage inference where it keeps code readable.
 
 ## Code Patterns
 
@@ -43,39 +56,19 @@ When displaying vulnerabilities, group them by workload to help users understand
 - Use inline styles for dynamic values; prefer Aksel's built-in props otherwise
 - Follow the spacing rules in `.github/instructions/nextjs-aksel.instructions.md`
 
-### Data Types
-```typescript
-// Key interfaces in src/app/types/vulnerabilities.ts
-interface Vulnerability {
-  identifier: string;
-  packageName: string;
-  riskScore: number;
-  riskScoreMultipliers?: RiskScoreMultipliers;
-}
-
-interface Workload {
-  id: string;
-  name: string;
-  environment: string;
-  repository?: string;
-  ingressTypes?: string[];
-  vulnerabilities: Vulnerability[];
-}
-```
-
 ### Threshold Configuration
 Thresholds are fetched from `/api/config` (which proxies to the backend) and have sensible defaults:
 ```typescript
-const highThreshold = config?.thresholds.high ?? 150;
-const mediumThreshold = config?.thresholds.medium ?? 75;
-const lowThreshold = config?.thresholds.low ?? 30;
+const criticalThreshold = config?.thresholds.critical ?? 75;
+const highThreshold = config?.thresholds.high ?? 50;
+const mediumThreshold = config?.thresholds.medium ?? 25;
 ```
 
 ## UX Guidelines
 
 ### Visual Emphasis
 - Critical items: Full opacity, larger size, prominent colors
-- Lower priority items: Reduced opacity (0.75), smaller scale (0.95), "Kan vente" labels
+- Lower priority items: Reduced opacity (0.75), smaller scale (0.95)
 
 ### Feedback & Encouragement
 - Show positive feedback when no critical vulnerabilities exist ("🙌 Ingen kritiske sårbarheter!")
@@ -88,11 +81,4 @@ const lowThreshold = config?.thresholds.low ?? 30;
 
 ## Language
 
-The UI is in Norwegian (Bokmål). Key terms:
-- Sårbarhet/Sårbarheter = Vulnerability/Vulnerabilities
-- Høy prio = High priority
-- Lurt å ta unna = Smart to clear out
-- Når du har tid = When you have time
-- Lav prioritet = Low priority
-- Kan vente = Can wait
-- Applikasjon/applikasjoner = Workload/workloads
+The UI is in Norwegian (Bokmål) with English translation available. All user-facing strings live in `messages/nb.json` and `messages/en.json` — use `next-intl` translation keys, never hardcoded strings. See `.github/instructions/language.instructions.md` for domain terminology.
