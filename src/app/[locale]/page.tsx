@@ -1,20 +1,30 @@
 "use client";
-import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
-import DeveloperView from "./views/DeveloperView";
-import TeamMemberView from "./views/TeamMemberView";
-import LeaderView from "./views/LeaderView";
-import NoTeamView from "./views/NoTeamView";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { Loader, Box } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
-  const { data: vulnData, isLoading: isVulnLoading, error } = useVulnerabilitiesContext();
-  const { effectiveRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
+  const { data: vulnData, error } = useVulnerabilitiesContext();
+  const { actualRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations("errors");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const router = useRouter();
 
-  // Show error state if fetch failed
+  useEffect(() => {
+    if (!isInitialized || isRoleLoading || !vulnData) return;
+
+    if (actualRole === "DEVELOPER") {
+      router.replace(`/${locale}/prioritization`);
+    } else {
+      router.replace(`/${locale}/compliance`);
+    }
+  }, [isInitialized, isRoleLoading, vulnData, actualRole, locale, router]);
+
   if (error) {
     return (
       <ErrorMessage
@@ -24,31 +34,12 @@ export default function Home() {
     );
   }
 
-  // Wait for both vulnerabilities data AND role initialization
-  if (isVulnLoading || isRoleLoading || !vulnData || !isInitialized) {
-    return (
-      <Box
-        paddingBlock="space-24"
-        style={{ display: "flex", justifyContent: "center" }}
-      >
-        <Loader size="large" title="Laster data..." />
-      </Box>
-    );
-  }
-
-  // Route based on effective role (selected context or actual user role)
-  if (effectiveRole === "DEVELOPER") {
-    return <DeveloperView />;
-  }
-
-  if (effectiveRole === "TEAM_MEMBER") {
-    return <TeamMemberView />;
-  }
-
-  if (effectiveRole === "LEADER") {
-    return <LeaderView />;
-  }
-
-  // Show NoTeamView for NONE or undefined roles
-  return <NoTeamView />;
+  return (
+    <Box
+      paddingBlock="space-24"
+      style={{ display: "flex", justifyContent: "center" }}
+    >
+      <Loader size="large" title={tCommon("loading")} />
+    </Box>
+  );
 }

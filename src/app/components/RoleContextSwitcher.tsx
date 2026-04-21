@@ -4,7 +4,7 @@ import { Select } from "@navikt/ds-react";
 import { useRoleContext } from "../shared/hooks/useRoleContext";
 import { useTranslations } from "next-intl";
 
-export function RoleContextSwitcher() {
+function RoleContextSwitcherInner() {
   const { setSelectedRole, actualRole, effectiveRole } = useRoleContext();
   const t = useTranslations("roleContext");
 
@@ -17,7 +17,6 @@ export function RoleContextSwitcher() {
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value;
-    // If the new role matches the actual role, clear the override
     if (newRole === actualRole) {
       setSelectedRole(null);
     } else {
@@ -25,7 +24,6 @@ export function RoleContextSwitcher() {
     }
   };
 
-  // Display the effective role, ensuring it always shows a valid value
   const displayValue = effectiveRole || actualRole || "NONE";
 
   return (
@@ -42,4 +40,11 @@ export function RoleContextSwitcher() {
       ))}
     </Select>
   );
+}
+
+export function RoleContextSwitcher() {
+  if (process.env.NODE_ENV !== "development") {
+    return null;
+  }
+  return <RoleContextSwitcherInner />;
 }

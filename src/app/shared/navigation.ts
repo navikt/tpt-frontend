@@ -34,21 +34,32 @@ export interface ModuleNavLink {
  */
 export const moduleNavLinks: ModuleNavLink[] = [
   {
+    labelKey: "header.sarbarhetsprioritering",
+    path: "/prioritization",
+    order: 1,
+    allowedRoles: ["DEVELOPER"],
+  },
+  {
+    labelKey: "header.etterlevelse",
+    path: "/compliance",
+    order: 2,
+  },
+  {
     labelKey: "header.allVulnerabilities",
     path: "/vulnerabilities",
-    order: 1,
+    order: 3,
     allowedRoles: ["DEVELOPER"],
   },
   {
     labelKey: "github.tab",
     path: "/github",
-    order: 2,
+    order: 4,
     allowedRoles: ["DEVELOPER"],
   },
   {
     labelKey: "admin.navTitle",
     path: "/admin",
-    order: 3,
+    order: 5,
     allowedRoles: ["ADMIN"],
   },
 ];

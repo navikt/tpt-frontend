@@ -6,27 +6,35 @@ import { SettingsPanel } from "../components/SettingsPanel";
 import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 import { Providers } from "../contexts/Providers";
+import { useSyncExternalStore } from "react";
+
+function subscribe() { return () => {}; }
+function getSnapshot() { return true; }
+function getServerSnapshot() { return false; }
+
+function useIsClient() {
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isLoading: isUserLoading } = useUser();
   const { effectiveRole, actualRole, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations();
   const locale = useLocale();
-
-  // Don't filter nav links until role data is loaded to avoid hydration mismatch
-  const filteredNavLinks = isRoleLoading 
+  const isClient = useIsClient();
+  // Render nav links only after client mount to avoid hydration mismatch,
+  // since role data is client-only (localStorage + API fetch)
+  const filteredNavLinks = !isClient || isRoleLoading
     ? []
     : moduleNavLinks.filter((link) => {
         if (!link.allowedRoles || link.allowedRoles.length === 0) {
           return true;
         }
         
-        // For ADMIN role, check actualRole (not overridable by context switcher)
         if (link.allowedRoles.includes("ADMIN")) {
           return actualRole === "ADMIN";
         }
         
-        // For other roles, check effectiveRole (can be overridden)
         if (!effectiveRole) {
           return false;
         }
@@ -36,7 +44,7 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <Page>
       <InternalHeader>
-        <InternalHeader.Title href={`/${locale}`}>{t("common.appTitle")}</InternalHeader.Title>
+        <InternalHeader.Title>{t("common.appTitle")}</InternalHeader.Title>
         {filteredNavLinks
           .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
           .map((link) => (

@@ -14,7 +14,9 @@
   },
   "header": {
     "allVulnerabilities": "All vulnerabilities",
-    "language": "Language"
+    "language": "Language",
+    "sarbarhetsprioritering": "Vulnerability Prioritization",
+    "etterlevelse": "Compliance"
   },
   "banner": {
     "underDevelopment": "TPT is under active development. Things can break suddenly! 🚧"

@@ -14,7 +14,9 @@
   },
   "header": {
     "allVulnerabilities": "Alle sårbarheter",
-    "language": "Språk"
+    "language": "Språk",
+    "sarbarhetsprioritering": "Sårbarhetsprioritering",
+    "etterlevelse": "Etterlevelse"
   },
   "banner": {
     "underDevelopment": "TPT er under aktiv utvikling. Ting kan brekke plutselig! 🚧"

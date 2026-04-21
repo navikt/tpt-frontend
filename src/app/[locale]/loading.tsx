@@ -1,13 +1,15 @@
 "use client";
 import { Box, Loader } from "@navikt/ds-react";
+import { useTranslations } from "next-intl";
 
 export default function Loading() {
+  const t = useTranslations("common");
   return (
     <Box
       paddingBlock="space-24"
       style={{ display: "flex", justifyContent: "center", minHeight: "50vh", alignItems: "center" }}
     >
-      <Loader size="large" title="Laster..." />
+      <Loader size="large" title={t("loading")} />
     </Box>
   );
 }

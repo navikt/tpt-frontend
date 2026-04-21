@@ -5,7 +5,6 @@ import { CogIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { RoleContextSwitcher } from "./RoleContextSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SettingsPanel() {
@@ -38,7 +37,6 @@ export function SettingsPanel() {
         <Popover.Content>
           <VStack gap="space-4">
             <ThemeToggle />
-            <RoleContextSwitcher />
             <LanguageSwitcher />
           </VStack>
         </Popover.Content>
