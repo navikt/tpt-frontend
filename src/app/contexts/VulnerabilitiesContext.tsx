@@ -2,9 +2,9 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
 
-type VulnerabilitiesContextType = ReturnType<typeof useVulnerabilities>;
+export type VulnerabilitiesContextType = ReturnType<typeof useVulnerabilities>;
 
-const VulnerabilitiesContext = createContext<VulnerabilitiesContextType | undefined>(undefined);
+export const VulnerabilitiesContext = createContext<VulnerabilitiesContextType | undefined>(undefined);
 
 export function VulnerabilitiesProvider({ children }: { children: ReactNode }) {
   const vulnerabilities = useVulnerabilities();

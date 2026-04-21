@@ -317,7 +317,12 @@
     "workloadName": "Applikasjon",
     "environment": "Miljø",
     "packageName": "Pakkenavn",
-    "riskScore": "Risikoscore"
+    "riskScore": "Risikoscore",
+    "backToAdmin": "Tilbake til admin",
+    "teamView": {
+      "title": "Sårbarheter for {teamSlug}",
+      "description": "Adminvisning – data er hentet direkte fra NAIS API for dette teamet."
+    }
   },
   "roleContext": {
     "viewAs": "Vis som",

@@ -317,7 +317,12 @@
     "workloadName": "Workload",
     "environment": "Environment",
     "packageName": "Package name",
-    "riskScore": "Risk score"
+    "riskScore": "Risk score",
+    "backToAdmin": "Back to admin",
+    "teamView": {
+      "title": "Vulnerabilities for {teamSlug}",
+      "description": "Admin view – data is fetched directly from the NAIS API for this team."
+    }
   },
   "roleContext": {
     "viewAs": "View as",

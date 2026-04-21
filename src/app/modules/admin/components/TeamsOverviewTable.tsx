@@ -1,10 +1,11 @@
 "use client";
 
 import { Table, BodyShort, Box, Search } from "@navikt/ds-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { TeamOverview } from "@/app/types/admin";
 import { formatNumber } from "@/lib/format";
 import { useState, useMemo } from "react";
+import Link from "next/link";
 
 interface TeamsOverviewTableProps {
   teams: TeamOverview[];
@@ -17,6 +18,7 @@ const DEFAULT_PAGE_SIZE = 20;
 
 export function TeamsOverviewTable({ teams }: TeamsOverviewTableProps) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const [sort, setSort] = useState<{ orderBy: SortField; direction: SortDirection }>({
     orderBy: "criticalVulnerabilities",
     direction: "descending",
@@ -124,7 +126,14 @@ export function TeamsOverviewTable({ teams }: TeamsOverviewTableProps) {
             <Table.Body>
               {displayedTeams.map((team) => (
                 <Table.Row key={team.teamSlug}>
-                  <Table.DataCell>{team.teamSlug}</Table.DataCell>
+                   <Table.DataCell>
+                    <Link
+                      href={`/${locale}/admin/team/${encodeURIComponent(team.teamSlug)}`}
+                      style={{ color: "var(--a-text-action)" }}
+                    >
+                      {team.teamSlug}
+                    </Link>
+                  </Table.DataCell>
                   <Table.DataCell align="right">
                     {formatNumber(team.totalVulnerabilities)}
                   </Table.DataCell>
