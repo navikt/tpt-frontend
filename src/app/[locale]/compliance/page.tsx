@@ -35,8 +35,8 @@ export default function CompliancePage() {
     );
   }
 
-  // Developers always see TeamMemberView here
-  if (actualRole === "DEVELOPER") {
+  // Admins and developers always see TeamMemberView here
+  if (actualRole === "ADMIN" || actualRole === "DEVELOPER") {
     return <TeamMemberView />;
   }
 
