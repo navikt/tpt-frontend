@@ -5,7 +5,7 @@ import { Vulnerability, Workload } from "@/app/shared/types/vulnerabilities";
 import { Link, LinkCard, Heading, BodyShort, HStack, Accordion, Button, Tag, ToggleGroup, Tooltip } from "@navikt/ds-react";
 import { ChevronDownIcon, ChevronUpIcon } from "@navikt/aksel-icons";
 import styles from "./VulnerabilitiesToLookAt.module.css";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   groupByRemediationAction,
   getPackageDisplayName,
@@ -25,10 +25,13 @@ interface VulnerabilitiesToLookAtProps {
     minThreshold: number;
     maxThreshold: number;
     selectedTeams: string[];
+    detailBasePath?: string;
 }
 
-const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams }: VulnerabilitiesToLookAtProps) => {
+const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams, detailBasePath }: VulnerabilitiesToLookAtProps) => {
     const t = useTranslations();
+    const locale = useLocale();
+    const basePath = detailBasePath ?? `/${locale}`;
     const { data, isLoading } = useVulnerabilitiesContext();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
     const { preferences, updatePreferences } = useUserPreferences();
@@ -192,8 +195,8 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                 </Accordion.Header>
                                 <Accordion.Content>
                                     {grouping === "action"
-                                        ? <ActionGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} />
-                                        : <PackageGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} />
+                                        ? <ActionGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} basePath={basePath} />
+                                        : <PackageGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} basePath={basePath} />
                                     }
                                 </Accordion.Content>
                             </Accordion.Item>
@@ -210,9 +213,10 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
 interface ContentProps {
     vulnerabilities: Vulnerability[];
     workload: Workload;
+    basePath: string;
 }
 
-const ActionGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
+const ActionGroupedContent = ({ vulnerabilities, workload, basePath }: ContentProps) => {
     const groups = groupByRemediationAction(vulnerabilities);
 
     return (
@@ -222,6 +226,7 @@ const ActionGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
                     key={group.category}
                     group={group}
                     workload={workload}
+                    basePath={basePath}
                 />
             ))}
         </div>
@@ -231,9 +236,10 @@ const ActionGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
 interface RemediationGroupSectionProps {
     group: RemediationGroup;
     workload: Workload;
+    basePath: string;
 }
 
-const RemediationGroupSection = ({ group, workload }: RemediationGroupSectionProps) => {
+const RemediationGroupSection = ({ group, workload, basePath }: RemediationGroupSectionProps) => {
     const t = useTranslations();
     const [expanded, setExpanded] = useState(group.category === "app-dependency");
 
@@ -282,6 +288,7 @@ const RemediationGroupSection = ({ group, workload }: RemediationGroupSectionPro
                     <PackageGroupedContent
                         vulnerabilities={group.vulnerabilities}
                         workload={workload}
+                        basePath={basePath}
                     />
                 </div>
             )}
@@ -291,7 +298,7 @@ const RemediationGroupSection = ({ group, workload }: RemediationGroupSectionPro
 
 // ── Package-grouped view (existing behaviour) ────────────────────────────────
 
-const PackageGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
+const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentProps) => {
     const t = useTranslations();
 
     const byPackage = Object.entries(
@@ -332,7 +339,7 @@ const PackageGroupedContent = ({ vulnerabilities, workload }: ContentProps) => {
                             >
                                 <LinkCard.Title>
                                     <LinkCard.Anchor asChild>
-                                        <Link href={`/${workload.id}/${vuln.identifier}`}>
+                                        <Link href={`${basePath}/${workload.id}/${vuln.identifier}`}>
                                             <BodyShort size="small">{vuln.identifier}</BodyShort>
                                         </Link>
                                     </LinkCard.Anchor>

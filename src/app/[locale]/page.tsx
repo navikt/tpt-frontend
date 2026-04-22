@@ -18,7 +18,7 @@ export default function Home() {
   useEffect(() => {
     if (!isInitialized || isRoleLoading || !vulnData) return;
 
-    if (actualRole === "DEVELOPER") {
+    if (actualRole === "DEVELOPER" || actualRole === "ADMIN") {
       router.replace(`/${locale}/prioritization`);
     } else {
       router.replace(`/${locale}/compliance`);

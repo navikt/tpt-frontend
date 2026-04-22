@@ -8,7 +8,7 @@ import { useUserPreferences } from "@/app/shared/hooks/useUserPreferences";
 import { BodyShort, Loader, Box } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 
-export default function DeveloperView() {
+export default function DeveloperView({ detailBasePath }: { detailBasePath?: string }) {
   const t = useTranslations();
   const { config, isLoading } = useConfigContext();
   const { data: vulnData, teamFilters, setTeamFilters } = useVulnerabilitiesContext();
@@ -91,6 +91,7 @@ export default function DeveloperView() {
           minThreshold={activeBucket.minThreshold}
           maxThreshold={activeBucket.maxThreshold}
           selectedTeams={selectedTeams}
+          detailBasePath={detailBasePath}
         />
       </main>
     </div>

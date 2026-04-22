@@ -107,7 +107,7 @@ export default function AdminTeamPage({ params }: AdminTeamPageProps) {
         isLoading={isLoading}
         error={error}
       >
-        <DeveloperView />
+        <DeveloperView detailBasePath={`/${locale}/admin/team/${teamSlug}`} />
       </AdminTeamVulnerabilitiesProvider>
     </Box>
   );
