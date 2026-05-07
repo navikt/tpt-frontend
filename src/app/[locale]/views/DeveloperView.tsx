@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 export default function DeveloperView({ detailBasePath }: { detailBasePath?: string }) {
   const t = useTranslations();
   const { config, isLoading } = useConfigContext();
-  const { data: vulnData, teamFilters, setTeamFilters } = useVulnerabilitiesContext();
+  const { data: vulnData, teamFilters, setTeamFilters, appNameFilter, setAppNameFilter } = useVulnerabilitiesContext();
   const { preferences, updatePreferences } = useUserPreferences();
   
   const selectedTeams = useMemo(() => {
@@ -85,12 +85,15 @@ export default function DeveloperView({ detailBasePath }: { detailBasePath?: str
           onTeamsChange={handleTeamsChange}
           showAllBuckets={preferences.showAllBuckets}
           onShowAllBucketsChange={(show) => updatePreferences({ showAllBuckets: show })}
+          appNameFilter={appNameFilter}
+          onAppNameFilterChange={setAppNameFilter}
         />
         <VulnerabilitiesToLookAt 
           bucketName={activeBucket.name}
           minThreshold={activeBucket.minThreshold}
           maxThreshold={activeBucket.maxThreshold}
           selectedTeams={selectedTeams}
+          appNameFilter={appNameFilter}
           detailBasePath={detailBasePath}
         />
       </main>

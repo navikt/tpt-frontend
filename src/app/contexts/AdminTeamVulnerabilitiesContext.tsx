@@ -162,6 +162,8 @@ export function AdminTeamVulnerabilitiesProvider({
     availableApplications,
     availableCves,
     availablePackageNames,
+    appNameFilter: "",
+    setAppNameFilter: () => {},
   };
 
   return (

@@ -134,7 +134,10 @@
     "cancel": "Cancel",
     "apply": "Apply filter",
     "showAllBuckets": "Show all priority buckets",
-    "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise."
+    "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise.",
+    "appNameFilterLabel": "Filter applications",
+    "appNameFilterDescription": "Only show applications where the name contains the search text.",
+    "appNameFilterPlaceholder": "E.g. appsec-"
   },
   "vulnerabilitiesPage": {
     "title": "Vulnerabilities",

@@ -134,7 +134,10 @@
     "cancel": "Avbryt",
     "apply": "Bruk filter",
     "showAllBuckets": "Vis alle prioritetskategorier",
-    "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy."
+    "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy.",
+    "appNameFilterLabel": "Filtrer applikasjoner",
+    "appNameFilterDescription": "Vis kun applikasjoner der navn inneholder søketeksten.",
+    "appNameFilterPlaceholder": "F.eks. appsec-"
   },
   "vulnerabilitiesPage": {
     "title": "Sårbarheter",

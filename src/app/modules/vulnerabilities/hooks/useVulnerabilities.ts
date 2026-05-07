@@ -104,6 +104,8 @@ export const useVulnerabilities = () => {
     const filtersFromUrl = searchParamsToFilters(searchParams);
     return filtersFromUrl.packageNameFilters;
   });
+
+  const [appNameFilter, setAppNameFilter] = useState<string>("");
   
   const hasFetchedRef = useRef(false);
   const isInitializedRef = useRef(false);
@@ -197,6 +199,7 @@ export const useVulnerabilities = () => {
           setEnvironmentFilters({});
           setCveFilters({});
           setPackageNameFilters({});
+          setAppNameFilter("");
           
           const now = Date.now();
           setLastRefreshTime(now);
@@ -551,5 +554,7 @@ export const useVulnerabilities = () => {
     packageNameFilters,
     setPackageNameFilters: wrappedSetPackageNameFilters,
     availablePackageNames,
+    appNameFilter,
+    setAppNameFilter,
   };
 };

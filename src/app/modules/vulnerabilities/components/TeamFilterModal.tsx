@@ -8,6 +8,7 @@ import {
   Checkbox,
   BodyShort,
   Loader,
+  TextField,
 } from "@navikt/ds-react";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useTranslations } from "next-intl";
@@ -19,6 +20,8 @@ interface TeamFilterModalProps {
   onTeamsChange: (teams: string[]) => void;
   showAllBuckets?: boolean;
   onShowAllBucketsChange?: (show: boolean) => void;
+  appNameFilter?: string;
+  onAppNameFilterChange?: (filter: string) => void;
 }
 
 const TeamFilterModal = ({
@@ -28,10 +31,13 @@ const TeamFilterModal = ({
   onTeamsChange,
   showAllBuckets = false,
   onShowAllBucketsChange,
+  appNameFilter = "",
+  onAppNameFilterChange,
 }: TeamFilterModalProps) => {
   const t = useTranslations("teamFilter");
   const { data, isLoading } = useVulnerabilitiesContext();
   const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(selectedTeams);
+  const [tempAppNameFilter, setTempAppNameFilter] = useState<string>(appNameFilter);
 
   // Get unique teams from data
   const allTeams = data?.teams.map((team) => team.team) || [];
@@ -51,12 +57,13 @@ const TeamFilterModal = ({
 
   const handleApply = () => {
     onTeamsChange(tempSelectedTeams);
+    onAppNameFilterChange?.(tempAppNameFilter);
     onClose();
   };
 
   return (
     <Modal
-      key={`team-filter-${open ? 'open' : 'closed'}-${selectedTeams.join('|')}`}
+      key={`team-filter-${open ? 'open' : 'closed'}-${selectedTeams.join('|')}-${appNameFilter}`}
       open={open}
       onClose={onClose}
       header={{
@@ -76,6 +83,15 @@ const TeamFilterModal = ({
                 {t("description")}
               </BodyShort>
             </div>
+
+            <TextField
+              label={t("appNameFilterLabel")}
+              description={t("appNameFilterDescription")}
+              placeholder={t("appNameFilterPlaceholder")}
+              value={tempAppNameFilter}
+              onChange={(e) => setTempAppNameFilter(e.target.value)}
+              size="small"
+            />
 
             {/* Show all buckets toggle */}
             {onShowAllBucketsChange && (
