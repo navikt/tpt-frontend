@@ -167,7 +167,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                 <Accordion.Header>
                                     <HStack gap="space-8" align="center" justify="space-between" style={{ width: "100%" }}>
                                         <BodyShort weight="semibold">
-                                            {workloadGroup.workload.name} {t("list.vulnerabilitiesInWorkload", { count: workloadGroup.vulnerabilities.length })}
+                                            {workloadGroup.team}/{workloadGroup.workload.name} {t("list.vulnerabilitiesInWorkload", { count: workloadGroup.vulnerabilities.length })}
                                         </BodyShort>
                                         <HStack gap="space-8" align="center">
                                             {workloadGroup.workload.repository && (
