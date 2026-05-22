@@ -33,18 +33,18 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "baseline-browser-mapping": "^2.10.24",
-    "eslint": "^9",
+    "eslint": "^9.39.2",
     "eslint-config-next": "16.2.3",
     "husky": "^9.1.7",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "lint-staged": "^16.4.0",
-    "typescript": "^6"
+    "typescript": "^6.0.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
