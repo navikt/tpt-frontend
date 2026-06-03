@@ -17,6 +17,17 @@ function getServerEnv() {
   return { tptBackendUrl, tptBackendScope };
 }
 
+function pickPassthroughHeaders(headers: Headers) {
+  const out = new Headers();
+  const contentType = headers.get("content-type");
+  if (contentType) out.set("content-type", contentType);
+
+  const cacheControl = headers.get("cache-control");
+  if (cacheControl) out.set("cache-control", cacheControl);
+
+  return out;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ teamSlug: string }> }
@@ -59,14 +70,17 @@ export async function GET(
       backendToken = oboResult.token;
     }
 
-    const backendUrl = `${tptBackendUrl}/admin/vulnerabilities/team/${encodeURIComponent(teamSlug)}`;
+    const backendUrl = `${tptBackendUrl}/admin/vulnerabilities/team/${encodeURIComponent(
+      teamSlug
+    )}`;
 
     const response = await fetch(backendUrl, {
       headers: {
         Authorization: `Bearer ${backendToken}`,
-        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       cache: "no-store",
+      signal: request.signal,
     });
 
     if (!response.ok) {
@@ -79,8 +93,17 @@ export async function GET(
       );
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    if (!response.body) {
+      return NextResponse.json(
+        { error: "errors.internalError" },
+        { status: 500 }
+      );
+    }
+
+    return new NextResponse(response.body, {
+      status: 200,
+      headers: pickPassthroughHeaders(response.headers),
+    });
   } catch (error) {
     console.error("Internal server error:", error);
 
@@ -92,9 +115,7 @@ export async function GET(
 
     return NextResponse.json(
       {
-        error: isNetworkError
-          ? "errors.networkError"
-          : "errors.internalError",
+        error: isNetworkError ? "errors.networkError" : "errors.internalError",
       },
       { status: 500 }
     );
