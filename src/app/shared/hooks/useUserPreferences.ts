@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import { getStoredJSON, setStoredJSON } from "@/app/shared/utils/storageHelpers";
-
-const USER_PREFERENCES_KEY = "tpt-user-preferences";
+import { useState, useEffect, useRef } from "react";
+import {
+  getKvItem,
+  setKvItem,
+  KV_KEYS,
+} from "@/app/shared/utils/indexedDbCache";
 
 export interface UserPreferences {
   showAllBuckets: boolean;
@@ -14,14 +16,22 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 };
 
 export const useUserPreferences = () => {
-  const [preferences, setPreferences] = useState<UserPreferences>(() => {
-    if (typeof window === 'undefined') return DEFAULT_PREFERENCES;
-    const stored = getStoredJSON<UserPreferences>(USER_PREFERENCES_KEY);
-    return stored ? { ...DEFAULT_PREFERENCES, ...stored } : DEFAULT_PREFERENCES;
-  });
+  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
-    setStoredJSON(USER_PREFERENCES_KEY, preferences);
+    (async () => {
+      const stored = await getKvItem<UserPreferences>(KV_KEYS.USER_PREFERENCES);
+      if (stored) {
+        setPreferences({ ...DEFAULT_PREFERENCES, ...stored });
+      }
+      loadedRef.current = true;
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    setKvItem(KV_KEYS.USER_PREFERENCES, preferences);
   }, [preferences]);
 
   const updatePreferences = (updates: Partial<UserPreferences>) => {

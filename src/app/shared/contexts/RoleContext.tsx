@@ -1,9 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
-
-const ROLE_CONTEXT_KEY = "tpt-role-context";
+import {
+  getKvItem,
+  setKvItem,
+  removeKvItem,
+  KV_KEYS,
+} from "@/app/shared/utils/indexedDbCache";
 
 interface RoleContextType {
   selectedRole: string | null;
@@ -16,24 +20,29 @@ interface RoleContextType {
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
-function getStoredRole(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(ROLE_CONTEXT_KEY);
-}
-
 export function RoleContextProvider({ children }: { children: ReactNode }) {
   const { data: vulnData, isLoading } = useVulnerabilities();
   const actualRole = vulnData?.userRole;
-  
-  const [selectedRole, setSelectedRoleState] = useState<string | null>(() => getStoredRole());
 
-  // Save to localStorage when changed
+  const [selectedRole, setSelectedRoleState] = useState<string | null>(null);
+
+  // Load stored role from IndexedDB on mount
+  useEffect(() => {
+    (async () => {
+      const role = await getKvItem<string>(KV_KEYS.ROLE_CONTEXT);
+      if (role) {
+        setSelectedRoleState(role);
+      }
+    })();
+  }, []);
+
+  // Save to IndexedDB when changed
   const setSelectedRole = (role: string | null) => {
     setSelectedRoleState(role);
     if (role) {
-      localStorage.setItem(ROLE_CONTEXT_KEY, role);
+      setKvItem(KV_KEYS.ROLE_CONTEXT, role);
     } else {
-      localStorage.removeItem(ROLE_CONTEXT_KEY);
+      removeKvItem(KV_KEYS.ROLE_CONTEXT);
     }
   };
 

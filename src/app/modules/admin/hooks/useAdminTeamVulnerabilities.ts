@@ -1,11 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import { ApiError, handleApiError } from "@/app/shared/utils/errorHandling";
+import {
+  getCachedItem,
+  setCachedItem,
+} from "@/app/shared/utils/indexedDbCache";
+
+const CACHE_MAX_AGE_MS = 30 * 60 * 1000;
+
+function cacheKey(teamSlug: string): string {
+  return `admin-team-${teamSlug}`;
+}
 
 export function useAdminTeamVulnerabilities(teamSlug: string | null) {
   const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
+  const hasFetchedRef = useRef(false);
 
   const fetchData = useCallback(async () => {
     if (!teamSlug) return;
@@ -31,8 +42,7 @@ export function useAdminTeamVulnerabilities(teamSlug: string | null) {
                 problemDetails: errorData,
               }
             : {
-                message:
-                  errorData.error || "errors.fetchVulnerabilitiesError",
+                message: errorData.error || "errors.fetchVulnerabilitiesError",
                 status: response.status,
                 details: errorData.details,
                 isReportable: errorData.isReportable ?? response.status >= 500,
@@ -44,6 +54,7 @@ export function useAdminTeamVulnerabilities(teamSlug: string | null) {
 
       const responseData: VulnerabilitiesResponse = await response.json();
       setData(responseData);
+      setCachedItem(cacheKey(teamSlug), responseData);
     } catch (err) {
       const apiError = handleApiError(
         err,
@@ -57,8 +68,23 @@ export function useAdminTeamVulnerabilities(teamSlug: string | null) {
   }, [teamSlug]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!teamSlug) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
+    (async () => {
+      const cached = await getCachedItem<VulnerabilitiesResponse>(
+        cacheKey(teamSlug),
+        CACHE_MAX_AGE_MS,
+      );
+      if (cached) {
+        setData(cached);
+        setIsLoading(false);
+      }
+
+      fetchData();
+    })();
+  }, [teamSlug, fetchData]);
 
   return { data, isLoading, error };
 }

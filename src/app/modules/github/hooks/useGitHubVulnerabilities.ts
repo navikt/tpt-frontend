@@ -1,51 +1,28 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import {
-  getStoredNumber,
-  setStoredNumber,
-  getStoredJSON,
-  setStoredJSON,
-} from "@/app/shared/utils/storageHelpers";
+  getCachedItemEntry,
+  setCachedItem,
+  getKvItem,
+  setKvItem,
+  CACHE_KEYS,
+  KV_KEYS,
+} from "@/app/shared/utils/indexedDbCache";
+import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
 
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
-const LAST_REFRESH_STORAGE_KEY = "tpt-last-refresh-github";
-const VULNERABILITIES_STORAGE_KEY = "tpt-github-vulnerabilities-data";
-const CACHE_TIMESTAMP_STORAGE_KEY = "tpt-github-cache-timestamp";
-const TEAM_PREFERENCES_KEY = "tpt-github-team-preferences";
-
-// Check if cache is expired (older than 30 minutes)
-const isCacheExpired = (): boolean => {
-  const cacheTimestamp = getStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY);
-  if (!cacheTimestamp) return true;
-  return Date.now() - cacheTimestamp > CACHE_MAX_AGE_MS;
-};
 
 export const useGitHubVulnerabilities = () => {
-  // Lazy initialization - load cache synchronously before first render
-  const [data, setData] = useState<VulnerabilitiesResponse | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const cachedData = getStoredJSON<VulnerabilitiesResponse>(VULNERABILITIES_STORAGE_KEY);
-    return (cachedData && !isCacheExpired()) ? cachedData : null;
-  });
-  
-  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
-  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null;
-    return getStoredNumber(LAST_REFRESH_STORAGE_KEY);
-  });
-  
-  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>(() => {
-    if (typeof window === 'undefined') return {};
-    const savedTeams = getStoredJSON<string[]>(TEAM_PREFERENCES_KEY);
-    if (savedTeams && Array.isArray(savedTeams)) {
-      return Object.fromEntries(savedTeams.map(team => [team, true]));
-    }
-    return {};
-  });
-  
+
+  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
+
+  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
+
   const [repositoryFilters, setRepositoryFilters] = useState<Record<string, boolean>>({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
   const hasFetchedRef = useRef(false);
@@ -57,23 +34,22 @@ export const useGitHubVulnerabilities = () => {
       } else if (showLoading) {
         setIsLoading(true);
       }
-      
+
       const response = await fetch("/api/github");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const responseData: VulnerabilitiesResponse = await response.json();
       setData(responseData);
-      setStoredJSON(VULNERABILITIES_STORAGE_KEY, responseData);
-      setStoredNumber(CACHE_TIMESTAMP_STORAGE_KEY, Date.now());
+      setCachedItem(CACHE_KEYS.GITHUB, responseData);
       setTeamFilters({});
       setRepositoryFilters({});
       setCveFilters({});
-      
+
       if (isRefresh) {
         const now = Date.now();
         setLastRefreshTime(now);
-        setStoredNumber(LAST_REFRESH_STORAGE_KEY, now);
+        setKvItem(KV_KEYS.LAST_REFRESH_GITHUB, now);
       }
     } catch (error) {
       console.error("Error fetching GitHub vulnerabilities data:", error);
@@ -85,13 +61,12 @@ export const useGitHubVulnerabilities = () => {
 
   const refresh = useCallback(() => {
     const now = Date.now();
-    const storedTime = getStoredNumber(LAST_REFRESH_STORAGE_KEY);
-    if (storedTime && now - storedTime < REFRESH_COOLDOWN_MS) {
+    if (lastRefreshTime && now - lastRefreshTime < REFRESH_COOLDOWN_MS) {
       return false; // Cooldown not elapsed
     }
     fetchData(true); // isRefresh = true
     return true;
-  }, [fetchData]);
+  }, [fetchData, lastRefreshTime]);
 
   const canRefresh = useMemo(() => {
     if (!lastRefreshTime) return true;
@@ -104,27 +79,66 @@ export const useGitHubVulnerabilities = () => {
     return Math.max(0, REFRESH_COOLDOWN_MS - elapsed);
   }, [lastRefreshTime]);
 
-  useEffect(function fetchGitHubVulnerabilitiesEffect() {
-    // Skip if already fetched in this session
+  // Initialize from IndexedDB and conditionally revalidate
+  useEffect(function initializeEffect() {
     if (hasFetchedRef.current) return;
-    
+
     hasFetchedRef.current = true;
-    
-    // If we have valid cached data, fetch in background without showing loader
-    const hasValidCache = data && !isCacheExpired();
-    fetchData(false, !hasValidCache); // showLoading only if no cache
+
+    (async () => {
+      try {
+        // Read from "forever cache" — no TTL check, only local app version
+        const cached = await getCachedItemEntry<VulnerabilitiesResponse>(
+          CACHE_KEYS.GITHUB,
+        );
+
+        // Use the swappable revalidation guard to decide if we need fresh data.
+        // Matches old behaviour: stale cache is treated like no-cache for UX —
+        // isLoading stays true and a loading spinner is shown.
+        const shouldRevalidate = await needsRevalidation(
+          cached?.meta ?? null,
+          CACHE_MAX_AGE_MS,
+        );
+
+        if (cached) {
+          setData(cached.data);
+          if (!shouldRevalidate) {
+            setIsLoading(false);
+          }
+        }
+
+        // Load last refresh time
+        const lrt = await getKvItem<number>(KV_KEYS.LAST_REFRESH_GITHUB);
+        if (lrt !== null) setLastRefreshTime(lrt);
+
+        // Load team preferences
+        const savedTeams = await getKvItem<string[]>(KV_KEYS.GITHUB_TEAM_PREFERENCES);
+        if (savedTeams && Array.isArray(savedTeams)) {
+          setTeamFilters(Object.fromEntries(savedTeams.map(team => [team, true])));
+        }
+
+        if (shouldRevalidate) {
+          fetchData(false, true);
+        } else {
+          setIsLoading(false);
+        }
+      } catch {
+        // IndexedDB unavailable or read error — fall through to network fetch
+        fetchData(false, true);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, []);
 
   const allTeams = useMemo(
     () => data?.teams.map((team) => team.team) || [],
     [data]
   );
 
-  // Persist team filters to localStorage when they change
+  // Persist team filters to IndexedDB when they change
   useEffect(() => {
     const selectedTeams = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
-    setStoredJSON(TEAM_PREFERENCES_KEY, selectedTeams);
+    setKvItem(KV_KEYS.GITHUB_TEAM_PREFERENCES, selectedTeams);
   }, [teamFilters]);
 
   const availableRepositories = useMemo(() => {
