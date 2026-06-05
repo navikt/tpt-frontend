@@ -19,6 +19,28 @@ import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
+// Synchronous sessionStorage flag to skip loading on re-mounts (HMR, refresh)
+// when IndexedDB has been seeded on a previous visit in this tab.
+const CACHE_SEED_FLAG = "tpt-cache-seeded";
+
+function hasCacheSeed(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(CACHE_SEED_FLAG) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function setCacheSeed(): void {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(CACHE_SEED_FLAG, "1");
+  } catch {
+    // Ignore (private browsing, storage quota, etc.)
+  }
+}
+
 // Global state to share fetched data across all instances
 let globalFetchInProgress = false;
 let globalFetchPromise: Promise<VulnerabilitiesResponse | null> | null = null;
@@ -38,7 +60,7 @@ export const useVulnerabilities = () => {
   // Initialize with global cached data
   const [data, setData] = useState<VulnerabilitiesResponse | null>(() => globalCachedData);
 
-  const [isLoading, setIsLoading] = useState(!globalCachedData);
+  const [isLoading, setIsLoading] = useState(() => !globalCachedData && !hasCacheSeed());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
@@ -164,6 +186,7 @@ export const useVulnerabilities = () => {
         // Update global cache
         globalCachedData = responseData;
         setData(responseData);
+        setCacheSeed();
         setCachedItem(CACHE_KEYS.VULNERABILITIES, responseData);
 
         // Only clear filters when doing a manual refresh (not initial load)
@@ -245,10 +268,8 @@ export const useVulnerabilities = () => {
         if (cached) {
           globalCachedData = cached.data;
           setData(cached.data);
-          // Only suppress loading when cache is still fresh
-          if (!shouldRevalidate) {
-            setIsLoading(false);
-          }
+          setCacheSeed();
+          setIsLoading(false);
         }
 
         // Load last refresh time
@@ -270,7 +291,7 @@ export const useVulnerabilities = () => {
         }
 
         if (shouldRevalidate) {
-          fetchData(false, true);
+          fetchData(false, !cached);
         } else {
           setIsLoading(false);
         }

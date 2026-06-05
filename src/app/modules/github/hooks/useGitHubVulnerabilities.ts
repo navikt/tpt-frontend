@@ -13,10 +13,30 @@ import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
+const CACHE_SEED_FLAG = "tpt-gh-cache-seeded";
+
+function hasCacheSeed(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(CACHE_SEED_FLAG) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function setCacheSeed(): void {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(CACHE_SEED_FLAG, "1");
+  } catch {
+    // Ignore
+  }
+}
+
 export const useGitHubVulnerabilities = () => {
   const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => !hasCacheSeed());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
@@ -41,6 +61,7 @@ export const useGitHubVulnerabilities = () => {
       }
       const responseData: VulnerabilitiesResponse = await response.json();
       setData(responseData);
+      setCacheSeed();
       setCachedItem(CACHE_KEYS.GITHUB, responseData);
       setTeamFilters({});
       setRepositoryFilters({});
@@ -102,9 +123,8 @@ export const useGitHubVulnerabilities = () => {
 
         if (cached) {
           setData(cached.data);
-          if (!shouldRevalidate) {
-            setIsLoading(false);
-          }
+          setCacheSeed();
+          setIsLoading(false);
         }
 
         // Load last refresh time
@@ -118,7 +138,7 @@ export const useGitHubVulnerabilities = () => {
         }
 
         if (shouldRevalidate) {
-          fetchData(false, true);
+          fetchData(false, !cached);
         } else {
           setIsLoading(false);
         }
