@@ -20,9 +20,12 @@ export default function TeamMemberView() {
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
   const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
-  const activeAppNames = hasAppFilters
-    ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
-    : null;
+  const activeAppNames = useMemo(
+    () => hasAppFilters
+      ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
+      : null,
+    [applicationFilters, hasAppFilters]
+  );
 
   const filteredTeams = useMemo(() => {
     if (!vulnData?.teams) return [];
@@ -33,7 +36,7 @@ export default function TeamMemberView() {
         workloads: team.workloads.filter((w) => activeAppNames.has(w.name)),
       }))
       .filter((team) => team.workloads.length > 0);
-  }, [vulnData, applicationFilters]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [vulnData, activeAppNames]);
 
   const overview = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;
@@ -109,30 +112,54 @@ export default function TeamMemberView() {
       ? slaData.teams.filter((t) => filteredTeamSlugs.has(t.teamSlug))
       : slaData.teams;
 
-    const totalCriticalOverdue = relevantSlaTeams.reduce(
-      (sum, team) => sum + (team.criticalOverdue || 0),
-      0
+    // When app filter is active, reconstruct counts from overdueItems filtered by app name.
+    // The pre-aggregated team totals include all apps, so we must re-sum from item level.
+    const filteredTeams = relevantSlaTeams.map((team) => {
+      if (!hasAppFilters) return team;
+
+      const criticalItems = (team.criticalOverdueItems ?? []).filter(
+        (item) => activeAppNames!.has(item.applicationName)
+      );
+      const nonCriticalItems = (team.nonCriticalOverdueItems ?? []).filter(
+        (item) => activeAppNames!.has(item.applicationName)
+      );
+
+      const criticalAppSet = new Set(criticalItems.map((i) => i.applicationName));
+      const nonCriticalAppSet = new Set(nonCriticalItems.map((i) => i.applicationName));
+      const allOverdueApps = new Set([...criticalAppSet, ...nonCriticalAppSet]);
+
+      return {
+        ...team,
+        criticalOverdue: criticalItems.length,
+        nonCriticalOverdue: nonCriticalItems.length,
+        repositoriesOutOfSla: allOverdueApps.size,
+        maxDaysOverdue: criticalItems.length > 0
+          ? Math.max(...criticalItems.map((i) => i.workdaysOverdue))
+          : 0,
+        criticalOverdueItems: criticalItems,
+        nonCriticalOverdueItems: nonCriticalItems,
+      };
+    });
+
+    const totalCriticalOverdue = filteredTeams.reduce(
+      (sum, team) => sum + (team.criticalOverdue || 0), 0
     );
-    const totalNonCriticalOverdue = relevantSlaTeams.reduce(
-      (sum, team) => sum + (team.nonCriticalOverdue || 0),
-      0
+    const totalNonCriticalOverdue = filteredTeams.reduce(
+      (sum, team) => sum + (team.nonCriticalOverdue || 0), 0
     );
-    const totalCriticalWithinSla = relevantSlaTeams.reduce(
-      (sum, team) => sum + (team.criticalWithinSla || 0),
-      0
+    const totalCriticalWithinSla = filteredTeams.reduce(
+      (sum, team) => sum + (team.criticalWithinSla || 0), 0
     );
-    const totalNonCriticalWithinSla = relevantSlaTeams.reduce(
-      (sum, team) => sum + (team.nonCriticalWithinSla || 0),
-      0
+    const totalNonCriticalWithinSla = filteredTeams.reduce(
+      (sum, team) => sum + (team.nonCriticalWithinSla || 0), 0
     );
-    const totalRepositoriesOutOfSla = relevantSlaTeams.reduce(
-      (sum, team) => sum + (team.repositoriesOutOfSla || 0),
-      0
+    const totalRepositoriesOutOfSla = filteredTeams.reduce(
+      (sum, team) => sum + (team.repositoriesOutOfSla || 0), 0
     );
 
     const totalVulnerabilities = totalCriticalOverdue + totalNonCriticalOverdue + totalCriticalWithinSla + totalNonCriticalWithinSla;
     const totalNeedingAttention = totalCriticalOverdue + totalNonCriticalOverdue;
-    const percentageNeedingAttention = totalVulnerabilities > 0 
+    const percentageNeedingAttention = totalVulnerabilities > 0
       ? Math.round((totalNeedingAttention / totalVulnerabilities) * 100)
       : 0;
 
@@ -145,9 +172,11 @@ export default function TeamMemberView() {
       totalVulnerabilities,
       totalNeedingAttention,
       percentageNeedingAttention,
-      relevantSlaTeams,
+      relevantSlaTeams: filteredTeams.filter(
+        (t) => t.criticalOverdue > 0 || t.nonCriticalOverdue > 0
+      ),
     };
-  }, [slaData, filteredTeamSlugs, hasAppFilters]);
+  }, [slaData, filteredTeamSlugs, hasAppFilters, activeAppNames]);
 
   if (slaLoading || vulnLoading || configLoading || !slaData || !slaTotals || !overview || !deploymentCompliance) {
     return (
@@ -357,11 +386,7 @@ export default function TeamMemberView() {
             </Box>
           )}
 
-          {slaTotals.relevantSlaTeams
-            .filter(team => 
-              (team.criticalOverdue && team.criticalOverdue > 0) || 
-              (team.nonCriticalOverdue && team.nonCriticalOverdue > 0)
-            ).length > 0 && (
+          {slaTotals.relevantSlaTeams.length > 0 && (
             <Box
               padding="space-24"
               borderRadius="8"
@@ -373,12 +398,7 @@ export default function TeamMemberView() {
                 {t("teamDetails")}
               </Heading>
               <Accordion>
-                {slaTotals.relevantSlaTeams
-                  .filter(team => 
-                    (team.criticalOverdue && team.criticalOverdue > 0) || 
-                    (team.nonCriticalOverdue && team.nonCriticalOverdue > 0)
-                  )
-                  .map((team) => (
+                {slaTotals.relevantSlaTeams.map((team) => (
                   <Accordion.Item key={team.teamSlug}>
                     <Accordion.Header>
                       {t("team")}: {team.teamSlug} ({formatNumber(team.criticalOverdue + team.nonCriticalOverdue)} {t("totalVulnerabilities").toLowerCase()})

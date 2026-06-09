@@ -128,6 +128,7 @@
   },
   "teamFilter": {
     "title": "Filter",
+    "buttonLabel": "Filter",
     "loadingTeams": "Loading data...",
     "teamsLabel": "Teams",
     "description": "Select which teams you want to see data for. Only selected teams will be shown.",
@@ -140,6 +141,7 @@
     "noApps": "No applications found",
     "cancel": "Cancel",
     "apply": "Apply filter",
+    "reset": "Reset filter",
     "showAllBuckets": "Show all priority buckets",
     "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise."
   },

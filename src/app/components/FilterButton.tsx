@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Button, Tooltip } from "@navikt/ds-react";
-import { CogIcon } from "@navikt/aksel-icons";
+import { Button } from "@navikt/ds-react";
+import { FilterIcon } from "@navikt/aksel-icons";
 import TeamFilterModal from "@/app/modules/vulnerabilities/components/TeamFilterModal";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useTranslations } from "next-intl";
@@ -20,7 +20,7 @@ export default function FilterButton({
   showAllBuckets,
   onShowAllBucketsChange,
 }: FilterButtonProps) {
-  const t = useTranslations("summary");
+  const t = useTranslations("teamFilter");
   const {
     data: vulnData,
     teamFilters,
@@ -52,17 +52,15 @@ export default function FilterButton({
 
   return (
     <>
-      <Tooltip content={t("filterTeam")}>
-        <Button
-          variant={isFiltered ? "primary" : "tertiary"}
-          size="small"
-          icon={<CogIcon aria-hidden />}
-          onClick={() => setOpen(true)}
-        >
-          {t("settings")}
-          {activeFilterCount > 0 && ` (${activeFilterCount})`}
-        </Button>
-      </Tooltip>
+      <Button
+        variant={isFiltered ? "primary" : "tertiary"}
+        size="small"
+        icon={<FilterIcon aria-hidden />}
+        onClick={() => setOpen(true)}
+      >
+        {t("buttonLabel")}
+        {activeFilterCount > 0 && ` (${activeFilterCount})`}
+      </Button>
 
       <TeamFilterModal
         open={open}

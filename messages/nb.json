@@ -128,6 +128,7 @@
   },
   "teamFilter": {
     "title": "Filter",
+    "buttonLabel": "Filter",
     "loadingTeams": "Laster data...",
     "teamsLabel": "Team",
     "description": "Velg hvilke team du vil se data for. Bare valgte team vil vises.",
@@ -140,6 +141,7 @@
     "noApps": "Ingen applikasjoner funnet",
     "cancel": "Avbryt",
     "apply": "Bruk filter",
+    "reset": "Nullstill filter",
     "showAllBuckets": "Vis alle prioritetskategorier",
     "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy."
   },

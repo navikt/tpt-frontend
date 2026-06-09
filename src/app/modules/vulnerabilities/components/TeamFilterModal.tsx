@@ -74,6 +74,12 @@ const TeamFilterModal = ({
     onClose();
   };
 
+  const handleReset = () => {
+    onTeamsChange([]);
+    onApplicationsChange?.([]);
+    onClose();
+  };
+
   return (
     <Modal
       key={`team-filter-${open ? "open" : "closed"}-${selectedTeams.join("|")}-${selectedApplications.join("|")}`}
@@ -184,13 +190,18 @@ const TeamFilterModal = ({
         )}
       </Modal.Body>
       <Modal.Footer>
-        <HStack gap="space-16">
-          <Button variant="secondary" onClick={onClose}>
-            {t("cancel")}
+        <HStack gap="space-16" justify="space-between" style={{ width: "100%" }}>
+          <Button variant="tertiary" onClick={handleReset}>
+            {t("reset")}
           </Button>
-          <Button onClick={handleApply}>
-            {t("apply")}
-          </Button>
+          <HStack gap="space-16">
+            <Button variant="secondary" onClick={onClose}>
+              {t("cancel")}
+            </Button>
+            <Button onClick={handleApply}>
+              {t("apply")}
+            </Button>
+          </HStack>
         </HStack>
       </Modal.Footer>
     </Modal>
