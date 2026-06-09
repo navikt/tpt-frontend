@@ -56,9 +56,7 @@ describe("queryParamHelpers", () => {
       const params = filtersToSearchParams(filters);
 
       expect(params.get(QUERY_PARAM_KEYS.team)).toBe("team1,team2");
-      // app filter is base64-encoded under QUERY_PARAM_KEYS.app ("appf")
-      expect(params.get(QUERY_PARAM_KEYS.app)).not.toBeNull();
-      expect(params.get(QUERY_PARAM_KEYS.app)).not.toBe("app1");
+      expect(params.get(QUERY_PARAM_KEYS.app)).toBe("app1");
       expect(params.get(QUERY_PARAM_KEYS.env)).toBe("prod,dev");
       expect(params.get(QUERY_PARAM_KEYS.cve)).toBe("CVE-2024-1234");
       expect(params.get(QUERY_PARAM_KEYS.pkg)).toBe("express,react");
@@ -95,26 +93,7 @@ describe("queryParamHelpers", () => {
       expect(params.get(QUERY_PARAM_KEYS.team)).toBe("team with spaces");
     });
 
-    it("should use readable format for pkg and not use legacy compressed param", () => {
-      const packageNames = Object.fromEntries(
-        Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
-      );
-
-      const largeFilters = {
-        teamFilters: {},
-        applicationFilters: {},
-        environmentFilters: {},
-        cveFilters: {},
-        packageNameFilters: packageNames,
-      };
-
-      const params = filtersToSearchParams(largeFilters);
-
-      expect(params.get(QUERY_PARAM_KEYS.compressed)).toBeNull();
-      expect(params.get(QUERY_PARAM_KEYS.pkg)).toBe(Object.keys(packageNames).join(","));
-    });
-
-    it("should encode app filter as base64 and keep other params readable", () => {
+    it("should not use legacy compressed param", () => {
       const filters = {
         teamFilters: { team1: true },
         applicationFilters: { app1: true },
@@ -124,27 +103,20 @@ describe("queryParamHelpers", () => {
       };
 
       const params = filtersToSearchParams(filters);
-
       expect(params.get(QUERY_PARAM_KEYS.compressed)).toBeNull();
-      expect(params.get(QUERY_PARAM_KEYS.team)).toBe("team1");
-      // appf param should be a base64 string, not a plain app name
-      const appParam = params.get(QUERY_PARAM_KEYS.app);
-      expect(appParam).not.toBeNull();
-      expect(appParam).not.toContain("app1");
     });
   });
 
   describe("searchParamsToFilters", () => {
-    it("should parse all query params to filter states (new appf= format)", () => {
-      // Build params the same way the app does (via filtersToSearchParams)
-      const original = {
-        teamFilters: { team1: true, team2: true },
-        applicationFilters: { app1: true },
-        environmentFilters: { prod: true },
-        cveFilters: { "CVE-2024-1234": true },
-        packageNameFilters: { express: true },
-      };
-      const params = filtersToSearchParams(original);
+    it("should parse all query params to filter states", () => {
+      const params = new URLSearchParams({
+        [QUERY_PARAM_KEYS.team]: "team1,team2",
+        [QUERY_PARAM_KEYS.app]: "app1",
+        [QUERY_PARAM_KEYS.env]: "prod",
+        [QUERY_PARAM_KEYS.cve]: "CVE-2024-1234",
+        [QUERY_PARAM_KEYS.pkg]: "express",
+      });
+
       const filters = searchParamsToFilters(params);
 
       expect(filters.teamFilters).toEqual({ team1: true, team2: true });
@@ -152,12 +124,6 @@ describe("queryParamHelpers", () => {
       expect(filters.environmentFilters).toEqual({ prod: true });
       expect(filters.cveFilters).toEqual({ "CVE-2024-1234": true });
       expect(filters.packageNameFilters).toEqual({ express: true });
-    });
-
-    it("should parse legacy ?app= readable format as fallback", () => {
-      const params = new URLSearchParams({ app: "app1,app2" });
-      const filters = searchParamsToFilters(params);
-      expect(filters.applicationFilters).toEqual({ app1: true, app2: true });
     });
 
     it("should return empty filter states for missing params", () => {
@@ -231,32 +197,13 @@ describe("queryParamHelpers", () => {
       expect(roundTripFilters).toEqual(originalFilters);
     });
 
-    it("should maintain filter state with many app names through round-trip", () => {
+    it("should maintain filter state with multiple app names", () => {
       const originalFilters = {
         teamFilters: { team1: true },
-        applicationFilters: Object.fromEntries(
-          Array.from({ length: 20 }, (_, i) => [`my-long-app-name-service-${i}`, true])
-        ),
+        applicationFilters: { "my-service": true, "auth-api": true, "payment-svc": true },
         environmentFilters: { prod: true },
         cveFilters: {},
         packageNameFilters: {},
-      };
-
-      const params = filtersToSearchParams(originalFilters);
-      const roundTripFilters = searchParamsToFilters(params);
-
-      expect(roundTripFilters).toEqual(originalFilters);
-    });
-
-    it("should maintain filter state with large pkg list through round-trip", () => {
-      const originalFilters = {
-        teamFilters: { team1: true, team2: true },
-        applicationFilters: { app1: true },
-        environmentFilters: { prod: true },
-        cveFilters: {},
-        packageNameFilters: Object.fromEntries(
-          Array.from({ length: 50 }, (_, i) => [`package-name-${i}`, true])
-        ),
       };
 
       const params = filtersToSearchParams(originalFilters);

@@ -1,6 +1,5 @@
 /**
  * Utility functions for serializing and deserializing vulnerability filters to/from URL query params
- * Supports hybrid mode: readable params for team/env/cve/pkg, base64 for app names (can be long)
  */
 
 export type FilterState = Record<string, boolean>;
@@ -16,11 +15,11 @@ export interface VulnerabilityFilters {
 // Query param keys
 export const QUERY_PARAM_KEYS = {
   team: "team",
-  app: "appf",   // base64-encoded app filter
+  app: "app",
   env: "env",
   cve: "cve",
   pkg: "pkg",
-  compressed: "f", // legacy: single compressed filter param (all filters)
+  compressed: "f", // legacy: single compressed filter param
 } as const;
 
 /**
@@ -36,28 +35,7 @@ function decompressFilters(compressed: string): VulnerabilityFilters | null {
 }
 
 /**
- * Encode a list of active filter keys to a compact base64 string
- */
-function encodeFilterList(filters: FilterState): string {
-  const active = Object.keys(filters).filter((k) => filters[k] === true);
-  if (active.length === 0) return "";
-  return btoa(encodeURIComponent(JSON.stringify(active)));
-}
-
-/**
- * Decode a base64 filter list back to FilterState
- */
-function decodeFilterList(encoded: string): FilterState {
-  try {
-    const keys: string[] = JSON.parse(decodeURIComponent(atob(encoded)));
-    return Object.fromEntries(keys.map((k) => [k, true]));
-  } catch {
-    return {};
-  }
-}
-
-/**
- * Serialize filter state to comma-separated string (for short filters like team/env)
+ * Serialize filter state to comma-separated string
  */
 export function serializeFilters(filters: FilterState): string {
   const activeFilters = Object.keys(filters).filter((key) => filters[key] === true);
@@ -75,9 +53,7 @@ export function deserializeFilters(value: string | null): FilterState {
 }
 
 /**
- * Convert filter states to URLSearchParams.
- * - team/env/cve/pkg: readable comma-separated params
- * - app: base64-encoded (appf=) to keep URLs short
+ * Convert filter states to URLSearchParams
  */
 export function filtersToSearchParams(filters: VulnerabilityFilters): URLSearchParams {
   const params = new URLSearchParams();
@@ -85,9 +61,8 @@ export function filtersToSearchParams(filters: VulnerabilityFilters): URLSearchP
   const teamParam = serializeFilters(filters.teamFilters);
   if (teamParam) params.set(QUERY_PARAM_KEYS.team, teamParam);
 
-  // App names can be long — always encode as base64
-  const appEncoded = encodeFilterList(filters.applicationFilters);
-  if (appEncoded) params.set(QUERY_PARAM_KEYS.app, appEncoded);
+  const appParam = serializeFilters(filters.applicationFilters);
+  if (appParam) params.set(QUERY_PARAM_KEYS.app, appParam);
 
   const envParam = serializeFilters(filters.environmentFilters);
   if (envParam) params.set(QUERY_PARAM_KEYS.env, envParam);
@@ -102,8 +77,7 @@ export function filtersToSearchParams(filters: VulnerabilityFilters): URLSearchP
 }
 
 /**
- * Parse URLSearchParams into filter states.
- * Supports legacy ?f= format, new ?appf= base64 format, and plain readable params.
+ * Parse URLSearchParams into filter states
  */
 export function searchParamsToFilters(searchParams: URLSearchParams): VulnerabilityFilters {
   // Legacy: full compressed format
@@ -113,15 +87,9 @@ export function searchParamsToFilters(searchParams: URLSearchParams): Vulnerabil
     if (decompressed) return decompressed;
   }
 
-  // New format: appf= is base64, others are readable
-  const appEncoded = searchParams.get(QUERY_PARAM_KEYS.app);
-  const applicationFilters = appEncoded
-    ? decodeFilterList(appEncoded)
-    : deserializeFilters(searchParams.get("app")); // fallback for old ?app= links
-
   return {
     teamFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.team)),
-    applicationFilters,
+    applicationFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.app)),
     environmentFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.env)),
     cveFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.cve)),
     packageNameFilters: deserializeFilters(searchParams.get(QUERY_PARAM_KEYS.pkg)),
