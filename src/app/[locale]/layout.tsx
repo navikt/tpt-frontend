@@ -7,6 +7,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 import { Providers } from "../contexts/Providers";
 import { useSyncExternalStore } from "react";
+import { useSearchParams } from "next/navigation";
 
 function subscribe() { return () => {}; }
 function getSnapshot() { return true; }
@@ -22,6 +23,8 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const t = useTranslations();
   const locale = useLocale();
   const isClient = useIsClient();
+  const searchParams = useSearchParams();
+
   // Render nav links only after client mount to avoid hydration mismatch,
   // since role data is client-only (localStorage + API fetch)
   const filteredNavLinks = !isClient || isRoleLoading
@@ -41,21 +44,28 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
         return link.allowedRoles.includes(effectiveRole);
       });
 
+  const filterParams = searchParams.toString();
+
   return (
     <Page>
       <InternalHeader>
         <InternalHeader.Title>{t("common.appTitle")}</InternalHeader.Title>
         {filteredNavLinks
           .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-          .map((link) => (
-            <InternalHeader.Title
-              key={link.path}
-              href={`/${locale}${link.path}`}
-              style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
-            >
-              {t(link.labelKey)}
-            </InternalHeader.Title>
-          ))}
+          .map((link) => {
+            const href = filterParams
+              ? `/${locale}${link.path}?${filterParams}`
+              : `/${locale}${link.path}`;
+            return (
+              <InternalHeader.Title
+                key={link.path}
+                href={href}
+                style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
+              >
+                {t(link.labelKey)}
+              </InternalHeader.Title>
+            );
+          })}
         <Spacer />
         <SettingsPanel />
         {!isUserLoading && user && (
