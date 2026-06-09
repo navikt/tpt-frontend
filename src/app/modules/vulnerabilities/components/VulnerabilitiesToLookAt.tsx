@@ -25,18 +25,19 @@ interface VulnerabilitiesToLookAtProps {
     minThreshold: number;
     maxThreshold: number;
     selectedTeams: string[];
-    appNameFilter?: string;
     detailBasePath?: string;
 }
 
-const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams, appNameFilter = "", detailBasePath }: VulnerabilitiesToLookAtProps) => {
+const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selectedTeams, detailBasePath }: VulnerabilitiesToLookAtProps) => {
     const t = useTranslations();
     const locale = useLocale();
     const basePath = detailBasePath ?? `/${locale}`;
-    const { data, isLoading } = useVulnerabilitiesContext();
+    const { data, isLoading, applicationFilters } = useVulnerabilitiesContext();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
     const { preferences, updatePreferences } = useUserPreferences();
     const grouping = preferences.vulnerabilityGrouping ?? "action";
+
+    const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
 
     const toggleAll = () => {
         const allIds = workloadsWithVulns.map(w => w.workload.id);
@@ -66,11 +67,9 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
             if (!selectedTeams.includes(team.team)) return;
 
             team.workloads.forEach((workload) => {
-                // Apply app name filter (matches against team/name)
-                if (appNameFilter) {
-                    const fullName = `${team.team}/${workload.name}`;
-                    if (!fullName.includes(appNameFilter) && !workload.name.includes(appNameFilter)) return;
-                }
+                // Apply application filter (multi-select from context)
+                if (hasAppFilters && !applicationFilters[workload.name]) return;
+
                 const filteredVulns = workload.vulnerabilities.filter(
                     (vuln) => vuln.riskScore >= minThreshold && vuln.riskScore < maxThreshold
                 );

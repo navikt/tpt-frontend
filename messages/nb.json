@@ -127,17 +127,21 @@
     "actionsLabel": "{count} {count, plural, one {tiltak} other {tiltak}}"
   },
   "teamFilter": {
-    "title": "Filter etter team",
-    "loadingTeams": "Laster team...",
-    "description": "Velg hvilke team du vil se sårbarheter for. Bare valgte team vil vises på hovedsiden.",
+    "title": "Filter",
+    "loadingTeams": "Laster data...",
+    "teamsLabel": "Team",
+    "description": "Velg hvilke team du vil se data for. Bare valgte team vil vises.",
     "noTeams": "Ingen team funnet",
+    "appsLabel": "Applikasjoner",
+    "appsDescription": "Velg hvilke applikasjoner du vil se data for. Tom betyr alle.",
+    "appsSearchLabel": "Søk i applikasjoner",
+    "appsSearchPlaceholder": "Søk etter appnavn...",
+    "appsSelected": "{count} applikasjoner valgt",
+    "noApps": "Ingen applikasjoner funnet",
     "cancel": "Avbryt",
     "apply": "Bruk filter",
     "showAllBuckets": "Vis alle prioritetskategorier",
-    "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy.",
-    "appNameFilterLabel": "Filtrer applikasjoner",
-    "appNameFilterDescription": "Vis kun applikasjoner der navn inneholder søketeksten.",
-    "appNameFilterPlaceholder": "F.eks. appsec-"
+    "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy."
   },
   "vulnerabilitiesPage": {
     "title": "Sårbarheter",

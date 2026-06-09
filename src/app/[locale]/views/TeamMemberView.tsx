@@ -3,30 +3,47 @@ import { useMemo } from "react";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
-import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion, Link } from "@navikt/ds-react";
+import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion, Link, HStack } from "@navikt/ds-react";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 import { DEPLOYMENT_AGE_DAYS } from "@/app/shared/constants/deploymentAge";
+import FilterButton from "@/app/components/FilterButton";
 
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
-  const { data: vulnData, isLoading: vulnLoading } = useVulnerabilitiesContext();
+  const { data: vulnData, isLoading: vulnLoading, applicationFilters } = useVulnerabilitiesContext();
   const { isLoading: configLoading } = useConfigContext();
   
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
+  const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
+  const activeAppNames = hasAppFilters
+    ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
+    : null;
+
+  const filteredTeams = useMemo(() => {
+    if (!vulnData?.teams) return [];
+    if (!activeAppNames) return vulnData.teams;
+    return vulnData.teams
+      .map((team) => ({
+        ...team,
+        workloads: team.workloads.filter((w) => activeAppNames.has(w.name)),
+      }))
+      .filter((team) => team.workloads.length > 0);
+  }, [vulnData, applicationFilters]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const overview = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;
 
-    const totalTeams = vulnData.teams.length;
-    const totalWorkloads = vulnData.teams.reduce(
+    const totalTeams = filteredTeams.length;
+    const totalWorkloads = filteredTeams.reduce(
       (sum, team) => sum + (team.workloads?.length || 0),
       0
     );
-    const totalVulnerabilities = vulnData.teams.reduce(
+    const totalVulnerabilities = filteredTeams.reduce(
       (sum, team) =>
         sum +
         (team.workloads?.reduce(
@@ -41,7 +58,7 @@ export default function TeamMemberView() {
       totalWorkloads,
       totalVulnerabilities,
     };
-  }, [vulnData]);
+  }, [filteredTeams, vulnData]);
 
   const deploymentCompliance = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;
@@ -49,7 +66,7 @@ export default function TeamMemberView() {
     let totalWorkloadsWithDeployInfo = 0;
     let nonCompliantWorkloads = 0;
 
-    const teamDetails = vulnData.teams.map((team) => {
+    const teamDetails = filteredTeams.map((team) => {
       const workloadDetails = team.workloads?.map((workload) => {
         const ageInfo = calculateDeploymentAge(workload.lastDeploy, deploymentAgeDays);
         if (ageInfo.hasDeploymentInfo) {
@@ -78,28 +95,37 @@ export default function TeamMemberView() {
       nonCompliantWorkloads,
       teamDetails: teamDetails.filter(t => t.nonCompliantCount > 0),
     };
-  }, [vulnData, deploymentAgeDays]);
+  }, [filteredTeams, vulnData, deploymentAgeDays]);
+
+  const filteredTeamSlugs = useMemo(
+    () => new Set(filteredTeams.map((t) => t.team)),
+    [filteredTeams]
+  );
 
   const slaTotals = useMemo(() => {
     if (!slaData || !slaData.teams) return null;
 
-    const totalCriticalOverdue = slaData.teams.reduce(
+    const relevantSlaTeams = hasAppFilters
+      ? slaData.teams.filter((t) => filteredTeamSlugs.has(t.teamSlug))
+      : slaData.teams;
+
+    const totalCriticalOverdue = relevantSlaTeams.reduce(
       (sum, team) => sum + (team.criticalOverdue || 0),
       0
     );
-    const totalNonCriticalOverdue = slaData.teams.reduce(
+    const totalNonCriticalOverdue = relevantSlaTeams.reduce(
       (sum, team) => sum + (team.nonCriticalOverdue || 0),
       0
     );
-    const totalCriticalWithinSla = slaData.teams.reduce(
+    const totalCriticalWithinSla = relevantSlaTeams.reduce(
       (sum, team) => sum + (team.criticalWithinSla || 0),
       0
     );
-    const totalNonCriticalWithinSla = slaData.teams.reduce(
+    const totalNonCriticalWithinSla = relevantSlaTeams.reduce(
       (sum, team) => sum + (team.nonCriticalWithinSla || 0),
       0
     );
-    const totalRepositoriesOutOfSla = slaData.teams.reduce(
+    const totalRepositoriesOutOfSla = relevantSlaTeams.reduce(
       (sum, team) => sum + (team.repositoriesOutOfSla || 0),
       0
     );
@@ -119,8 +145,9 @@ export default function TeamMemberView() {
       totalVulnerabilities,
       totalNeedingAttention,
       percentageNeedingAttention,
+      relevantSlaTeams,
     };
-  }, [slaData]);
+  }, [slaData, filteredTeamSlugs, hasAppFilters]);
 
   if (slaLoading || vulnLoading || configLoading || !slaData || !slaTotals || !overview || !deploymentCompliance) {
     return (
@@ -154,9 +181,12 @@ export default function TeamMemberView() {
       <main>
         <VStack gap="space-32">
           <div>
-            <Heading size="large" level="1" spacing>
-              {t("title")}
-            </Heading>
+            <HStack justify="space-between" align="start">
+              <Heading size="large" level="1" spacing>
+                {t("title")}
+              </Heading>
+              <FilterButton />
+            </HStack>
             <BodyShort spacing>
               {t("description")}
             </BodyShort>
@@ -327,7 +357,7 @@ export default function TeamMemberView() {
             </Box>
           )}
 
-          {slaData.teams
+          {slaTotals.relevantSlaTeams
             .filter(team => 
               (team.criticalOverdue && team.criticalOverdue > 0) || 
               (team.nonCriticalOverdue && team.nonCriticalOverdue > 0)
@@ -343,7 +373,7 @@ export default function TeamMemberView() {
                 {t("teamDetails")}
               </Heading>
               <Accordion>
-                {slaData.teams
+                {slaTotals.relevantSlaTeams
                   .filter(team => 
                     (team.criticalOverdue && team.criticalOverdue > 0) || 
                     (team.nonCriticalOverdue && team.nonCriticalOverdue > 0)

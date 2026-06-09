@@ -9,6 +9,7 @@ import {
   BodyShort,
   Loader,
   TextField,
+  Label,
 } from "@navikt/ds-react";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useTranslations } from "next-intl";
@@ -18,10 +19,10 @@ interface TeamFilterModalProps {
   onClose: () => void;
   selectedTeams: string[];
   onTeamsChange: (teams: string[]) => void;
+  selectedApplications?: string[];
+  onApplicationsChange?: (apps: string[]) => void;
   showAllBuckets?: boolean;
   onShowAllBucketsChange?: (show: boolean) => void;
-  appNameFilter?: string;
-  onAppNameFilterChange?: (filter: string) => void;
 }
 
 const TeamFilterModal = ({
@@ -29,21 +30,27 @@ const TeamFilterModal = ({
   onClose,
   selectedTeams,
   onTeamsChange,
+  selectedApplications = [],
+  onApplicationsChange,
   showAllBuckets = false,
   onShowAllBucketsChange,
-  appNameFilter = "",
-  onAppNameFilterChange,
 }: TeamFilterModalProps) => {
   const t = useTranslations("teamFilter");
-  const { data, isLoading } = useVulnerabilitiesContext();
+  const { data, isLoading, availableApplications } = useVulnerabilitiesContext();
   const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(selectedTeams);
-  const [tempAppNameFilter, setTempAppNameFilter] = useState<string>(appNameFilter);
+  const [tempSelectedApplications, setTempSelectedApplications] = useState<string[]>(selectedApplications);
+  const [appSearch, setAppSearch] = useState<string>("");
 
   // Get unique teams from data
   const allTeams = data?.teams.map((team) => team.team) || [];
   const uniqueTeams = Array.from(new Set(allTeams)).sort();
 
-  // Reinitialize temporary state when modal opens or selection changes by remounting via key
+  const filteredApplications = availableApplications
+    .slice()
+    .sort()
+    .filter((app) =>
+      appSearch.trim() === "" || app.toLowerCase().includes(appSearch.toLowerCase())
+    );
 
   const handleTeamToggle = (team: string) => {
     if (tempSelectedTeams.includes(team)) {
@@ -53,17 +60,23 @@ const TeamFilterModal = ({
     }
   };
 
-  // Removed select-all toggle; using only checkboxes per requirements
+  const handleAppToggle = (app: string) => {
+    if (tempSelectedApplications.includes(app)) {
+      setTempSelectedApplications(tempSelectedApplications.filter((a) => a !== app));
+    } else {
+      setTempSelectedApplications([...tempSelectedApplications, app]);
+    }
+  };
 
   const handleApply = () => {
     onTeamsChange(tempSelectedTeams);
-    onAppNameFilterChange?.(tempAppNameFilter);
+    onApplicationsChange?.(tempSelectedApplications);
     onClose();
   };
 
   return (
     <Modal
-      key={`team-filter-${open ? 'open' : 'closed'}-${selectedTeams.join('|')}-${appNameFilter}`}
+      key={`team-filter-${open ? "open" : "closed"}-${selectedTeams.join("|")}-${selectedApplications.join("|")}`}
       open={open}
       onClose={onClose}
       header={{
@@ -78,20 +91,80 @@ const TeamFilterModal = ({
           </div>
         ) : (
           <VStack gap="space-24">
-            <div>
-              <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-                {t("description")}
-              </BodyShort>
-            </div>
+            {/* Team filter */}
+            <VStack gap="space-12">
+              <div>
+                <Label size="small">{t("teamsLabel")}</Label>
+                <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+                  {t("description")}
+                </BodyShort>
+              </div>
+              {uniqueTeams.length > 0 ? (
+                <VStack gap="space-8">
+                  {uniqueTeams.map((team) => (
+                    <Checkbox
+                      key={team}
+                      checked={tempSelectedTeams.includes(team)}
+                      onChange={() => handleTeamToggle(team)}
+                    >
+                      {team}
+                    </Checkbox>
+                  ))}
+                </VStack>
+              ) : (
+                <BodyShort>{t("noTeams")}</BodyShort>
+              )}
+            </VStack>
 
-            <TextField
-              label={t("appNameFilterLabel")}
-              description={t("appNameFilterDescription")}
-              placeholder={t("appNameFilterPlaceholder")}
-              value={tempAppNameFilter}
-              onChange={(e) => setTempAppNameFilter(e.target.value)}
-              size="small"
-            />
+            {/* Application filter — only shown when caller supports it */}
+            {onApplicationsChange && (
+              <VStack gap="space-12">
+                <div>
+                  <Label size="small">{t("appsLabel")}</Label>
+                  <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+                    {t("appsDescription")}
+                  </BodyShort>
+                </div>
+                <TextField
+                  label={t("appsSearchLabel")}
+                  hideLabel
+                  placeholder={t("appsSearchPlaceholder")}
+                  value={appSearch}
+                  onChange={(e) => setAppSearch(e.target.value)}
+                  size="small"
+                />
+                {tempSelectedApplications.length > 0 && (
+                  <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+                    {t("appsSelected", { count: tempSelectedApplications.length })}
+                  </BodyShort>
+                )}
+                <div
+                  style={{
+                    maxHeight: "16rem",
+                    overflowY: "auto",
+                    border: "1px solid var(--ax-border-neutral-subtle)",
+                    borderRadius: "4px",
+                    padding: "0.5rem",
+                  }}
+                >
+                  {filteredApplications.length > 0 ? (
+                    <VStack gap="space-8">
+                      {filteredApplications.map((app) => (
+                        <Checkbox
+                          key={app}
+                          checked={tempSelectedApplications.includes(app)}
+                          onChange={() => handleAppToggle(app)}
+                        >
+                          {app}
+                        </Checkbox>
+                      ))}
+                    </VStack>
+                  ) : (
+                    <BodyShort size="small">{t("noApps")}</BodyShort>
+                  )}
+                </div>
+              </VStack>
+            )}
 
             {/* Show all buckets toggle */}
             {onShowAllBucketsChange && (
@@ -106,30 +179,6 @@ const TeamFilterModal = ({
                   {t("showAllBucketsDescription")}
                 </BodyShort>
               </div>
-            )}
-
-            {uniqueTeams.length > 0 && (
-              <div>
-                <VStack gap="space-12">
-                  {uniqueTeams.map((team) => {
-                    const isChecked = tempSelectedTeams.includes(team);
-                    
-                    return (
-                      <Checkbox
-                        key={team}
-                        checked={isChecked}
-                        onChange={() => handleTeamToggle(team)}
-                      >
-                        {team}
-                      </Checkbox>
-                    );
-                  })}
-                </VStack>
-              </div>
-            )}
-
-            {uniqueTeams.length === 0 && (
-              <BodyShort>{t("noTeams")}</BodyShort>
             )}
           </VStack>
         )}

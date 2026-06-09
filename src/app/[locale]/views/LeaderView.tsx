@@ -11,6 +11,7 @@ import {
   Heading,
   VStack,
   HGrid,
+  HStack,
   Detail,
   Link,
   Table,
@@ -19,21 +20,38 @@ import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
+import FilterButton from "@/app/components/FilterButton";
 
 
 export default function LeaderView() {
   const t = useTranslations("leaderView");
   const tTeam = useTranslations("teamMemberView");
   const { isLoading: configLoading } = useConfigContext();
-  const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
+  const { data: vulnData, isLoading: dataLoading, applicationFilters } = useVulnerabilitiesContext();
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
+  const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
+  const activeAppNames = hasAppFilters
+    ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
+    : null;
+
+  const filteredTeams = useMemo(() => {
+    if (!vulnData?.teams) return [];
+    if (!activeAppNames) return vulnData.teams;
+    return vulnData.teams
+      .map((team) => ({
+        ...team,
+        workloads: team.workloads.filter((w) => activeAppNames.has(w.name)),
+      }))
+      .filter((team) => team.workloads.length > 0);
+  }, [vulnData, applicationFilters]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const teamStatistics = useMemo(() => {
     if (!vulnData || !slaData) return [];
 
-    return vulnData.teams.map((team) => {
+    return filteredTeams.map((team) => {
       // Find corresponding SLA data
       const teamSla = slaData.teams.find(t => t.teamSlug === team.team);
 
@@ -56,7 +74,7 @@ export default function LeaderView() {
         deploymentsNeedingUpdate,
       };
     });
-  }, [vulnData, slaData, deploymentAgeDays]);
+  }, [filteredTeams, vulnData, slaData, deploymentAgeDays]);
 
   const sortedTeams = useMemo(() => {
     // Sort by critical overdue first, then by non-critical overdue
@@ -127,9 +145,12 @@ export default function LeaderView() {
       <main>
         <VStack gap="space-32">
           <div>
-            <Heading size="large" level="1" spacing>
-              {t("title")}
-            </Heading>
+            <HStack justify="space-between" align="start">
+              <Heading size="large" level="1" spacing>
+                {t("title")}
+              </Heading>
+              <FilterButton />
+            </HStack>
             <BodyShort spacing>
               {t("description")}
             </BodyShort>

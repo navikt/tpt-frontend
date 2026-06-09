@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 export default function DeveloperView({ detailBasePath }: { detailBasePath?: string }) {
   const t = useTranslations();
   const { config, isLoading } = useConfigContext();
-  const { data: vulnData, teamFilters, setTeamFilters, appNameFilter, setAppNameFilter } = useVulnerabilitiesContext();
+  const { data: vulnData, teamFilters } = useVulnerabilitiesContext();
   const { preferences, updatePreferences } = useUserPreferences();
   
   const selectedTeams = useMemo(() => {
@@ -22,11 +22,6 @@ export default function DeveloperView({ detailBasePath }: { detailBasePath?: str
     return filtered;
   }, [teamFilters, vulnData]);
 
-  const handleTeamsChange = (teams: string[]) => {
-    const newFilters = Object.fromEntries(teams.map(team => [team, true]));
-    setTeamFilters(newFilters);
-  };
-  
   const defaultBucket = useMemo<BucketThreshold | null>(() => {
     if (!config) return null;
     return {
@@ -82,18 +77,14 @@ export default function DeveloperView({ detailBasePath }: { detailBasePath?: str
           selectedBucket={activeBucket} 
           onBucketSelect={setSelectedBucket}
           selectedTeams={selectedTeams}
-          onTeamsChange={handleTeamsChange}
           showAllBuckets={preferences.showAllBuckets}
           onShowAllBucketsChange={(show) => updatePreferences({ showAllBuckets: show })}
-          appNameFilter={appNameFilter}
-          onAppNameFilterChange={setAppNameFilter}
         />
         <VulnerabilitiesToLookAt 
           bucketName={activeBucket.name}
           minThreshold={activeBucket.minThreshold}
           maxThreshold={activeBucket.maxThreshold}
           selectedTeams={selectedTeams}
-          appNameFilter={appNameFilter}
           detailBasePath={detailBasePath}
         />
       </main>

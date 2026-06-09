@@ -127,17 +127,21 @@
     "actionsLabel": "{count} {count, plural, one {action} other {actions}}"
   },
   "teamFilter": {
-    "title": "Filter by team",
-    "loadingTeams": "Loading teams...",
-    "description": "Select which teams you want to see vulnerabilities for. Only selected teams will be shown on the main page.",
+    "title": "Filter",
+    "loadingTeams": "Loading data...",
+    "teamsLabel": "Teams",
+    "description": "Select which teams you want to see data for. Only selected teams will be shown.",
     "noTeams": "No teams found",
+    "appsLabel": "Applications",
+    "appsDescription": "Select which applications you want to see data for. Empty means all.",
+    "appsSearchLabel": "Search applications",
+    "appsSearchPlaceholder": "Search by app name...",
+    "appsSelected": "{count} applications selected",
+    "noApps": "No applications found",
     "cancel": "Cancel",
     "apply": "Apply filter",
     "showAllBuckets": "Show all priority buckets",
-    "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise.",
-    "appNameFilterLabel": "Filter applications",
-    "appNameFilterDescription": "Only show applications where the name contains the search text.",
-    "appNameFilterPlaceholder": "E.g. appsec-"
+    "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise."
   },
   "vulnerabilitiesPage": {
     "title": "Vulnerabilities",
