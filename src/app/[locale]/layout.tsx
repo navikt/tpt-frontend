@@ -33,11 +33,10 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
         if (!link.allowedRoles || link.allowedRoles.length === 0) {
           return true;
         }
-        
-        if (link.allowedRoles.includes("ADMIN")) {
-          return actualRole === "ADMIN";
+        // ADMIN sees everything
+        if (actualRole === "ADMIN") {
+          return true;
         }
-        
         if (!effectiveRole) {
           return false;
         }
@@ -49,7 +48,9 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <Page>
       <InternalHeader>
-        <InternalHeader.Title>{t("common.appTitle")}</InternalHeader.Title>
+        <InternalHeader.Title href={filterParams ? `/${locale}?${filterParams}` : `/${locale}`}>
+          {t("common.appTitle")}
+        </InternalHeader.Title>
         {filteredNavLinks
           .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
           .map((link) => {
