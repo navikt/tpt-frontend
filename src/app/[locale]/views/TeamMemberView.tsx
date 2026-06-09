@@ -3,40 +3,27 @@ import { useMemo } from "react";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
-import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion, Link, HStack } from "@navikt/ds-react";
+import { BodyShort, Loader, Box, Heading, VStack, HGrid, Table, Detail, Accordion, Link, HStack, ToggleGroup } from "@navikt/ds-react";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { useTranslations } from "next-intl";
 import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 import { DEPLOYMENT_AGE_DAYS } from "@/app/shared/constants/deploymentAge";
 import FilterButton from "@/app/components/FilterButton";
+import { useComplianceFilter } from "@/app/shared/hooks/useComplianceFilter";
 
 export default function TeamMemberView() {
   const t = useTranslations("teamMemberView");
+  const tFilter = useTranslations("complianceFilter");
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
-  const { data: vulnData, isLoading: vulnLoading, applicationFilters } = useVulnerabilitiesContext();
+  const { data: vulnData, isLoading: vulnLoading } = useVulnerabilitiesContext();
   const { isLoading: configLoading } = useConfigContext();
-  
+
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
-  const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
-  const activeAppNames = useMemo(
-    () => hasAppFilters
-      ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
-      : null,
-    [applicationFilters, hasAppFilters]
-  );
+  const { activeTeams, hasAppFilters, activeAppNames, showFiltered, setShowFiltered } = useComplianceFilter();
 
-  const filteredTeams = useMemo(() => {
-    if (!vulnData?.teams) return [];
-    if (!activeAppNames) return vulnData.teams;
-    return vulnData.teams
-      .map((team) => ({
-        ...team,
-        workloads: team.workloads.filter((w) => activeAppNames.has(w.name)),
-      }))
-      .filter((team) => team.workloads.length > 0);
-  }, [vulnData, activeAppNames]);
+  const filteredTeams = activeTeams;
 
   const overview = useMemo(() => {
     if (!vulnData || !vulnData.teams) return null;
@@ -214,7 +201,19 @@ export default function TeamMemberView() {
               <Heading size="large" level="1" spacing>
                 {t("title")}
               </Heading>
-              <FilterButton />
+              <HStack gap="space-8" align="center">
+                {hasAppFilters && (
+                  <ToggleGroup
+                    size="small"
+                    value={showFiltered ? "filtered" : "all"}
+                    onChange={(v) => setShowFiltered(v === "filtered")}
+                  >
+                    <ToggleGroup.Item value="filtered">{tFilter("showFiltered")}</ToggleGroup.Item>
+                    <ToggleGroup.Item value="all">{tFilter("showAll")}</ToggleGroup.Item>
+                  </ToggleGroup>
+                )}
+                <FilterButton />
+              </HStack>
             </HStack>
             <BodyShort spacing>
               {t("description")}

@@ -281,6 +281,10 @@
     "status": "Status",
     "needsUpdate": "Trenger redeployment"
   },
+  "complianceFilter": {
+    "showFiltered": "Filtrert",
+    "showAll": "Alle"
+  },
   "noTeamView": {
     "title": "Ingen team funnet",
     "description": "Vi kunne ikke koble deg til noen utviklingsteam.",

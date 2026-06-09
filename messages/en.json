@@ -281,6 +281,10 @@
     "status": "Status",
     "needsUpdate": "Needs redeployment"
   },
+  "complianceFilter": {
+    "showFiltered": "Filtered",
+    "showAll": "All"
+  },
   "noTeamView": {
     "title": "No teams found",
     "description": "We were unable to link you to any development teams.",
