@@ -35,7 +35,7 @@ export default function LeaderView() {
 
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
-  const { activeTeams, hasAppFilters, activeAppNames, showFiltered, setShowFiltered } = useComplianceFilter();
+  const { activeTeams, hasAppFilters, isFilterActive, showFiltered, setShowFiltered, applicationFilters } = useComplianceFilter();
 
   const filteredTeams = activeTeams;
 
@@ -61,12 +61,18 @@ export default function LeaderView() {
       let repositoriesOutOfSla = teamSla?.repositoriesOutOfSla || 0;
       let maxDaysOverdue = teamSla?.maxDaysOverdue || 0;
 
-      if (hasAppFilters && teamSla) {
+      // When filter is active, reconstruct SLA counts from overdueItems
+      // Derive activeAppNames here to ensure consistency within this memo
+      const activeAppNames = isFilterActive
+        ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
+        : null;
+
+      if (activeAppNames && teamSla) {
         const criticalItems = (teamSla.criticalOverdueItems ?? []).filter(
-          (item) => activeAppNames!.has(item.applicationName)
+          (item) => activeAppNames.has(item.applicationName)
         );
         const nonCriticalItems = (teamSla.nonCriticalOverdueItems ?? []).filter(
-          (item) => activeAppNames!.has(item.applicationName)
+          (item) => activeAppNames.has(item.applicationName)
         );
         const overdueApps = new Set([
           ...criticalItems.map((i) => i.applicationName),
@@ -90,7 +96,7 @@ export default function LeaderView() {
         deploymentsNeedingUpdate,
       };
     });
-  }, [filteredTeams, vulnData, slaData, deploymentAgeDays, hasAppFilters, activeAppNames]);
+  }, [filteredTeams, vulnData, slaData, deploymentAgeDays, isFilterActive, applicationFilters]);
 
   const sortedTeams = useMemo(() => {
     const sorted = [...teamStatistics];
