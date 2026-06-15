@@ -24,12 +24,29 @@ export default function DeveloperView({ detailBasePath }: { detailBasePath?: str
 
   const defaultBucket = useMemo<BucketThreshold | null>(() => {
     if (!config) return null;
-    return {
-      name: t("buckets.highPriority"),
-      minThreshold: config.thresholds.critical,
-      maxThreshold: Number.MAX_VALUE,
-    };
-  }, [config, t]);
+
+    const { critical, high, medium } = config.thresholds;
+
+    const allVulnerabilities =
+      vulnData?.teams
+        .filter((team) => selectedTeams.includes(team.team))
+        .flatMap((team) => team.workloads.flatMap((w) => w.vulnerabilities)) ?? [];
+
+    const criticalCount = allVulnerabilities.filter((v) => v.riskScore >= critical).length;
+    const importantCount = allVulnerabilities.filter((v) => v.riskScore >= high && v.riskScore < critical).length;
+    const whenTimeCount = allVulnerabilities.filter((v) => v.riskScore >= medium && v.riskScore < high).length;
+
+    if (criticalCount > 0) {
+      return { name: t("buckets.highPriority"), minThreshold: critical, maxThreshold: Number.MAX_VALUE };
+    }
+    if (importantCount > 0) {
+      return { name: t("buckets.important"), minThreshold: high, maxThreshold: critical };
+    }
+    if (whenTimeCount > 0) {
+      return { name: t("buckets.whenTime"), minThreshold: medium, maxThreshold: high };
+    }
+    return { name: t("buckets.highPriority"), minThreshold: critical, maxThreshold: Number.MAX_VALUE };
+  }, [config, vulnData, selectedTeams, t]);
 
   const [selectedBucket, setSelectedBucket] = useState<BucketThreshold | null>(null);
 
