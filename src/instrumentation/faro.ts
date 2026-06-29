@@ -4,10 +4,12 @@ import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 let faro: Faro | null = null;
 let initPromise: Promise<void> | null = null;
 
-export function initInstrumentation(): void {
-  if (typeof window === 'undefined' || faro !== null || initPromise !== null) return;
+export function initInstrumentation(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (initPromise !== null) return initPromise;
 
   initPromise = getFaro();
+  return initPromise;
 }
 
 async function getFaro(): Promise<void> {
@@ -56,4 +58,8 @@ async function getFaro(): Promise<void> {
 
 export function getFaroInstance(): Faro | null {
   return faro;
+}
+
+export function setFaroUser(email: string): void {
+  faro?.api.setUser({ email });
 }
