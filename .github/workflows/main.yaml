@@ -16,7 +16,7 @@ jobs:
       id-token: write
       security-events: write
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -33,12 +33,12 @@ jobs:
       - run: pnpm run lint
       - run: pnpm test
       - run: pnpm run build
-      - uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
+      - uses: nais/docker-build-push@f8bc7437f7549c2b08197152d781b98f8727a08a # v0
         id: docker-push
         with:
           team: appsec
           build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
-      - uses: nais/deploy/actions/deploy@a7f8690f9b367fcbf5348a0a1e21d44f1aae50eb # v2
+      - uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais.yaml
@@ -51,7 +51,7 @@ jobs:
       id-token: write # for nais/login
     needs: build-and-push
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - uses: nais/login@bb6c3e1e14e53d40d69d0d092bd2fce2e39ae3bf # v0
