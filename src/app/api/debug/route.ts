@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
+import { isAbortError } from "@/app/shared/utils/errorHandling";
 
 // Environment validation helper
 function getServerEnv() {
@@ -77,6 +78,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
 
   } catch (error) {
+    if (isAbortError(error)) {
+      // Client disconnected (e.g. navigated away) before we could respond.
+      return NextResponse.json(
+        { error: "Client aborted request" },
+        { status: 499 }
+      );
+    }
+
     console.error("Debug endpoint error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
