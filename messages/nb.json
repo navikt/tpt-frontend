@@ -335,7 +335,14 @@
     "teamView": {
       "title": "Sårbarheter for {teamSlug}",
       "description": "Adminvisning – data er hentet direkte fra NAIS API for dette teamet."
-    }
+    },
+    "operations": "Driftsoperasjoner",
+    "triggerSsvcBackfill": "Kjør SSVC-etterfylling",
+    "ssvcBackfillConfirmation": "Dette henter alle sporede CVE-er på nytt fra NVD for å fylle inn manglende SSVC-data. Jobben kjører i bakgrunnen og kan ta tid. Fortsette?",
+    "confirm": "Bekreft",
+    "cancel": "Avbryt",
+    "ssvcBackfillStarted": "SSVC-etterfylling startet. Følg med i applikasjonsloggene for fremdrift.",
+    "ssvcBackfillError": "Kunne ikke starte SSVC-etterfylling."
   },
   "roleContext": {
     "viewAs": "Vis som",

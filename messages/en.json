@@ -335,7 +335,14 @@
     "teamView": {
       "title": "Vulnerabilities for {teamSlug}",
       "description": "Admin view – data is fetched directly from the NAIS API for this team."
-    }
+    },
+    "operations": "Operations",
+    "triggerSsvcBackfill": "Run SSVC backfill",
+    "ssvcBackfillConfirmation": "This re-fetches every tracked CVE from NVD to backfill missing SSVC data. The job runs in the background and may take a while. Continue?",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "ssvcBackfillStarted": "SSVC backfill started. Check application logs for progress.",
+    "ssvcBackfillError": "Failed to start SSVC backfill."
   },
   "roleContext": {
     "viewAs": "View as",
