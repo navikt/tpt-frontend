@@ -342,21 +342,7 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "ssvcBackfillStarted": "SSVC backfill started. Check application logs for progress.",
-    "ssvcBackfillError": "Failed to start SSVC backfill.",
-    "fetchGcveComparison": "Fetch NVD/GCVE diff",
-    "gcveComparisonError": "Failed to fetch NVD/GCVE comparison.",
-    "gcveTotalTracked": "Total tracked CVEs",
-    "gcveCovered": "Covered by GCVE",
-    "gcveMissing": "Missing in GCVE",
-    "gcveLastSync": "Last GCVE sync",
-    "gcveNeverSynced": "Never synced",
-    "gcveMissingSample": "CVEs missing in GCVE ({count})",
-    "gcveCvssDiscrepancies": "CVSS discrepancies between NVD and GCVE ({count})",
-    "gcveNvdScore": "NVD score",
-    "gcveGcveScore": "GCVE score",
-    "gcveNvdSeverity": "NVD severity",
-    "gcveGcveSeverity": "GCVE severity",
-    "gcveNoDifferences": "No differences found between NVD and GCVE."
+    "ssvcBackfillError": "Failed to start SSVC backfill."
   },
   "roleContext": {
     "viewAs": "View as",

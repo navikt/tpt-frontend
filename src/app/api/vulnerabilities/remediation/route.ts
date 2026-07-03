@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
-import { isAbortError } from "@/app/shared/utils/errorHandling";
 
 function getServerEnv() {
   const tptBackendUrl = process.env.TPT_BACKEND_URL;
@@ -89,11 +88,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    if (isAbortError(error)) {
-      // Client disconnected (e.g. navigated away) before we could respond.
-      return new Response(null, { status: 499 });
-    }
-
     console.error("Remediation stream error:", error);
     return new Response(
       "event: error\ndata: Internal server error\n\n",

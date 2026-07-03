@@ -342,21 +342,7 @@
     "confirm": "Bekreft",
     "cancel": "Avbryt",
     "ssvcBackfillStarted": "SSVC-etterfylling startet. Følg med i applikasjonsloggene for fremdrift.",
-    "ssvcBackfillError": "Kunne ikke starte SSVC-etterfylling.",
-    "fetchGcveComparison": "Hent NVD/GCVE-diff",
-    "gcveComparisonError": "Kunne ikke hente NVD/GCVE-sammenligning.",
-    "gcveTotalTracked": "Totalt sporede CVE-er",
-    "gcveCovered": "Dekket av GCVE",
-    "gcveMissing": "Mangler i GCVE",
-    "gcveLastSync": "Siste GCVE-synk",
-    "gcveNeverSynced": "Aldri synkronisert",
-    "gcveMissingSample": "CVE-er som mangler i GCVE ({count})",
-    "gcveCvssDiscrepancies": "CVSS-avvik mellom NVD og GCVE ({count})",
-    "gcveNvdScore": "NVD-score",
-    "gcveGcveScore": "GCVE-score",
-    "gcveNvdSeverity": "NVD-alvorlighet",
-    "gcveGcveSeverity": "GCVE-alvorlighet",
-    "gcveNoDifferences": "Ingen avvik funnet mellom NVD og GCVE."
+    "ssvcBackfillError": "Kunne ikke starte SSVC-etterfylling."
   },
   "roleContext": {
     "viewAs": "Vis som",
