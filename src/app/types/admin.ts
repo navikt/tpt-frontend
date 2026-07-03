@@ -32,3 +32,20 @@ export interface TeamsSlaResponse {
   totalNonCriticalOverdue: number;
   generatedAt: string;
 }
+
+export interface CvssDiscrepancy {
+  cveId: string;
+  nvdCvssV31Score: number;
+  gcveCvssV31Score: number;
+  nvdSeverity: string | null;
+  gcveSeverity: string | null;
+}
+
+export interface GcveComparisonReport {
+  totalTrackedCves: number;
+  gcveCoveredCount: number;
+  gcveMissingCount: number;
+  gcveMissingSample: string[];
+  cvssDiscrepancies: CvssDiscrepancy[];
+  lastGcveSyncTimestamp: string | null;
+}

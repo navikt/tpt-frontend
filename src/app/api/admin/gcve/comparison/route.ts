@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       backendToken = oboResult.token;
     }
 
-    const backendUrl = `${tptBackendUrl}/admin/teams/sla`;
+    const backendUrl = `${tptBackendUrl}/admin/gcve/comparison`;
 
     const response = await fetch(backendUrl, {
       headers: {
@@ -60,10 +60,10 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       console.error(
-        `Failed to fetch teams SLA: ${response.status} ${response.statusText}`
+        `Failed to fetch GCVE comparison: ${response.status} ${response.statusText}`
       );
       return NextResponse.json(
-        { error: "errors.fetchTeamsSlaError" },
+        { error: "errors.fetchGcveComparisonError" },
         { status: response.status }
       );
     }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
+import { isAbortError } from "@/app/shared/utils/errorHandling";
 
 function getServerEnv() {
   const tptBackendUrl = process.env.TPT_BACKEND_URL;
@@ -71,6 +72,14 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data, { status: 202 });
   } catch (error) {
+    if (isAbortError(error)) {
+      // Client disconnected (e.g. navigated away) before we could respond.
+      return NextResponse.json(
+        { error: "errors.internalError" },
+        { status: 499 }
+      );
+    }
+
     console.error("Internal server error:", error);
 
     const isNetworkError = error instanceof Error && (

@@ -5,6 +5,7 @@ import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 import {
   parseProblemDetails,
   getErrorMessageKey,
+  isAbortError,
 } from "@/app/shared/utils/errorHandling";
 
 // Environment validation helper
@@ -138,6 +139,14 @@ export async function GET(request: NextRequest) {
       headers: pickPassthroughHeaders(response.headers),
     });
   } catch (error) {
+    if (isAbortError(error)) {
+      // Client disconnected (e.g. navigated away) before we could respond.
+      return NextResponse.json(
+        { error: "errors.internalError" },
+        { status: 499 }
+      );
+    }
+
     console.error("Internal server error:", error);
 
     const isNetworkError =

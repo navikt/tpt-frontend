@@ -173,6 +173,18 @@ export function handleApiError(
 }
 
 /**
+ * Check if error is caused by the client aborting the request (e.g. the user
+ * navigated away or closed the tab before the response could be sent).
+ * Next.js surfaces this as either a DOMException named "AbortError" or its
+ * own internal "ResponseAborted" error. This is expected client behavior,
+ * not a server failure, and should not be logged/reported as one.
+ */
+export function isAbortError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return error.name === "AbortError" || error.name === "ResponseAborted";
+}
+
+/**
  * Check if error is a network/connection error
  */
 export function isNetworkError(error: unknown): boolean {

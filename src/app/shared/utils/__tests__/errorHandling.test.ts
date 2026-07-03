@@ -1,5 +1,6 @@
 import {
   isNetworkError,
+  isAbortError,
   getUserFriendlyErrorMessage,
 } from "../errorHandling";
 
@@ -29,6 +30,30 @@ describe("errorHandling utilities", () => {
     it("should not identify non-network errors", () => {
       const error = new Error("Something else went wrong");
       expect(isNetworkError(error)).toBe(false);
+    });
+  });
+
+  describe("isAbortError", () => {
+    it("should identify DOMException AbortError", () => {
+      const error = new Error("The user aborted a request.");
+      error.name = "AbortError";
+      expect(isAbortError(error)).toBe(true);
+    });
+
+    it("should identify Next.js ResponseAborted errors", () => {
+      const error = new Error("");
+      error.name = "ResponseAborted";
+      expect(isAbortError(error)).toBe(true);
+    });
+
+    it("should not identify non-abort errors", () => {
+      const error = new Error("Something else went wrong");
+      expect(isAbortError(error)).toBe(false);
+    });
+
+    it("should not identify non-Error values", () => {
+      expect(isAbortError("not an error")).toBe(false);
+      expect(isAbortError(undefined)).toBe(false);
     });
   });
 
