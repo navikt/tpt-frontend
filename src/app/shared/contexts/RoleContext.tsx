@@ -21,7 +21,7 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleContextProvider({ children }: { children: ReactNode }) {
-  const { data: vulnData, isLoading } = useVulnerabilities();
+  const { data: vulnData, isLoading, error: vulnError } = useVulnerabilities();
   const actualRole = vulnData?.userRole;
 
   const [selectedRole, setSelectedRoleState] = useState<string | null>(null);
@@ -49,8 +49,9 @@ export function RoleContextProvider({ children }: { children: ReactNode }) {
   // Determine effective role (override or actual)
   const effectiveRole = selectedRole || actualRole;
 
-  // Only consider initialized when we have data
-  const isInitialized = !!vulnData && !isLoading;
+  // Consider initialized once the fetch has settled — either with data or
+  // with an error. Never leave pages spinning forever on a network failure.
+  const isInitialized = !isLoading && (!!vulnData || !!vulnError);
 
   const value: RoleContextType = {
     selectedRole,

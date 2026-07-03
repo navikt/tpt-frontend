@@ -140,6 +140,8 @@ export const useVulnerabilities = () => {
         if (result) {
           setData(result);
         }
+        // If the shared fetch failed (result is null) and we have no data,
+        // transition out of loading so callers don't spin forever.
       }
       setIsLoading(false);
       return;

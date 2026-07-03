@@ -14,15 +14,6 @@ export default function CompliancePage() {
   const t = useTranslations("errors");
   const tTeamMember = useTranslations("teamMemberView");
 
-  if (error) {
-    return (
-      <ErrorMessage
-        error={error}
-        title={t("fetchVulnerabilitiesError")}
-      />
-    );
-  }
-
   // Wait for role to be known before deciding which view to show
   if (isRoleLoading || !isInitialized) {
     return (
@@ -32,6 +23,15 @@ export default function CompliancePage() {
       >
         <Loader size="large" title={tTeamMember("loadingData")} />
       </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorMessage
+        error={error}
+        title={t("fetchVulnerabilitiesError")}
+      />
     );
   }
 
