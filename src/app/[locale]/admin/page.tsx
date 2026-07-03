@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Heading, BodyShort, VStack, Loader } from "@navikt/ds-react";
+import { Box, Heading, BodyShort, VStack, Loader, Alert } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { useTeamsOverview } from "@/app/modules/admin/hooks/useTeamsOverview";
 import { useTeamsSla } from "@/app/modules/admin/hooks/useTeamsSla";
@@ -9,7 +9,6 @@ import { SsvcBackfillButton } from "@/app/modules/admin/components/SsvcBackfillB
 import { TeamsOverviewTable } from "@/app/modules/admin/components/TeamsOverviewTable";
 import { TeamsSlaTable } from "@/app/modules/admin/components/TeamsSlaTable";
 import { VulnerabilitySearch } from "@/app/modules/admin/components/VulnerabilitySearch";
-import { ErrorMessage } from "@/app/components/ErrorMessage";
 
 export default function AdminPage() {
   const t = useTranslations("admin");
@@ -27,35 +26,6 @@ export default function AdminPage() {
     isLoading: slaLoading,
   } = useTeamsSla();
 
-  if (overviewError) {
-    return (
-      <ErrorMessage
-        error={overviewError}
-        title={tErrors("fetchTeamsOverviewError")}
-      />
-    );
-  }
-
-  if (slaError) {
-    return (
-      <ErrorMessage
-        error={slaError}
-        title={tErrors("fetchTeamsSlaError")}
-      />
-    );
-  }
-
-  if (overviewLoading || slaLoading || !overviewData || !slaData) {
-    return (
-      <Box
-        paddingBlock="space-24"
-        style={{ display: "flex", justifyContent: "center" }}
-      >
-        <Loader size="large" title={t("loadingData")} />
-      </Box>
-    );
-  }
-
   return (
     <Box paddingBlock="space-24">
       <VStack gap="space-32">
@@ -66,12 +36,14 @@ export default function AdminPage() {
           <BodyShort style={{ opacity: 0.75 }}>{t("description")}</BodyShort>
         </Box>
 
-        <AdminSummaryCards
-          totalTeams={overviewData.totalTeams}
-          totalVulnerabilities={overviewData.totalVulnerabilities}
-          totalOverdue={slaData.totalOverdue}
-          totalCriticalOverdue={slaData.totalCriticalOverdue}
-        />
+        {overviewData || slaData ? (
+          <AdminSummaryCards
+            totalTeams={overviewData?.totalTeams ?? 0}
+            totalVulnerabilities={overviewData?.totalVulnerabilities ?? 0}
+            totalOverdue={slaData?.totalOverdue}
+            totalCriticalOverdue={slaData?.totalCriticalOverdue}
+          />
+        ) : null}
 
         <Box>
           <VulnerabilitySearch />
@@ -81,14 +53,30 @@ export default function AdminPage() {
           <Heading size="medium" level="2" style={{ marginBottom: "1rem" }}>
             {t("teamsOverview")}
           </Heading>
-          <TeamsOverviewTable teams={overviewData.teams} />
+          {overviewLoading ? (
+            <Loader size="small" title={t("loadingData")} />
+          ) : overviewError ? (
+            <Alert variant="warning" size="small">
+              {tErrors("fetchTeamsOverviewError")}
+            </Alert>
+          ) : overviewData ? (
+            <TeamsOverviewTable teams={overviewData.teams} />
+          ) : null}
         </Box>
 
         <Box>
           <Heading size="medium" level="2" style={{ marginBottom: "1rem" }}>
             {t("slaCompliance")}
           </Heading>
-          <TeamsSlaTable teams={slaData.teams} />
+          {slaLoading ? (
+            <Loader size="small" title={t("loadingData")} />
+          ) : slaError ? (
+            <Alert variant="warning" size="small">
+              {tErrors("fetchTeamsSlaError")}
+            </Alert>
+          ) : slaData ? (
+            <TeamsSlaTable teams={slaData.teams} />
+          ) : null}
         </Box>
 
         <Box>
