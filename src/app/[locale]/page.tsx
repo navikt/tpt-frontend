@@ -43,36 +43,42 @@ function RoleCard({
       type="button"
       onClick={() => onSelect(role)}
       style={{
-        all: "unset",
+        // Reset browser button defaults explicitly without all:unset
+        appearance: "none",
+        WebkitAppearance: "none",
+        font: "inherit",
+        color: "inherit",
+        textAlign: "left",
+        // Layout
         cursor: "pointer",
         display: "flex",
         flexDirection: "column",
-        borderRadius: "12px",
-        border: selected
-          ? "2px solid var(--a-blue-500)"
-          : "2px solid var(--a-border-default)",
-        background: selected
-          ? "var(--a-surface-selected)"
-          : "var(--a-surface-subtle)",
+        width: "100%",
+        boxSizing: "border-box",
+        minWidth: 0,
         padding: "1.25rem",
         gap: "0.75rem",
-        transition: "border-color 120ms, background 120ms, box-shadow 120ms",
+        // Visuals
+        borderRadius: "12px",
+        border: selected ? "2px solid #005B82" : "2px solid #C6C2BF",
+        backgroundColor: selected ? "#E0F0FF" : "#F7F7F7",
         boxShadow: selected
-          ? "0 0 0 3px var(--a-blue-200)"
-          : "0 1px 3px rgba(0,0,0,0.10)",
-        minWidth: 0,
-        boxSizing: "border-box",
+          ? "0 0 0 3px #B3D9F2"
+          : "0 1px 4px rgba(0,0,0,0.12)",
+        transition: "border-color 120ms, background-color 120ms, box-shadow 120ms",
       }}
       onMouseEnter={(e) => {
         if (!selected) {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-strong)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 6px rgba(0,0,0,0.14)";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "#6A6560";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.18)";
+          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#EFEFEF";
         }
       }}
       onMouseLeave={(e) => {
         if (!selected) {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-default)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 1px 3px rgba(0,0,0,0.10)";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "#C6C2BF";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 1px 4px rgba(0,0,0,0.12)";
+          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#F7F7F7";
         }
       }}
       aria-pressed={selected}
