@@ -2,7 +2,7 @@
 
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
-import { Loader, Box, Button, BodyShort, Heading, Tag, List } from "@navikt/ds-react";
+import { Loader, Box, Button, BodyShort, Heading, Tag } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -47,18 +47,33 @@ function RoleCard({
         cursor: "pointer",
         display: "flex",
         flexDirection: "column",
-        borderRadius: "var(--a-border-radius-large)",
+        borderRadius: "12px",
         border: selected
           ? "2px solid var(--a-blue-500)"
           : "2px solid var(--a-border-default)",
         background: selected
           ? "var(--a-surface-selected)"
-          : "var(--a-surface-default)",
-        padding: "1.5rem",
+          : "var(--a-surface-subtle)",
+        padding: "1.25rem",
         gap: "0.75rem",
-        transition: "border-color 120ms, background 120ms",
-        boxShadow: selected ? "0 0 0 3px var(--a-blue-200)" : undefined,
+        transition: "border-color 120ms, background 120ms, box-shadow 120ms",
+        boxShadow: selected
+          ? "0 0 0 3px var(--a-blue-200)"
+          : "0 1px 3px rgba(0,0,0,0.10)",
         minWidth: 0,
+        boxSizing: "border-box",
+      }}
+      onMouseEnter={(e) => {
+        if (!selected) {
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-strong)";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 6px rgba(0,0,0,0.14)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!selected) {
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-default)";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 1px 3px rgba(0,0,0,0.10)";
+        }
       }}
       aria-pressed={selected}
     >
@@ -93,11 +108,14 @@ function RoleCard({
         >
           {tWelcomeCard("youWillSee")}
         </BodyShort>
-        <List as="ul" size="small" style={{ margin: 0, paddingLeft: "1.25rem" }}>
+        <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
           {bullets.map((bullet) => (
-            <List.Item key={bullet}>{bullet}</List.Item>
+            <li key={bullet} style={{ display: "flex", alignItems: "flex-start", gap: "0.4rem" }}>
+              <span style={{ color: "var(--a-blue-500)", fontWeight: "bold", lineHeight: "1.4", flexShrink: 0 }}>•</span>
+              <BodyShort size="small">{bullet}</BodyShort>
+            </li>
           ))}
-        </List>
+        </ul>
       </Box>
     </button>
   );

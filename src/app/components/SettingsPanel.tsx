@@ -2,16 +2,23 @@
 
 import { Popover, Button, VStack, BodyShort, Select } from "@navikt/ds-react";
 import { CogIcon } from "@navikt/aksel-icons";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import type { AppRole } from "@/app/shared/contexts/RoleContext";
 
+function redirectPath(locale: string, role: string): string {
+  return role === "DEVELOPER" ? `/${locale}/prioritization` : `/${locale}/compliance`;
+}
+
 function RoleSwitcher() {
   const { effectiveRole, actualRole, availableRoles, setSelectedRole } = useRoleContext();
   const t = useTranslations("roleContext");
+  const locale = useLocale();
+  const router = useRouter();
 
   const displayValue = (effectiveRole || actualRole || "") as AppRole | "";
 
@@ -22,6 +29,7 @@ function RoleSwitcher() {
     } else {
       setSelectedRole(newRole);
     }
+    router.push(redirectPath(locale, newRole));
   };
 
   if (availableRoles.length === 0) return null;
