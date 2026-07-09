@@ -15,6 +15,7 @@ import {
   KV_KEYS,
 } from "@/app/shared/utils/indexedDbCache";
 import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
+import { useSyncEvents } from "@/app/shared/hooks/useSyncEvents";
 
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
@@ -225,6 +226,19 @@ export const useVulnerabilities = () => {
     globalFetchPromise = fetchPromise;
     return await fetchPromise;
   }, []);
+
+  // Keep a stable ref to fetchData so useSyncEvents callback never goes stale
+  const fetchDataRef = useRef(fetchData);
+  useEffect(() => {
+    fetchDataRef.current = fetchData;
+  });
+
+  const { isSyncing } = useSyncEvents({
+    onSyncComplete: useCallback(() => {
+      // Silent background re-fetch: no spinner, no filter reset, no cooldown
+      fetchDataRef.current(false, false);
+    }, []),
+  });
 
   const refresh = useCallback(() => {
     const now = Date.now();
@@ -580,6 +594,7 @@ export const useVulnerabilities = () => {
     data,
     isLoading,
     isRefreshing,
+    isSyncing,
     error,
     refresh,
     canRefresh,
