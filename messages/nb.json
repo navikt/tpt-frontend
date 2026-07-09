@@ -358,8 +358,64 @@
     "gcveGcveSeverity": "GCVE-alvorlighet",
     "gcveNoDifferences": "Ingen avvik funnet mellom NVD og GCVE."
   },
+  "welcome": {
+    "eyebrow": "Velkommen til TPT",
+    "heading": "Hvilken av disse ligner mest på deg?",
+    "subheading": "Velg rollen som passer best, så tilpasser vi dashbordet etter hva som er viktig i din arbeidshverdag. Du kan endre dette når som helst i innstillingene.",
+    "selectButton": "Velg rolle",
+    "selectPrompt": "Velg en rolle for å fortsette",
+    "changeAnytime": "Du kan bytte rolle når som helst fra innstillingene.",
+    "youWillSee": "Du vil se",
+    "roles": {
+      "DEVELOPER": {
+        "title": "Utvikler",
+        "subtitle": "Teknisk visning",
+        "description": "Jeg er ansvarlig for å patche og fikse sårbarheter i produktene våre.",
+        "bullets": [
+          "Spesifikke sårbarheter i dine tjenester",
+          "Prioritert liste over hva som haster",
+          "Tekniske detaljer og utbedringsguider"
+        ]
+      },
+      "TEAM_MEMBER": {
+        "title": "Team Member",
+        "subtitle": "Ikke-teknisk visning",
+        "description": "Jeg jobber i et team og trenger oversikt over sikkerhetssituasjonen vår.",
+        "bullets": [
+          "Sikkerhetsstatus for teamet ditt",
+          "Oversikt over hva som trenger handling",
+          "Deployment-status og målsettinger"
+        ]
+      },
+      "PRODUCT_LEADER": {
+        "title": "Produktleder",
+        "subtitle": "Ikke-teknisk visning",
+        "description": "Jeg leder et produktområde og trenger overblikk for å delegere og prioritere arbeid.",
+        "bullets": [
+          "Sikkerhetsstatus på tvers av team",
+          "Oversikt over hva som haster",
+          "Risikobilde per applikasjon"
+        ]
+      },
+      "TECH_LEADER": {
+        "title": "Teknologileder",
+        "subtitle": "Ikke-teknisk visning",
+        "description": "Jeg har ansvar for den helhetlige sikkerhetssituasjonen på tvers av organisasjonen eller avdelingen min.",
+        "bullets": [
+          "Helhetlig sikkerhetsbilde",
+          "Status på tvers av alle team",
+          "Trender og risikoutvikling"
+        ]
+      }
+    }
+  },
   "roleContext": {
     "viewAs": "Vis som",
+    "changeRole": "Bytt rolle",
+    "DEVELOPER": "Utvikler",
+    "TEAM_MEMBER": "Team Member",
+    "PRODUCT_LEADER": "Produktleder",
+    "TECH_LEADER": "Teknologileder",
     "developer": "Utvikler",
     "teamMember": "Teammedlem",
     "leader": "Leder",

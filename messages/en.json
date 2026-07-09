@@ -358,8 +358,64 @@
     "gcveGcveSeverity": "GCVE severity",
     "gcveNoDifferences": "No differences found between NVD and GCVE."
   },
+  "welcome": {
+    "eyebrow": "Welcome to TPT",
+    "heading": "Which of these sounds most like you?",
+    "subheading": "Pick the role you relate to most and we'll shape your dashboard around what matters in your day. You can change this anytime in settings.",
+    "selectButton": "Select role",
+    "selectPrompt": "Select a role to continue",
+    "changeAnytime": "You can switch roles anytime from settings.",
+    "youWillSee": "You'll see",
+    "roles": {
+      "DEVELOPER": {
+        "title": "Developer",
+        "subtitle": "Technical view",
+        "description": "I'm responsible for patching and fixing vulnerabilities in our products.",
+        "bullets": [
+          "Specific vulnerabilities in your services",
+          "Prioritized list of what's urgent",
+          "Technical details and remediation guides"
+        ]
+      },
+      "TEAM_MEMBER": {
+        "title": "Team Member",
+        "subtitle": "Non-technical view",
+        "description": "I work in a team and need an overview of our security situation.",
+        "bullets": [
+          "Security status for your team",
+          "Overview of what needs action",
+          "Deployment status and targets"
+        ]
+      },
+      "PRODUCT_LEADER": {
+        "title": "Product Leader",
+        "subtitle": "Non-technical view",
+        "description": "I lead a product area and need a high-level view to delegate and prioritize work.",
+        "bullets": [
+          "Security status across teams",
+          "Overview of what's urgent",
+          "Risk picture per application"
+        ]
+      },
+      "TECH_LEADER": {
+        "title": "Tech Leader",
+        "subtitle": "Non-technical view",
+        "description": "I'm responsible for the overall security posture across the organization or my department.",
+        "bullets": [
+          "Holistic security picture",
+          "Status across all teams",
+          "Trends and risk development"
+        ]
+      }
+    }
+  },
   "roleContext": {
     "viewAs": "View as",
+    "changeRole": "Change role",
+    "DEVELOPER": "Developer",
+    "TEAM_MEMBER": "Team Member",
+    "PRODUCT_LEADER": "Product Leader",
+    "TECH_LEADER": "Tech Leader",
     "developer": "Developer",
     "teamMember": "Team Member",
     "leader": "Leader",

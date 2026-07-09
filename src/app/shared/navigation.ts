@@ -43,6 +43,7 @@ export const moduleNavLinks: ModuleNavLink[] = [
     labelKey: "header.etterlevelse",
     path: "/compliance",
     order: 2,
+    allowedRoles: ["TEAM_MEMBER", "PRODUCT_LEADER", "TECH_LEADER"],
   },
   {
     labelKey: "header.allVulnerabilities",
