@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 
 export default function CompliancePage() {
   const { error } = useVulnerabilitiesContext();
-  const { actualRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
+  const { effectiveRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations("errors");
   const tTeamMember = useTranslations("teamMemberView");
 
@@ -35,17 +35,12 @@ export default function CompliancePage() {
     );
   }
 
-  // Admins and developers always see TeamMemberView here
-  if (actualRole === "ADMIN" || actualRole === "DEVELOPER") {
+  if (effectiveRole === "DEVELOPER" || effectiveRole === "TEAM_MEMBER") {
     return <TeamMemberView />;
   }
 
-  if (actualRole === "LEADER") {
+  if (effectiveRole === "LEADER" || effectiveRole === "PRODUCT_LEADER" || effectiveRole === "TECH_LEADER") {
     return <LeaderView />;
-  }
-
-  if (actualRole === "TEAM_MEMBER") {
-    return <TeamMemberView />;
   }
 
   return <NoTeamView />;

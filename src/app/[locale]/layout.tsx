@@ -3,6 +3,7 @@ import { Page, InternalHeader, GlobalAlert, Spacer, Alert } from "@navikt/ds-rea
 import { useUser } from "../shared/hooks/useUser";
 import { useRoleContext, RoleContextProvider } from "../shared/hooks/useRoleContext";
 import { SettingsPanel } from "../components/SettingsPanel";
+import { FeedbackButton } from "../components/FeedbackButton";
 import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 import { Providers } from "../contexts/Providers";
@@ -92,6 +93,7 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
       <Page.Block as="main" width="lg" gutters>
         {children}
       </Page.Block>
+      <FeedbackButton />
     </Page>
   );
 }
