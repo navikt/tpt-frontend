@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         Accept: "text/event-stream",
         "Cache-Control": "no-cache",
       },
+      cache: "no-store",
       signal: request.signal,
     });
 
@@ -83,7 +84,8 @@ export async function GET(request: NextRequest) {
     }
 
     console.error("Events stream error:", error);
-    return new Response("event: error\ndata: Internal server error\n\n", {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(`event: error\ndata: Internal server error: ${message}\n\n`, {
       status: 500,
       headers: { "Content-Type": "text/event-stream" },
     });

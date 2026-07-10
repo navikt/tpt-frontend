@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useVulnerabilities } from "@/app/modules/vulnerabilities/hooks/useVulnerabilities";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import {
   getKvItem,
   setKvItem,
@@ -31,7 +31,7 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleContextProvider({ children }: { children: ReactNode }) {
-  const { data: vulnData, isLoading, error: vulnError } = useVulnerabilities();
+  const { data: vulnData, isLoading, error: vulnError } = useVulnerabilitiesContext();
   const actualRole = vulnData?.userRole;
 
   const [selectedRole, setSelectedRoleState] = useState<string | null>(null);
