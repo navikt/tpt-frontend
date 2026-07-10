@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
+// Wait this long after the last team_sync_complete before re-fetching,
+// so a burst of events for multiple teams collapses into a single fetch.
+const DEBOUNCE_MS = 1000;
+
 interface UseSyncEventsOptions {
   onSyncComplete: () => void;
 }
@@ -9,6 +13,7 @@ export function useSyncEvents({ onSyncComplete }: UseSyncEventsOptions): {
 } {
   const [isSyncing, setIsSyncing] = useState(false);
   const onSyncCompleteRef = useRef(onSyncComplete);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     onSyncCompleteRef.current = onSyncComplete;
@@ -21,22 +26,38 @@ export function useSyncEvents({ onSyncComplete }: UseSyncEventsOptions): {
 
     eventSource.addEventListener("team_sync_started", () => {
       setIsSyncing(true);
+      // Cancel any pending fetch — more syncs are still in flight
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
     });
 
     eventSource.addEventListener("team_sync_complete", () => {
-      onSyncCompleteRef.current();
-      setIsSyncing(false);
+      // Debounce: wait for the burst to settle before fetching
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      debounceTimerRef.current = setTimeout(() => {
+        onSyncCompleteRef.current();
+        setIsSyncing(false);
+        debounceTimerRef.current = null;
+      }, DEBOUNCE_MS);
     });
 
     eventSource.onerror = () => {
-      // EventSource reconnects automatically on error.
-      // Reset syncing state so we don't show a permanent spinner if the
-      // connection drops mid-sync.
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
       setIsSyncing(false);
     };
 
     return () => {
       eventSource.close();
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
   }, []);
 
