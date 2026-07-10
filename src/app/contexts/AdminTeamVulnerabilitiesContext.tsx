@@ -143,6 +143,7 @@ export function AdminTeamVulnerabilitiesProvider({
     data,
     isLoading,
     isRefreshing: false,
+    isSyncing: false,
     error,
     refresh: () => false,
     canRefresh: false,

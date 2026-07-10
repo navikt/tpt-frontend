@@ -41,6 +41,9 @@
     "fetchNewData": "Fetch new data from backend",
     "wait": "Wait"
   },
+  "sync": {
+    "fetchingInBackground": "Updating vulnerability data in the background..."
+  },
   "github": {
     "tab": "GitHub",
     "repositories": "Repositories",

@@ -1,5 +1,5 @@
 "use client";
-import { Page, InternalHeader, GlobalAlert, Spacer } from "@navikt/ds-react";
+import { Page, InternalHeader, GlobalAlert, Spacer, Alert } from "@navikt/ds-react";
 import { useUser } from "../shared/hooks/useUser";
 import { useRoleContext, RoleContextProvider } from "../shared/hooks/useRoleContext";
 import { SettingsPanel } from "../components/SettingsPanel";
@@ -8,6 +8,7 @@ import { moduleNavLinks } from "../shared/navigation";
 import { Providers } from "../contexts/Providers";
 import { useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
+import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
 
 function subscribe() { return () => {}; }
 function getSnapshot() { return true; }
@@ -20,6 +21,7 @@ function useIsClient() {
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isLoading: isUserLoading } = useUser();
   const { effectiveRole, actualRole, isLoading: isRoleLoading } = useRoleContext();
+  const { isSyncing } = useVulnerabilitiesContext();
   const t = useTranslations();
   const locale = useLocale();
   const isClient = useIsClient();
@@ -82,6 +84,11 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
           </GlobalAlert.Title>
         </GlobalAlert.Header>
       </GlobalAlert>
+      {isSyncing && (
+        <Alert variant="info" size="small" style={{ borderRadius: 0 }}>
+          {t("sync.fetchingInBackground")}
+        </Alert>
+      )}
       <Page.Block as="main" width="lg" gutters>
         {children}
       </Page.Block>

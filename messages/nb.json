@@ -41,6 +41,9 @@
     "fetchNewData": "Hent nye data fra backend",
     "wait": "Vent"
   },
+  "sync": {
+    "fetchingInBackground": "Oppdaterer sårbarhetsdata i bakgrunnen..."
+  },
   "github": {
     "tab": "GitHub",
     "repositories": "Repositories",
