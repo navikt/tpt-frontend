@@ -55,7 +55,7 @@ export const moduleNavLinks: ModuleNavLink[] = [
     labelKey: "github.tab",
     path: "/github",
     order: 4,
-    allowedRoles: ["DEVELOPER"],
+    allowedRoles: ["PRODUCT_LEADER", "TECH_LEADER"],
   },
   {
     labelKey: "admin.navTitle",
