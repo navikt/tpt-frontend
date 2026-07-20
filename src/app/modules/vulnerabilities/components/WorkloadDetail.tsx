@@ -29,9 +29,6 @@ import {
     getSeverityIconColor
 } from "@/app/shared/utils/riskFactors";
 import { useTranslations } from "next-intl";
-import { RemediationSection } from "@/app/modules/vulnerabilities/components/RemediationSection";
-import { useConfigContext } from "@/app/contexts/ConfigContext";
-import { useRoleContext } from "@/app/shared/contexts/RoleContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 
 function getIconForFactor(iconName: string): React.ReactNode {
@@ -65,8 +62,6 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
     const t = useTranslations();
     const [showFullDescription, setShowFullDescription] = useState(false);
     const { data, isLoading } = useVulnerabilitiesContext();
-    const { config } = useConfigContext();
-    const { actualRole } = useRoleContext();
 
     const workloadData = data?.teams
         .flatMap((team) =>
@@ -305,15 +300,6 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
                         </HStack>
                     </Box>
                 </>
-            )}
-            {config?.aiEnabled && actualRole === "ADMIN" && (
-                <RemediationSection
-                    cveId={vulnerabilityData.identifier}
-                    workloadName={workloadData.name}
-                    environment={workloadData.environment}
-                    packageName={vulnerabilityData.packageName}
-                    packageEcosystem={vulnerabilityData.packageEcosystem}
-                />
             )}
         </div>
     );

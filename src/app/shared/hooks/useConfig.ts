@@ -14,7 +14,6 @@ interface ThresholdConfig {
     environmentMax: number;
     actionabilityMax: number;
   };
-  aiEnabled?: boolean;
 }
 
 // Global state to share config across all instances

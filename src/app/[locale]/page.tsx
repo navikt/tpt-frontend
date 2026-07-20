@@ -60,25 +60,25 @@ function RoleCard({
         gap: "0.75rem",
         // Visuals
         borderRadius: "12px",
-        border: selected ? "2px solid #005B82" : "2px solid #C6C2BF",
-        backgroundColor: selected ? "#E0F0FF" : "#F7F7F7",
+        border: selected ? "2px solid var(--a-blue-600)" : "2px solid var(--a-border-default)",
+        backgroundColor: selected ? "var(--a-blue-50)" : "var(--a-surface-subtle)",
         boxShadow: selected
-          ? "0 0 0 3px #B3D9F2"
+          ? "0 0 0 3px var(--a-blue-200)"
           : "0 1px 4px rgba(0,0,0,0.12)",
         transition: "border-color 120ms, background-color 120ms, box-shadow 120ms",
       }}
       onMouseEnter={(e) => {
         if (!selected) {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "#6A6560";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-strong)";
           (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.18)";
-          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#EFEFEF";
+          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--a-surface-hover)";
         }
       }}
       onMouseLeave={(e) => {
         if (!selected) {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "#C6C2BF";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-default)";
           (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 1px 4px rgba(0,0,0,0.12)";
-          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#F7F7F7";
+          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--a-surface-subtle)";
         }
       }}
       aria-pressed={selected}

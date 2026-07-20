@@ -30,7 +30,6 @@ export async function GET() {
             medium: data.thresholds?.medium ?? FALLBACK_THRESHOLDS.medium,
           },
           scoring: data.scoring,
-          aiEnabled: data.aiEnabled ?? false,
         });
       } else {
         const errorBody = await response.json().catch(() => null);
