@@ -29,7 +29,9 @@ export function useComplianceFilter() {
       ? vulnData.teams.filter((t) => teamFilters[t.team] === true)
       : vulnData.teams;
 
-    // Step 2: filter workloads by app within remaining teams
+    // Step 2: filter workloads by app within remaining teams.
+    // Teams with no matching workloads are kept (with empty workloads array)
+    // so that callers can decide whether to show them (e.g. 0-bar in chart).
     if (!hasAppFilters) return teamsAfterTeamFilter;
 
     const activeAppNames = new Set(
@@ -39,8 +41,7 @@ export function useComplianceFilter() {
       .map((team) => ({
         ...team,
         workloads: team.workloads.filter((w) => activeAppNames.has(w.name)),
-      }))
-      .filter((team) => team.workloads.length > 0);
+      }));
   }, [vulnData, teamFilters, applicationFilters, isFilterActive, hasTeamFilters, hasAppFilters]);
 
   const allTeams = useMemo(() => vulnData?.teams ?? [], [vulnData]);
