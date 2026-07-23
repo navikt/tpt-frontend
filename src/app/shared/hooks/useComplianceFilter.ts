@@ -7,30 +7,41 @@ import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext
  * Provides:
  *  - `activeTeams`       — the teams to base all calculations on (filtered or all)
  *  - `hasAppFilters`     — whether any app filter is currently active
+ *  - `hasTeamFilters`    — whether any team filter is currently active
  *  - `showFiltered`      — current toggle state
  *  - `setShowFiltered`   — toggle setter
  *  - `applicationFilters`— raw filter map from context (use to derive activeAppNames inside useMemos)
  */
 export function useComplianceFilter() {
-  const { data: vulnData, applicationFilters } = useVulnerabilitiesContext();
+  const { data: vulnData, applicationFilters, teamFilters } = useVulnerabilitiesContext();
   const [showFiltered, setShowFiltered] = useState(true);
 
-  const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
-  const isFilterActive = hasAppFilters && showFiltered;
+  const hasTeamFilters = Object.values(teamFilters).some((v) => v === true);
+  const hasAppFilters  = Object.values(applicationFilters).some((v) => v === true);
+  const isFilterActive = (hasTeamFilters || hasAppFilters) && showFiltered;
 
   const filteredTeams = useMemo(() => {
     if (!vulnData?.teams) return [];
     if (!isFilterActive) return vulnData.teams;
+
+    // Step 1: filter by team
+    const teamsAfterTeamFilter = hasTeamFilters
+      ? vulnData.teams.filter((t) => teamFilters[t.team] === true)
+      : vulnData.teams;
+
+    // Step 2: filter workloads by app within remaining teams
+    if (!hasAppFilters) return teamsAfterTeamFilter;
+
     const activeAppNames = new Set(
       Object.keys(applicationFilters).filter((k) => applicationFilters[k])
     );
-    return vulnData.teams
+    return teamsAfterTeamFilter
       .map((team) => ({
         ...team,
         workloads: team.workloads.filter((w) => activeAppNames.has(w.name)),
       }))
       .filter((team) => team.workloads.length > 0);
-  }, [vulnData, applicationFilters, isFilterActive]);
+  }, [vulnData, teamFilters, applicationFilters, isFilterActive, hasTeamFilters, hasAppFilters]);
 
   const allTeams = useMemo(() => vulnData?.teams ?? [], [vulnData]);
   const activeTeams = isFilterActive ? filteredTeams : allTeams;
@@ -40,6 +51,7 @@ export function useComplianceFilter() {
     filteredTeams,
     allTeams,
     hasAppFilters,
+    hasTeamFilters,
     isFilterActive,
     showFiltered,
     setShowFiltered,

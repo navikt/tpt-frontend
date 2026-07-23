@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
+import { mockSlaOverduePayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 import { isAbortError } from "@/app/shared/utils/errorHandling";
 
@@ -19,6 +20,10 @@ function getServerEnv() {
 }
 
 export async function GET(request: NextRequest) {
+  if (process.env.MOCKS_ENABLED === "true") {
+    console.log("mocks enabled - returning mock SLA data");
+    return NextResponse.json(mockSlaOverduePayload);
+  }
   try {
     const { tptBackendUrl } = getServerEnv();
 

@@ -85,6 +85,7 @@ const TeamFilterModal = ({
       key={`team-filter-${open ? "open" : "closed"}-${selectedTeams.join("|")}-${selectedApplications.join("|")}`}
       open={open}
       onClose={onClose}
+      closeOnBackdropClick
       header={{
         heading: t("title"),
         closeButton: true,

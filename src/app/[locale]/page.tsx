@@ -8,6 +8,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { AppRole } from "@/app/shared/contexts/RoleContext";
+import styles from "./page.module.css";
 
 function redirectPath(locale: string, role: string): string {
   return role === "DEVELOPER" ? `/${locale}/prioritization` : `/${locale}/compliance`;
@@ -42,45 +43,11 @@ function RoleCard({
     <button
       type="button"
       onClick={() => onSelect(role)}
-      style={{
-        // Reset browser button defaults explicitly without all:unset
-        appearance: "none",
-        WebkitAppearance: "none",
-        font: "inherit",
-        color: "inherit",
-        textAlign: "left",
-        // Layout
-        cursor: "pointer",
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        boxSizing: "border-box",
-        minWidth: 0,
-        padding: "1.25rem",
-        gap: "0.75rem",
-        // Visuals
-        borderRadius: "12px",
-        border: selected ? "2px solid var(--a-blue-600)" : "2px solid var(--a-border-default)",
-        backgroundColor: selected ? "var(--a-blue-50)" : "var(--a-surface-subtle)",
-        boxShadow: selected
-          ? "0 0 0 3px var(--a-blue-200)"
-          : "0 1px 4px rgba(0,0,0,0.12)",
-        transition: "border-color 120ms, background-color 120ms, box-shadow 120ms",
-      }}
-      onMouseEnter={(e) => {
-        if (!selected) {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-strong)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.18)";
-          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--a-surface-hover)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!selected) {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--a-border-default)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 1px 4px rgba(0,0,0,0.12)";
-          (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--a-surface-subtle)";
-        }
-      }}
+      className={styles.roleCard}
+      style={selected ? {
+        borderColor: "var(--ax-border-accent)",
+        boxShadow: "0 0 0 1px var(--ax-border-accent)",
+      } : undefined}
       aria-pressed={selected}
     >
       <Box style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>

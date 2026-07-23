@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { mockConfigPayload } from "@/app/mocks/mockPayloads";
 import { parseProblemDetails, getErrorMessageKey } from "@/app/shared/utils/errorHandling";
 
 // Hardcoded fallback values
@@ -9,6 +10,11 @@ const FALLBACK_THRESHOLDS = {
 };
 
 export async function GET() {
+  if (process.env.MOCKS_ENABLED === "true") {
+    console.log("mocks enabled - returning mock config");
+    return NextResponse.json(mockConfigPayload);
+  }
+
   const tptBackendUrl = process.env.TPT_BACKEND_URL;
 
   // Try to fetch from backend first

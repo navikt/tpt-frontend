@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useSlaOverdue } from "@/app/shared/hooks/useSlaOverdue";
+import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import { DEPLOYMENT_AGE_DAYS } from "@/app/shared/constants/deploymentAge";
 import {
   BodyShort,
@@ -23,15 +24,19 @@ import { formatNumber } from "@/lib/format";
 import { calculateDeploymentAge } from "@/app/utils/deploymentAge";
 import FilterButton from "@/app/components/FilterButton";
 import { useComplianceFilter } from "@/app/shared/hooks/useComplianceFilter";
+import TeamRiskBarChart from "@/app/modules/vulnerabilities/components/TeamRiskBarChart";
 
 
 export default function LeaderView() {
   const t = useTranslations("leaderView");
   const tTeam = useTranslations("teamMemberView");
   const tFilter = useTranslations("complianceFilter");
-  const { isLoading: configLoading } = useConfigContext();
+  const { isLoading: configLoading, config } = useConfigContext();
   const { data: vulnData, isLoading: dataLoading } = useVulnerabilitiesContext();
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
+  const { effectiveRole } = useRoleContext();
+
+  const chartGroupBy = effectiveRole === "PRODUCT_LEADER" ? "app" : "team";
 
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 
@@ -272,6 +277,22 @@ export default function LeaderView() {
                   </Heading>
                 </Box>
               </HGrid>
+            </VStack>
+          </Box>
+
+          {/* Risk Bar Chart */}
+          <Box
+            padding="space-16"
+            borderRadius="8"
+            background="default"
+            borderWidth="1"
+            borderColor="neutral-subtle"
+          >
+            <VStack gap="space-12">
+              <Heading size="medium" level="2">
+                {t("chartTitle")}
+              </Heading>
+              <TeamRiskBarChart teams={filteredTeams} config={config} groupBy={chartGroupBy} />
             </VStack>
           </Box>
 

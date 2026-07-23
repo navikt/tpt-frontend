@@ -203,6 +203,7 @@
     "title": "Teamoversikt",
     "description": "En oversikt over alle team og deres sårbarheter.",
     "loadingData": "Laster data...",
+    "chartTitle": "Sårbarheter per team",
     "total": "Totalt",
     "teams": "Team",
     "applications": "Applikasjoner",

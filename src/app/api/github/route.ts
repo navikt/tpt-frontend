@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
-import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
+import { mockGithubPayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 import { isAbortError } from "@/app/shared/utils/errorHandling";
 
@@ -23,9 +23,7 @@ function getServerEnv() {
 export async function GET(request: NextRequest) {
   if (process.env.MOCKS_ENABLED === "true") {
     console.log("mocks enabled - returning mock data for GitHub");
-    // For now, return the same mock data structure
-    // In production, this would be different data from the GitHub endpoint
-    return NextResponse.json(mockVulnerabilitiesPayload);
+    return NextResponse.json(mockGithubPayload);
   }
   try {
     const { tptBackendUrl } = getServerEnv();

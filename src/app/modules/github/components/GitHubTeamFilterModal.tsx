@@ -55,6 +55,7 @@ export function GitHubTeamFilterModal({
     <Modal
       open={open}
       onClose={onClose}
+      closeOnBackdropClick
       header={{ heading: t("title") }}
       width="small"
     >

@@ -203,6 +203,7 @@
     "title": "Team Overview",
     "description": "An overview of all teams and their vulnerabilities.",
     "loadingData": "Loading data...",
+    "chartTitle": "Vulnerabilities per team",
     "total": "Total",
     "teams": "Teams",
     "applications": "Applications",
