@@ -15,3 +15,9 @@ minimumReleaseAgeExclude:
   - brace-expansion@5.0.6
   - ws@8.20.1
   - protobufjs@8.2.0
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - 'eslint-import-resolver-typescript@3.10.1'
+  - 'react-is@19.2.8'
+  - 'semver@6.3.1'
+  - 'ua-parser-js@1.0.41'
