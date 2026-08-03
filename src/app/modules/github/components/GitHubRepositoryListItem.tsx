@@ -47,12 +47,14 @@ function SecurityMetricItem({
   label, 
   value, 
   icon, 
-  color 
+  color,
+  hint,
 }: { 
   label: string; 
   value: string; 
   icon: React.ReactNode; 
   color: string;
+  hint?: string | null;
 }) {
   return (
     <HStack gap="space-8" align="center">
@@ -66,6 +68,11 @@ function SecurityMetricItem({
         <BodyShort size="small" weight="semibold">
           {value}
         </BodyShort>
+        {hint && (
+          <BodyShort size="small" style={{ color: "var(--a-text-danger)" }}>
+            {hint}
+          </BodyShort>
+        )}
       </div>
     </HStack>
   );
@@ -104,6 +111,34 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
   };
 
   const distrolessStatus = getDistrolessStatus();
+
+  // Determine code scanning status
+  const getCodeScanningStatus = () => {
+    if (repository.codeScanningStatus === "OK") {
+      return {
+        value: t("repository.ok"),
+        icon: <CheckmarkCircleFillIcon fontSize="1.25rem" />,
+        color: "var(--a-icon-success)",
+        hint: null,
+      };
+    } else if (repository.codeScanningStatus) {
+      return {
+        value: t("repository.notOk"),
+        icon: <XMarkOctagonFillIcon fontSize="1.25rem" />,
+        color: "var(--a-icon-danger)",
+        hint: repository.codeScanningStatus,
+      };
+    } else {
+      return {
+        value: t("repository.unknown"),
+        icon: <QuestionmarkDiamondFillIcon fontSize="1.25rem" />,
+        color: "var(--a-icon-info)",
+        hint: null,
+      };
+    }
+  };
+
+  const codeScanningStatus = getCodeScanningStatus();
 
   return (
     <div 
@@ -180,9 +215,16 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
                     icon={distrolessStatus.icon}
                     color={distrolessStatus.color}
                   />
+                  <SecurityMetricItem
+                    label={t("repository.codeScanning")}
+                    value={codeScanningStatus.value}
+                    icon={codeScanningStatus.icon}
+                    color={codeScanningStatus.color}
+                    hint={codeScanningStatus.hint}
+                  />
                 </HStack>
                 <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                  {t("repository.comingSoon")}: {t("repository.codeScanning")}, {t("repository.lockFiles")}
+                  {t("repository.comingSoon")}: {t("repository.lockFiles")}
                 </BodyShort>
               </VStack>
             </Box>
