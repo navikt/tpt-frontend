@@ -17,7 +17,7 @@ function getServerEnv() {
   return { tptBackendUrl, tptBackendScope };
 }
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const { tptBackendUrl } = getServerEnv();
 
@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
         Accept: "application/json",
       },
       signal: request.signal,
+      method: "POST",
     });
 
     if (!backendResponse.ok || !backendResponse.body) {
