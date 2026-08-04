@@ -38,7 +38,7 @@ jobs:
         with:
           team: appsec
           build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
-      - uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+      - uses: nais/deploy/actions/deploy@fc3eae3edebabdf67f7592102ae16176d5ba3b5f # v2
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais.yaml
@@ -64,6 +64,6 @@ jobs:
           format: 'sarif'
           scanners: 'secret'
           output: 'trivy.sarif'
-      - uses: github/codeql-action/upload-sarif@e0647621c2984b5ed2f768cb892365bf2a616ad1 # v4.37.2
+      - uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
         with:
           sarif_file: 'trivy.sarif'
