@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import {
   filtersToSearchParams,
@@ -57,6 +57,7 @@ export const __resetVulnerabilitiesState = () => {
 export const useVulnerabilities = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   // Initialize with global cached data
   const [data, setData] = useState<VulnerabilitiesResponse | null>(() => globalCachedData);
@@ -331,6 +332,12 @@ export const useVulnerabilities = () => {
     setKvItem(KV_KEYS.TEAM_PREFERENCES, selectedTeams);
   }, [teamFilters]);
 
+  // Reset URL sync tracking when navigating to a new page so filters
+  // are re-written to the new pathname's query string.
+  useEffect(() => {
+    lastSyncedParamsRef.current = "";
+  }, [pathname]);
+
   // Sync filters to URL query params (debounced)
   useEffect(() => {
     if (!isInitializedRef.current) return;
@@ -357,7 +364,7 @@ export const useVulnerabilities = () => {
       if (newParamsString !== lastSyncedParamsRef.current) {
         lastSyncedParamsRef.current = newParamsString;
         const newUrl = newParamsString
-          ? `?${newParamsString}`
+          ? `${window.location.pathname}?${newParamsString}`
           : window.location.pathname;
         router.replace(newUrl, { scroll: false });
       }
@@ -375,6 +382,7 @@ export const useVulnerabilities = () => {
     cveFilters,
     packageNameFilters,
     router,
+    pathname,
   ]);
 
   const availableEnvironments = useMemo(() => {
