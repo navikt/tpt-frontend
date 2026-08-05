@@ -32,6 +32,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
+import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -65,7 +66,7 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
     const [showFullDescription, setShowFullDescription] = useState(false);
     const { data, isLoading } = useVulnerabilitiesContext();
     const { config } = useConfigContext();
-    const { actualRole } = useRoleContext();
+    useRoleContext();
     const searchParams = useSearchParams();
     const pkgParam = searchParams.get("pkg");
 

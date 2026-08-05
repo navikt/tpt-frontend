@@ -29,8 +29,7 @@ const COLORS = {
   low:       "#6f6f6f",
 } as const;
 
-const SERIES_NAMES = ["Snarest", "Må prioriteres", "Må planlegges", "Når det passer"] as const;
-type SeriesName = typeof SERIES_NAMES[number];
+type SeriesName = "Snarest" | "Må prioriteres" | "Må planlegges" | "Når det passer";
 type SortOrder = "desc" | "asc";
 
 const MIN_BAR_WIDTH_PX = 120;

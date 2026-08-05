@@ -97,7 +97,6 @@ function RoleCard({
 export default function Home() {
   const { data: vulnData, error } = useVulnerabilitiesContext();
   const {
-    actualRole,
     effectiveRole,
     isInitialized,
     isLoading: isRoleLoading,
