@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
     Heading,
     BodyShort,
@@ -64,6 +65,9 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
     const [showFullDescription, setShowFullDescription] = useState(false);
     const { data, isLoading } = useVulnerabilitiesContext();
     const { config } = useConfigContext();
+    const { actualRole } = useRoleContext();
+    const searchParams = useSearchParams();
+    const pkgParam = searchParams.get("pkg");
 
     const workloadData = data?.teams
         .flatMap((team) =>
@@ -75,7 +79,7 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
         .find((w) => w.id === workloadId);
 
     const vulnerabilityData = workloadData?.vulnerabilities.find(
-        (v) => v.identifier === vulnId
+        (v) => v.identifier === vulnId && (!pkgParam || v.packageName === pkgParam)
     );
 
     if (isLoading) {

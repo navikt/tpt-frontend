@@ -308,7 +308,7 @@ const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentP
 
     const byPackage = Object.entries(
         vulnerabilities.reduce((acc, vuln) => {
-            const key = vuln.packageName;
+            const key = getPackageDisplayName(vuln.packageName);
             if (!acc[key]) acc[key] = [];
             acc[key].push(vuln);
             return acc;
@@ -323,7 +323,7 @@ const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentP
                         weight="semibold"
                         style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}
                     >
-                        {getPackageDisplayName(packageName)} {t("list.vulnerabilitiesInPackage", { count: vulns.length })}
+                        {packageName} {t("list.vulnerabilitiesInPackage", { count: vulns.length })}
                     </BodyShort>
                     {vulns.map((vuln, vulnIndex) => {
                         const maxDescriptionLength = 200;
@@ -344,7 +344,7 @@ const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentP
                             >
                                 <LinkCard.Title>
                                     <LinkCard.Anchor asChild>
-                                        <Link href={`${basePath}/${workload.id}/${vuln.identifier}`}>
+                                        <Link href={`${basePath}/${workload.id}/${vuln.identifier}?pkg=${encodeURIComponent(vuln.packageName)}`}>
                                             <BodyShort size="small">{vuln.identifier}</BodyShort>
                                         </Link>
                                     </LinkCard.Anchor>
