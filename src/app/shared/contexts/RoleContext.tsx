@@ -67,7 +67,7 @@ export function RoleContextProvider({ children }: { children: ReactNode }) {
   const availableRoles: AppRole[] =
     actualRole === "ADMIN"
       ? [...BASE_ROLES, ...ADMIN_ONLY_ROLES]
-      : BASE_ROLES;
+      : [...BASE_ROLES, "PRODUCT_LEADER"];
 
   // Consider initialized once the fetch has settled — either with data or
   // with an error. Never leave pages spinning forever on a network failure.

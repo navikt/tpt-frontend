@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useEffect, useState, useRef, useCallback } from "react";
-import HighchartsReact, { HighchartsReactRefObject } from "highcharts-react-official";
+import { useMemo, useEffect, useState, useRef } from "react";
+import HighchartsReact, {
+  HighchartsReactRefObject,
+} from "highcharts-react-official";
 import Highcharts from "highcharts";
 import type { Team } from "@/app/shared/types/vulnerabilities";
 import type { Options, SeriesColumnOptions } from "highcharts";
-import { Button, HStack, BodyShort } from "@navikt/ds-react";
-import { ArrowDownIcon, ArrowUpIcon } from "@navikt/aksel-icons";
 
 interface ThresholdConfig {
   thresholds: {
@@ -23,38 +23,34 @@ interface TeamRiskBarChartProps {
 }
 
 const COLORS = {
-  critical:  "#c30000",
+  critical: "#c30000",
   important: "#d47b00",
-  whenTime:  "#0067c5",
-  low:       "#6f6f6f",
+  whenTime: "#0067c5",
+  low: "#6f6f6f",
 } as const;
-
-type SeriesName = "Snarest" | "Må prioriteres" | "Må planlegges" | "Når det passer";
-type SortOrder = "desc" | "asc";
 
 const MIN_BAR_WIDTH_PX = 120;
 
 // Track whether accessibility module has been loaded
 let a11yLoaded = false;
 
-export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBarChartProps) {
+export default function TeamRiskBarChart({
+  teams,
+  config,
+  groupBy,
+}: TeamRiskBarChartProps) {
   const [isDark, setIsDark] = useState(false);
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
-  const [hiddenSeries, setHiddenSeries] = useState<Set<SeriesName>>(new Set());
   const chartRef = useRef<HighchartsReactRefObject>(null);
-  // Keep a stable ref so the callback can always read current hiddenSeries
-  const hiddenSeriesRef = useRef<Set<SeriesName>>(hiddenSeries);
-
-  useEffect(() => {
-    hiddenSeriesRef.current = hiddenSeries;
-  }, [hiddenSeries]);
 
   useEffect(() => {
     const update = () =>
       setIsDark(document.documentElement.getAttribute("data-theme") === "dark");
     update();
     const observer = new MutationObserver(update);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -69,21 +65,33 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
   }, []);
 
   const criticalThreshold = config?.thresholds.critical ?? 75;
-  const highThreshold     = config?.thresholds.high     ?? 50;
-  const mediumThreshold   = config?.thresholds.medium   ?? 25;
+  const highThreshold = config?.thresholds.high ?? 50;
+  const mediumThreshold = config?.thresholds.medium ?? 25;
 
   const rawPoints = useMemo(() => {
-    const points: { label: string; critical: number; important: number; whenTime: number; low: number }[] = [];
+    const points: {
+      label: string;
+      critical: number;
+      important: number;
+      whenTime: number;
+      low: number;
+    }[] = [];
 
     if (groupBy === "team") {
       for (const team of teams) {
         const vulns = team.workloads.flatMap((w) => w.vulnerabilities);
         points.push({
-          label:     team.team,
-          critical:  vulns.filter((v) => v.riskScore >= criticalThreshold).length,
-          important: vulns.filter((v) => v.riskScore >= highThreshold && v.riskScore < criticalThreshold).length,
-          whenTime:  vulns.filter((v) => v.riskScore >= mediumThreshold && v.riskScore < highThreshold).length,
-          low:       vulns.filter((v) => v.riskScore  < mediumThreshold).length,
+          label: team.team,
+          critical: vulns.filter((v) => v.riskScore >= criticalThreshold)
+            .length,
+          important: vulns.filter(
+            (v) =>
+              v.riskScore >= highThreshold && v.riskScore < criticalThreshold
+          ).length,
+          whenTime: vulns.filter(
+            (v) => v.riskScore >= mediumThreshold && v.riskScore < highThreshold
+          ).length,
+          low: vulns.filter((v) => v.riskScore < mediumThreshold).length,
         });
       }
     } else {
@@ -102,10 +110,17 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
           const vulns = workload.vulnerabilities;
           points.push({
             label,
-            critical:  vulns.filter((v) => v.riskScore >= criticalThreshold).length,
-            important: vulns.filter((v) => v.riskScore >= highThreshold && v.riskScore < criticalThreshold).length,
-            whenTime:  vulns.filter((v) => v.riskScore >= mediumThreshold && v.riskScore < highThreshold).length,
-            low:       vulns.filter((v) => v.riskScore  < mediumThreshold).length,
+            critical: vulns.filter((v) => v.riskScore >= criticalThreshold)
+              .length,
+            important: vulns.filter(
+              (v) =>
+                v.riskScore >= highThreshold && v.riskScore < criticalThreshold
+            ).length,
+            whenTime: vulns.filter(
+              (v) =>
+                v.riskScore >= mediumThreshold && v.riskScore < highThreshold
+            ).length,
+            low: vulns.filter((v) => v.riskScore < mediumThreshold).length,
           });
         }
       }
@@ -116,54 +131,47 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
 
   const sortedPoints = useMemo(() => {
     return [...rawPoints].sort((a, b) => {
-      const visibleTotal = (p: typeof a) =>
-        (!hiddenSeries.has("Snarest")        ? p.critical  : 0) +
-        (!hiddenSeries.has("Må prioriteres") ? p.important : 0) +
-        (!hiddenSeries.has("Må planlegges")  ? p.whenTime  : 0) +
-        (!hiddenSeries.has("Når det passer") ? p.low       : 0);
-
-      const diff = visibleTotal(b) - visibleTotal(a);
-      return sortOrder === "desc" ? diff : -diff;
+      const total = (p: typeof a) =>
+        p.critical + p.important + p.whenTime + p.low;
+      return total(b) - total(a);
     });
-  }, [rawPoints, sortOrder, hiddenSeries]);
+  }, [rawPoints]);
 
   const { labels, seriesData } = useMemo(() => {
-    const names     = sortedPoints.map((p) => p.label);
-    const critical  = sortedPoints.map((p) => p.critical);
+    const names = sortedPoints.map((p) => p.label);
+    const critical = sortedPoints.map((p) => p.critical);
     const important = sortedPoints.map((p) => p.important);
-    const whenTime  = sortedPoints.map((p) => p.whenTime);
-    const low       = sortedPoints.map((p) => p.low);
+    const whenTime = sortedPoints.map((p) => p.whenTime);
+    const low = sortedPoints.map((p) => p.low);
 
     const series: SeriesColumnOptions[] = [
-      { type: "column", name: "Snarest",        data: critical,  color: COLORS.critical },
-      { type: "column", name: "Må prioriteres", data: important, color: COLORS.important },
-      { type: "column", name: "Må planlegges",  data: whenTime,  color: COLORS.whenTime },
-      { type: "column", name: "Når det passer", data: low,       color: COLORS.low },
+      {
+        type: "column",
+        name: "Snarest",
+        data: critical,
+        color: COLORS.critical,
+      },
+      {
+        type: "column",
+        name: "Må prioriteres",
+        data: important,
+        color: COLORS.important,
+      },
+      {
+        type: "column",
+        name: "Må planlegges",
+        data: whenTime,
+        color: COLORS.whenTime,
+      },
+      { type: "column", name: "Når det passer", data: low, color: COLORS.low },
     ];
 
     return { labels: names, seriesData: series };
   }, [sortedPoints]);
 
-  // Callback runs once after Highcharts creates a fresh chart instance.
-  // Restores hidden series from ref (stable, no stale closure).
-  const handleCallback = useCallback((chart: Highcharts.Chart) => {
-    const hidden = hiddenSeriesRef.current;
-    if (hidden.size === 0) return;
-    chart.series.forEach((s) => {
-      if (hidden.has(s.name as SeriesName)) {
-        s.setVisible(false, false);
-      }
-    });
-    chart.redraw(false);
-  }, []);
-
-  const cycleSort = () => {
-    setSortOrder((prev) => prev === "desc" ? "asc" : "desc");
-  };
-
   const minChartWidth = labels.length * MIN_BAR_WIDTH_PX;
 
-  const bg      = isDark ? "#1a2433" : "#ffffff";
+  const bg = isDark ? "#1a2433" : "#ffffff";
   const textCol = isDark ? "#e0e0e0" : "#1a1a1a";
   const gridCol = isDark ? "#2e3d52" : "#e8e8e8";
 
@@ -179,16 +187,18 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
       style: { fontFamily: "inherit" },
       animation: { duration: 300 },
     },
-    title:    { text: undefined },
+    title: { text: undefined },
     subtitle: { text: undefined },
-    credits:  { enabled: false },
+    credits: { enabled: false },
     accessibility: {
       enabled: true,
-      description: groupBy === "team"
-        ? "Stablet søylediagram som viser antall sårbarheter per team, fordelt på prioriteringskategorier."
-        : "Stablet søylediagram som viser antall sårbarheter per applikasjon, fordelt på prioriteringskategorier.",
+      description:
+        groupBy === "team"
+          ? "Stablet søylediagram som viser antall sårbarheter per team, fordelt på prioriteringskategorier."
+          : "Stablet søylediagram som viser antall sårbarheter per applikasjon, fordelt på prioriteringskategorier.",
       point: {
-        valueDescriptionFormat: "{index}. {xDescription}, {series.name}: {value}.",
+        valueDescriptionFormat:
+          "{index}. {xDescription}, {series.name}: {value}.",
       },
       series: {
         descriptionFormat: "{seriesDescription}.",
@@ -203,8 +213,8 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
         style: { color: textCol, fontSize: "13px" },
         rotation: labels.length > 8 ? -35 : 0,
       },
-      lineColor:     gridCol,
-      tickColor:     gridCol,
+      lineColor: gridCol,
+      tickColor: gridCol,
       gridLineWidth: 0,
     },
     yAxis: {
@@ -251,17 +261,7 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
       series: {
         events: {
           legendItemClick() {
-            const name = this.name as SeriesName;
-            // Toggle visibility directly on the series instance — safe, no chart.update()
-            this.setVisible(!this.visible, true);
-            // Sync React state for sort calculation
-            setHiddenSeries((prev) => {
-              const next = new Set(prev);
-              if (next.has(name)) next.delete(name);
-              else next.add(name);
-              return next;
-            });
-            return false; // prevent Highcharts default handler
+            return false; // disable legend filtering
           },
         },
       },
@@ -269,33 +269,16 @@ export default function TeamRiskBarChart({ teams, config, groupBy }: TeamRiskBar
     series: seriesData,
   };
 
-  const SortIcon = sortOrder === "desc" ? ArrowDownIcon : ArrowUpIcon;
-
-  // Key drives full remount when labels change (sort/filter).
-  // allowChartUpdate=false ensures chart.update() is never called — only fresh mounts.
   const chartKey = labels.join("|");
 
   return (
     <div style={{ width: "100%" }}>
-      <HStack justify="end" align="center" gap="space-8" style={{ marginBottom: "0.5rem" }}>
-        <BodyShort size="small" style={{ color: textCol }}>Sorter:</BodyShort>
-        <Button
-          variant="tertiary"
-          size="small"
-          onClick={cycleSort}
-        >
-          {sortOrder === "desc" ? "Høy" : "Lav"}
-          <SortIcon aria-hidden style={{ display: "inline", verticalAlign: "middle", margin: "0 2px" }} />
-          {sortOrder === "desc" ? "Lav" : "Høy"}
-        </Button>
-      </HStack>
       <HighchartsReact
         key={chartKey}
         ref={chartRef}
         highcharts={Highcharts}
         options={options}
         allowChartUpdate={false}
-        callback={handleCallback}
         containerProps={{ style: { width: "100%" } }}
       />
     </div>
