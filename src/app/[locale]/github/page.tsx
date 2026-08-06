@@ -12,7 +12,7 @@ import { useState } from "react";
 
 export default function GitHubPage() {
   const t = useTranslations();
-  const { data, teamFilters, setTeamFilters } = useGitHubVulnerabilities();
+  const { data, teamFilters, setTeamFilters, refresh, canRefresh, isRefreshing } = useGitHubVulnerabilities();
   const { config, isLoading } = useConfigContext();
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   
@@ -138,13 +138,24 @@ export default function GitHubPage() {
                 </div>
               </HStack>
               
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={() => setFilterModalOpen(true)}
-              >
-                {t("github.filterTeams")} ({selectedTeams.length > 0 ? selectedTeams.length : "alle"})
-              </Button>
+              <HStack gap="space-8">
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={() => setFilterModalOpen(true)}
+                >
+                  {t("github.filterTeams")} ({selectedTeams.length > 0 ? selectedTeams.length : "alle"})
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={refresh}
+                  disabled={!canRefresh || isRefreshing}
+                  loading={isRefreshing}
+                >
+                  {t("summary.refresh")}
+                </Button>
+              </HStack>
             </HStack>
           </Box>
 
