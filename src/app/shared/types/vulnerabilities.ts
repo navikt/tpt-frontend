@@ -56,6 +56,13 @@ export interface Repository {
   nameWithOwner: string;
   vulnerabilities: Vulnerability[];
   usesDistroless?: boolean | null;
+  /**
+   * GitHub Code Scanning status.
+   * - null: unknown / not yet collected
+   * - "OK": code scanning is active and healthy
+   * - any other string: hint/error message describing what needs to be fixed
+   */
+  codeScanningStatus?: string | null;
 }
 
 export interface Team {

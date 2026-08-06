@@ -81,6 +81,8 @@
       "comingSoon": "Kommer snart",
       "yes": "Ja",
       "no": "Nei",
+      "ok": "OK",
+      "notOk": "Ikke OK",
       "unknown": "Ukjent",
       "noRepositories": "Ingen repositories å vise",
       "showingTop": "Viser topp {count} repositories etter risikoscore",

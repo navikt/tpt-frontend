@@ -763,6 +763,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
         {
           nameWithOwner: "navikt/tpt-frontend",
           usesDistroless: false,
+          codeScanningStatus: "Code scanning is not enabled. Enable it via GitHub Advanced Security in repository settings.",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0030",
@@ -821,6 +822,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
         {
           nameWithOwner: "navikt/design-system",
           usesDistroless: true,
+          codeScanningStatus: "OK",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0032",
@@ -858,6 +860,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
         {
           nameWithOwner: "navikt/tpt-backend",
           usesDistroless: true,
+          codeScanningStatus: "OK",
           vulnerabilities: [
             {
               identifier: "CVE-2025-0040",
@@ -891,6 +894,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
         {
           nameWithOwner: "navikt/data-pipeline",
           usesDistroless: false,
+          codeScanningStatus: null,
           vulnerabilities: [
             {
               identifier: "CVE-2025-0041",

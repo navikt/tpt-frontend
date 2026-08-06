@@ -12,7 +12,7 @@ import { useState } from "react";
 
 export default function GitHubPage() {
   const t = useTranslations();
-  const { data, teamFilters, setTeamFilters } = useGitHubVulnerabilities();
+  const { data, teamFilters, setTeamFilters, refresh, canRefresh, isRefreshing, isLoading: isGitHubLoading } = useGitHubVulnerabilities();
   const { config, isLoading } = useConfigContext();
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   
@@ -35,9 +35,15 @@ export default function GitHubPage() {
   const filteredRepositories = useMemo(() => {
     if (!data) return [];
     
+    const seen = new Set<string>();
     return data.teams
       .filter((team) => selectedTeams.length === 0 || selectedTeams.includes(team.team))
       .flatMap((team) => team.repositories || [])
+      .filter((repo) => {
+        if (seen.has(repo.nameWithOwner)) return false;
+        seen.add(repo.nameWithOwner);
+        return true;
+      })
       .filter((repo) => repo.vulnerabilities.length > 0);
   }, [data, selectedTeams]);
 
@@ -80,8 +86,8 @@ export default function GitHubPage() {
 
   const allTeams = data?.teams.map((t) => t.team) || [];
 
-  // Show loading state while config is loading
-  if (isLoading) {
+  // Show loading state while config or GitHub data is loading
+  if (isLoading || isGitHubLoading) {
     return (
       <div className={styles.page}>
         <main className={styles.main}>
@@ -138,13 +144,24 @@ export default function GitHubPage() {
                 </div>
               </HStack>
               
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={() => setFilterModalOpen(true)}
-              >
-                {t("github.filterTeams")} ({selectedTeams.length > 0 ? selectedTeams.length : "alle"})
-              </Button>
+              <HStack gap="space-8">
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={() => setFilterModalOpen(true)}
+                >
+                  {t("github.filterTeams")} ({selectedTeams.length > 0 ? selectedTeams.length : "alle"})
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={refresh}
+                  disabled={!canRefresh || isRefreshing}
+                  loading={isRefreshing}
+                >
+                  {t("summary.refresh")}
+                </Button>
+              </HStack>
             </HStack>
           </Box>
 

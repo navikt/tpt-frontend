@@ -81,6 +81,8 @@
       "comingSoon": "Coming soon",
       "yes": "Yes",
       "no": "No",
+      "ok": "OK",
+      "notOk": "Not OK",
       "unknown": "Unknown",
       "noRepositories": "No repositories to show",
       "showingTop": "Showing top {count} repositories by risk score",
