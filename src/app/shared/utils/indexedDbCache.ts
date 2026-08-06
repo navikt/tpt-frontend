@@ -1,7 +1,7 @@
 import type { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 
 const DB_NAME = "tpt-cache";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 export const STORES = {
   KV: "kv",
@@ -44,8 +44,15 @@ function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const db = request.result;
+      const oldVersion = (event as IDBVersionChangeEvent).oldVersion;
+
+      // Clear API cache on every schema upgrade so stale data never
+      // survives a code change that alters the cached response shape.
+      if (oldVersion > 0 && db.objectStoreNames.contains(STORES.API_CACHE)) {
+        db.deleteObjectStore(STORES.API_CACHE);
+      }
 
       if (!db.objectStoreNames.contains(STORES.APPLICATIONS_BY_TEAM)) {
         const store = db.createObjectStore(STORES.APPLICATIONS_BY_TEAM, { keyPath: "key" });
