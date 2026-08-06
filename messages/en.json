@@ -204,6 +204,7 @@
     "description": "An overview of all teams and their vulnerabilities.",
     "loadingData": "Loading data...",
     "chartTitle": "Vulnerabilities per team",
+    "chartTitleApp": "Vulnerabilities per application",
     "total": "Total",
     "teams": "Teams",
     "applications": "Applications",
@@ -222,7 +223,17 @@
     "statusFollowUp": "Follow up",
     "statusOk": "OK",
     "noCriticalVulnerabilities": "🎉 No critical vulnerabilities!",
-    "noCriticalDescription": "No teams have high priority vulnerabilities at the moment."
+    "noCriticalDescription": "No teams have high priority vulnerabilities at the moment.",
+    "chart": {
+      "seriesSnarest": "Immediately",
+      "seriesPrioriteres": "Must be prioritized",
+      "seriesPlanlegges": "Must be planned",
+      "seriesNarDetPasser": "When time allows",
+      "yAxisTitle": "Number of vulnerabilities",
+      "tooltipTotal": "Total",
+      "a11yDescriptionTeam": "Stacked bar chart showing number of vulnerabilities per team, grouped by priority category.",
+      "a11yDescriptionApp": "Stacked bar chart showing number of vulnerabilities per application, grouped by priority category."
+    }
   },
   "teamMemberView": {
     "title": "Security Status",

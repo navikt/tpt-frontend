@@ -290,7 +290,7 @@ export default function LeaderView() {
           >
             <VStack gap="space-12">
               <Heading size="medium" level="2">
-                {t("chartTitle")}
+                {t(chartGroupBy === "app" ? "chartTitleApp" : "chartTitle")}
               </Heading>
               <TeamRiskBarChart teams={filteredTeams} config={config} groupBy={chartGroupBy} />
             </VStack>

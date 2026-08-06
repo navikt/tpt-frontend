@@ -5,7 +5,7 @@ import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext
 import { Loader, Box, Button, BodyShort, Heading, Tag } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { AppRole } from "@/app/shared/contexts/RoleContext";
 import styles from "./page.module.css";
@@ -110,6 +110,13 @@ export default function Home() {
   const tCommon = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  function buildRedirectUrl(role: string): string {
+    const base = redirectPath(locale, role);
+    const query = searchParams.toString();
+    return query ? `${base}?${query}` : base;
+  }
 
   const [pendingRole, setPendingRole] = useState<AppRole | null>(null);
 
@@ -119,14 +126,14 @@ export default function Home() {
     if (!vulnData && !error) return;
 
     if (hasSelectedRole) {
-      router.replace(redirectPath(locale, effectiveRole || "TEAM_MEMBER"));
+      router.replace(buildRedirectUrl(effectiveRole || "TEAM_MEMBER"));
     }
   }, [isInitialized, isRoleLoading, vulnData, error, hasSelectedRole, effectiveRole, locale, router]);
 
   function handleConfirm() {
     if (!pendingRole) return;
     setSelectedRole(pendingRole);
-    router.replace(redirectPath(locale, pendingRole));
+    router.replace(buildRedirectUrl(pendingRole));
   }
 
   if (error) {

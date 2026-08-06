@@ -7,6 +7,7 @@ import HighchartsReact, {
 import Highcharts from "highcharts";
 import type { Team } from "@/app/shared/types/vulnerabilities";
 import type { Options, SeriesColumnOptions } from "highcharts";
+import { useTranslations } from "next-intl";
 
 interface ThresholdConfig {
   thresholds: {
@@ -41,6 +42,7 @@ export default function TeamRiskBarChart({
 }: TeamRiskBarChartProps) {
   const [isDark, setIsDark] = useState(false);
   const chartRef = useRef<HighchartsReactRefObject>(null);
+  const t = useTranslations("leaderView.chart");
 
   useEffect(() => {
     const update = () =>
@@ -145,29 +147,14 @@ export default function TeamRiskBarChart({
     const low = sortedPoints.map((p) => p.low);
 
     const series: SeriesColumnOptions[] = [
-      {
-        type: "column",
-        name: "Snarest",
-        data: critical,
-        color: COLORS.critical,
-      },
-      {
-        type: "column",
-        name: "Må prioriteres",
-        data: important,
-        color: COLORS.important,
-      },
-      {
-        type: "column",
-        name: "Må planlegges",
-        data: whenTime,
-        color: COLORS.whenTime,
-      },
-      { type: "column", name: "Når det passer", data: low, color: COLORS.low },
+      { type: "column", name: t("seriesSnarest"),      data: critical,  color: COLORS.critical },
+      { type: "column", name: t("seriesPrioriteres"),  data: important, color: COLORS.important },
+      { type: "column", name: t("seriesPlanlegges"),   data: whenTime,  color: COLORS.whenTime },
+      { type: "column", name: t("seriesNarDetPasser"), data: low,       color: COLORS.low },
     ];
 
     return { labels: names, seriesData: series };
-  }, [sortedPoints]);
+  }, [sortedPoints, t]);
 
   const minChartWidth = labels.length * MIN_BAR_WIDTH_PX;
 
@@ -194,8 +181,8 @@ export default function TeamRiskBarChart({
       enabled: true,
       description:
         groupBy === "team"
-          ? "Stablet søylediagram som viser antall sårbarheter per team, fordelt på prioriteringskategorier."
-          : "Stablet søylediagram som viser antall sårbarheter per applikasjon, fordelt på prioriteringskategorier.",
+          ? t("a11yDescriptionTeam")
+          : t("a11yDescriptionApp"),
       point: {
         valueDescriptionFormat:
           "{index}. {xDescription}, {series.name}: {value}.",
@@ -219,7 +206,7 @@ export default function TeamRiskBarChart({
     },
     yAxis: {
       min: 0,
-      title: { text: "Antall sårbarheter", style: { color: textCol } },
+      title: { text: t("yAxisTitle"), style: { color: textCol } },
       stackLabels: {
         enabled: true,
         style: { color: textCol, fontWeight: "600", fontSize: "12px" },
@@ -247,7 +234,7 @@ export default function TeamRiskBarChart({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const ctx = this as any;
         const total: number = ctx.point?.stackTotal ?? ctx.total ?? 0;
-        return `<b>${this.x}</b><br/>${this.series.name}: <b>${this.y}</b><br/>Totalt: <b>${total}</b>`;
+        return `<b>${this.x}</b><br/>${this.series.name}: <b>${this.y}</b><br/>${t("tooltipTotal")}: <b>${total}</b>`;
       },
     },
     plotOptions: {

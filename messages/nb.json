@@ -204,6 +204,7 @@
     "description": "En oversikt over alle team og deres sårbarheter.",
     "loadingData": "Laster data...",
     "chartTitle": "Sårbarheter per team",
+    "chartTitleApp": "Sårbarheter per applikasjon",
     "total": "Totalt",
     "teams": "Team",
     "applications": "Applikasjoner",
@@ -222,7 +223,17 @@
     "statusFollowUp": "Følg med",
     "statusOk": "OK",
     "noCriticalVulnerabilities": "🎉 Ingen kritiske sårbarheter!",
-    "noCriticalDescription": "Ingen team har sårbarheter med høy prioritet akkurat nå."
+    "noCriticalDescription": "Ingen team har sårbarheter med høy prioritet akkurat nå.",
+    "chart": {
+      "seriesSnarest": "Snarest",
+      "seriesPrioriteres": "Må prioriteres",
+      "seriesPlanlegges": "Må planlegges",
+      "seriesNarDetPasser": "Når det passer",
+      "yAxisTitle": "Antall sårbarheter",
+      "tooltipTotal": "Totalt",
+      "a11yDescriptionTeam": "Stablet søylediagram som viser antall sårbarheter per team, fordelt på prioriteringskategorier.",
+      "a11yDescriptionApp": "Stablet søylediagram som viser antall sårbarheter per applikasjon, fordelt på prioriteringskategorier."
+    }
   },
   "teamMemberView": {
     "title": "Sikkerhetsstatus",
