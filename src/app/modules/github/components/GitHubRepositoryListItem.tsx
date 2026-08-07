@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, HStack, VStack, BodyShort, Heading, Link as AkselLink, Chips, Accordion } from "@navikt/ds-react";
+import { useMemo } from "react";
+import { Box, HStack, VStack, BodyShort, Heading, Link as AkselLink, Chips, Accordion, ExpansionCard } from "@navikt/ds-react";
 import { CheckmarkCircleFillIcon, XMarkOctagonFillIcon, QuestionmarkDiamondFillIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
@@ -140,6 +141,41 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
 
   const codeScanningStatus = getCodeScanningStatus();
 
+  const vulnerabilityGroups = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        packageName: string;
+        packageEcosystem?: string;
+        vulnerabilities: RepositoryMetrics["vulnerabilities"];
+      }
+    >();
+
+    repository.vulnerabilities.forEach((vulnerability) => {
+      const packageEcosystem = vulnerability.packageEcosystem;
+      const key = `${vulnerability.packageName}:${packageEcosystem ?? "unknown"}`;
+      const group = groups.get(key);
+
+      if (group) {
+        group.vulnerabilities.push(vulnerability);
+      } else {
+        groups.set(key, {
+          packageName: vulnerability.packageName,
+          packageEcosystem,
+          vulnerabilities: [vulnerability],
+        });
+      }
+    });
+
+    return Array.from(groups.entries())
+      .map(([key, group]) => ({ key, ...group }))
+      .sort(
+        (a, b) =>
+          b.vulnerabilities.length - a.vulnerabilities.length ||
+          a.packageName.localeCompare(b.packageName),
+      );
+  }, [repository.vulnerabilities]);
+
   return (
     <div 
       className={styles.accordionWrapper}
@@ -147,7 +183,7 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
         borderLeft: `6px solid ${riskColor}`,
       }}
     >
-      <Accordion>
+      <Accordion className={styles.packageAccordion}>
         <Accordion.Item>
           <Accordion.Header>
             <HStack justify="space-between" align="center" gap="space-12" style={{ width: "100%" }}>
@@ -230,95 +266,116 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
             </Box>
 
             {/* Vulnerability List */}
-            <Box
-              padding="space-8"
-              borderRadius="8"
-              background="neutral-soft"
+            <ExpansionCard
+              aria-label={t("repository.vulnerabilityList")}
+              defaultOpen
+              size="small"
             >
-              <VStack gap="space-8">
-                <Heading size="xsmall" level="4">
+              <ExpansionCard.Header>
+                <ExpansionCard.Title as="h4" size="small">
                   {t("repository.vulnerabilityList")} ({repository.vulnerabilities.length})
-                </Heading>
-                <VStack gap="space-6">
-                  {repository.vulnerabilities
-                    .sort((a, b) => b.riskScore - a.riskScore)
-                    .map((vuln) => {
-                      const vulnRiskLevel = getRiskLevel(vuln.riskScore);
-                      const vulnRiskColor = getRiskColor(vulnRiskLevel);
-                      
-                      return (
-                        <Box
-                          key={vuln.identifier}
-                          padding="space-8"
-                          borderRadius="4"
-                          background="neutral-soft"
-                          style={{
-                            borderLeft: "3px solid var(--a-border-strong)",
-                          }}
-                        >
-                          <VStack gap="space-4">
-                            <HStack justify="space-between" align="start" gap="space-12">
-                              <VStack gap="space-4" style={{ flex: 1 }}>
-                                <HStack gap="space-8" align="center" wrap>
-                                  <BodyShort weight="semibold" size="small">
-                                    {vuln.identifier}
-                                  </BodyShort>
-                                  <Chips size="small">
-                                    <Chips.Removable
-                                      variant="neutral"
-                                      style={{
-                                        backgroundColor: vulnRiskColor,
-                                        color: "white",
-                                        fontWeight: 600,
-                                        fontSize: "0.75rem",
-                                      }}
-                                    >
-                                      {formatNumber(vuln.riskScore)}
-                                    </Chips.Removable>
-                                  </Chips>
-                                </HStack>
-                                <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                                  {t("repository.package")}: {vuln.packageName}
-                                </BodyShort>
-                                {vuln.summary && (
-                                  <BodyShort size="small">{vuln.summary}</BodyShort>
-                                )}
-                              </VStack>
-                              
-                              <HStack gap="space-8">
-                                {vuln.dependabotUpdatePullRequestUrl && (
-                                  <AkselLink
-                                    href={vuln.dependabotUpdatePullRequestUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                </ExpansionCard.Title>
+              </ExpansionCard.Header>
+              <ExpansionCard.Content>
+                <Box padding="space-8" background="neutral-soft">
+                  <Accordion>
+                    {vulnerabilityGroups.map((group) => (
+                      <Accordion.Item key={group.key}>
+                        <Accordion.Header>
+                          <HStack justify="space-between" align="center" gap="space-8" style={{ width: "100%" }}>
+                            <BodyShort weight="semibold">
+                              {group.packageName}
+                              {group.packageEcosystem && ` (${group.packageEcosystem})`}
+                            </BodyShort>
+                            <BodyShort size="small">
+                              {t("repository.vulnerabilityCount", { count: group.vulnerabilities.length })}
+                            </BodyShort>
+                          </HStack>
+                        </Accordion.Header>
+                        <Accordion.Content>
+                          <VStack gap="space-6">
+                            {group.vulnerabilities
+                              .sort((a, b) => b.riskScore - a.riskScore)
+                              .map((vuln, index) => {
+                                const vulnRiskLevel = getRiskLevel(vuln.riskScore);
+                                const vulnRiskColor = getRiskColor(vulnRiskLevel);
+                                return (
+                                  <Box
+                                    key={`${vuln.identifier}:${vuln.packageName}:${vuln.vulnerabilityDetailsLink ?? "no-link"}:${index}`}
+                                    padding="space-8"
+                                    borderRadius="4"
+                                    background="neutral-soft"
+                                    style={{
+                                      borderLeft: "3px solid var(--a-border-strong)",
+                                    }}
                                   >
-                                    <HStack gap="space-4" align="center">
-                                      <BodyShort size="small">{t("repository.openPR")}</BodyShort>
-                                      <ExternalLinkIcon fontSize="1rem" />
-                                    </HStack>
-                                  </AkselLink>
-                                )}
-                                {vuln.vulnerabilityDetailsLink && (
-                                  <AkselLink
-                                    href={vuln.vulnerabilityDetailsLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    <HStack gap="space-4" align="center">
-                                      <BodyShort size="small">{t("repository.viewDetails")}</BodyShort>
-                                      <ExternalLinkIcon fontSize="1rem" />
-                                    </HStack>
-                                  </AkselLink>
-                                )}
-                              </HStack>
-                            </HStack>
+                                    <VStack gap="space-4">
+                                      <HStack justify="space-between" align="start" gap="space-12">
+                                        <VStack gap="space-4" style={{ flex: 1 }}>
+                                          <HStack gap="space-8" align="center" wrap>
+                                            <BodyShort weight="semibold" size="small">
+                                              {vuln.identifier}
+                                            </BodyShort>
+                                            <Chips size="small">
+                                              <Chips.Removable
+                                                variant="neutral"
+                                                style={{
+                                                  backgroundColor: vulnRiskColor,
+                                                  color: "white",
+                                                  fontWeight: 600,
+                                                  fontSize: "0.75rem",
+                                                }}
+                                              >
+                                                {formatNumber(vuln.riskScore)}
+                                              </Chips.Removable>
+                                            </Chips>
+                                          </HStack>
+                                          <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
+                                            {t("repository.package")}: {vuln.packageName}
+                                          </BodyShort>
+                                          {vuln.summary && (
+                                            <BodyShort size="small">{vuln.summary}</BodyShort>
+                                          )}
+                                        </VStack>
+                                        <HStack gap="space-8">
+                                          {vuln.dependabotUpdatePullRequestUrl && (
+                                            <AkselLink
+                                              href={vuln.dependabotUpdatePullRequestUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                            >
+                                              <HStack gap="space-4" align="center">
+                                                <BodyShort size="small">{t("repository.openPR")}</BodyShort>
+                                                <ExternalLinkIcon fontSize="1rem" />
+                                              </HStack>
+                                            </AkselLink>
+                                          )}
+                                          {vuln.vulnerabilityDetailsLink && (
+                                            <AkselLink
+                                              href={vuln.vulnerabilityDetailsLink}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                            >
+                                              <HStack gap="space-4" align="center">
+                                                <BodyShort size="small">{t("repository.viewDetails")}</BodyShort>
+                                                <ExternalLinkIcon fontSize="1rem" />
+                                              </HStack>
+                                            </AkselLink>
+                                          )}
+                                        </HStack>
+                                      </HStack>
+                                    </VStack>
+                                  </Box>
+                                );
+                              })}
                           </VStack>
-                        </Box>
-                      );
-                    })}
-                </VStack>
-              </VStack>
-            </Box>
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    ))}
+                  </Accordion>
+                </Box>
+              </ExpansionCard.Content>
+            </ExpansionCard>
             </VStack>
           </Accordion.Content>
         </Accordion.Item>
