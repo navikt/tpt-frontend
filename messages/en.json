@@ -89,6 +89,7 @@
       "showMore": "Show {count} more",
       "showLess": "Show less",
       "searchPlaceholder": "Search repositories...",
+      "vulnerabilityCount": "{count} vulnerabilities",
       "viewVulnerabilities": "View vulnerabilities",
       "openPR": "Open fix PR",
       "viewDetails": "View details",

@@ -89,6 +89,7 @@
       "showMore": "Vis {count} flere",
       "showLess": "Vis færre",
       "searchPlaceholder": "Søk etter repositories...",
+      "vulnerabilityCount": "{count} sårbarheter",
       "viewVulnerabilities": "Se sårbarheter",
       "openPR": "Åpne fix-PR",
       "viewDetails": "Se detaljer",
