@@ -245,12 +245,12 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
                   <VStack gap="space-6">
                     {repository.vulnerabilities
                       .sort((a, b) => b.riskScore - a.riskScore)
-                      .map((vuln) => {
+                      .map((vuln, index) => {
                         const vulnRiskLevel = getRiskLevel(vuln.riskScore);
                         const vulnRiskColor = getRiskColor(vulnRiskLevel);
                         return (
                           <Box
-                            key={vuln.identifier}
+                            key={`${vuln.identifier}:${vuln.packageName}:${vuln.vulnerabilityDetailsLink ?? "no-link"}:${index}`}
                             padding="space-8"
                             borderRadius="4"
                             background="neutral-soft"
