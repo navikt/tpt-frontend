@@ -4,6 +4,37 @@ applyTo: "src/**/*.{tsx,ts}"
 
 # Next.js with Aksel Design System
 
+## Component Structure
+- Use `"use client"` directive for components with state or interactivity
+- Keep data fetching in custom hooks (`useVulnerabilities`, `useConfig`)
+- Co-locate related components in feature folders
+
+## Code Quality
+- Always follow current best practices for the framework and language versions in use. Do not rely on outdated patterns from earlier versions.
+- When migrating or refactoring, fully replace old code. Never keep deprecated APIs, legacy wrappers, or backward-compatibility shims — clean up completely.
+- Remove dead code, unused imports, and obsolete files as part of every change.
+- Prefer small, focused components and functions with a single responsibility.
+- Use TypeScript strictly — avoid `any`, prefer explicit types, and leverage inference where it keeps code readable.
+- `tsconfig.json` has `strict: true` and `noUncheckedIndexedAccess: true` — lean on the compiler, but note there
+  are no custom ESLint rules enforcing the patterns below (`eslint.config.mjs` only extends `eslint-config-next`).
+
+### Defensive Coding for Optional/Nullable Data
+
+Runtime errors like `Cannot read properties of undefined` aren't fully caught by TypeScript's compile-time checks,
+especially for API responses with optional fields, user-provided data, and nested object access.
+
+- **Optional chaining** for nested property access: `workload.ageInfo?.daysSinceDeployment`, not `workload.ageInfo.daysSinceDeployment`
+- **Nullish coalescing** for defaults: `config?.deploymentAgeDays ?? 90`, not leaving it possibly `undefined`
+- **Type guards in filters/maps**: `.filter(w => w.ageInfo?.hasDeploymentInfo)`, not assuming the property exists
+- **Defensive utility functions** — handle `undefined`/`null`/`NaN` explicitly rather than letting them propagate:
+  ```typescript
+  export function formatNumber(num: number | undefined | null): string {
+    if (num === undefined || num === null || isNaN(num)) return "0";
+    return num.toLocaleString("nb-NO");
+  }
+  ```
+- **Validate at data entry points** — e.g. parse and check dates before using them, log and return a safe fallback on invalid input
+
 ## Spacing Rules
 
 **CRITICAL**: Always use Nav DS spacing tokens, never Tailwind padding/margin utilities.

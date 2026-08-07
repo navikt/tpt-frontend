@@ -8,7 +8,7 @@ TPT analyzes and ranks vulnerabilities based on multiple factors such as KEV (Kn
 
 ### Prerequisites
 
-- Node.js (version 24 or newer)
+- Node.js (version 24 or newer — the Docker image pins `node:24`; `.mise/config.toml` pins `25` for local tool management)
 - pnpm
 
 ### Installation and Running
@@ -54,11 +54,16 @@ The application uses the following environment variables (configured in `.env.lo
 |----------|-------------|---------|----------|
 | `LOCAL_DEV` | Enables local development mode (bypasses authentication) | `false` | No |
 | `LOCAL_DEV_EMAIL` | Email address for mock user in local mode | `lokal.utvikler@nav.no` | No |
+| `MOCKS_ENABLED` | Serves mocked API responses instead of calling the backend (set by `pnpm run dev:mocks`) | `false` | No |
 | `TPT_BACKEND_URL` | URL to TPT backend API | `http://localhost:8080` | Yes |
+| `TPT_BACKEND_SCOPE` | OBO token scope requested for calls to the backend | - | Yes |
 | `BACKEND_CACHE_SECONDS` | Cache duration for backend data in seconds | `300` (5 minutes) | No |
 | `TELEMETRY_URL` | URL for Faro telemetry (fetched at runtime) | - | No |
+| `NEXT_PUBLIC_VERSION` | App version reported to Faro telemetry | `unknown` | No |
 
 **Important about telemetry:** `TELEMETRY_URL` is read at runtime (not build-time) and sent to the client via `/api/telemetry-config`. This allows the same Docker image to be used across environments with different telemetry endpoints.
+
+**Cache busting:** IndexedDB client cache entries are versioned using `NEXT_PUBLIC_APP_VERSION`, falling back to `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` if unset — set automatically on Vercel-style deploys, no manual configuration needed.
 
 ### Pre-commit Hooks
 
