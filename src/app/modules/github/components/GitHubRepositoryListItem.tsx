@@ -183,7 +183,7 @@ export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListIte
         borderLeft: `6px solid ${riskColor}`,
       }}
     >
-      <Accordion>
+      <Accordion className={styles.packageAccordion}>
         <Accordion.Item>
           <Accordion.Header>
             <HStack justify="space-between" align="center" gap="space-12" style={{ width: "100%" }}>
