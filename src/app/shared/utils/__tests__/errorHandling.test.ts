@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import {
   isNetworkError,
   isAbortError,
@@ -5,8 +6,8 @@ import {
 } from "../errorHandling";
 
 // Mock Faro
-jest.mock("@/instrumentation/faro", () => ({
-  getFaroInstance: jest.fn(() => null),
+vi.mock("@/instrumentation/faro", () => ({
+  getFaroInstance: vi.fn(() => null),
 }));
 
 describe("errorHandling utilities", () => {
