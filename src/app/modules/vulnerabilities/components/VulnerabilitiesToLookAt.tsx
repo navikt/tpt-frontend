@@ -253,6 +253,7 @@ const RemediationGroupSection = ({ group, workload, basePath }: RemediationGroup
 
     const label = isOsRebuild ? t("list.rebuildBaseImage") : t("list.updateDependencies");
     const description = isOsRebuild ? t("list.rebuildBaseImageDescription") : t("list.updateDependenciesDescription");
+    const clickForDetails = t("list.clickForDetails")
     const summaryKey = isOsRebuild ? "list.osPackageSummary" : "list.appPackageSummary";
 
     return (
@@ -288,7 +289,8 @@ const RemediationGroupSection = ({ group, workload, basePath }: RemediationGroup
             {expanded && (
                 <div style={{ marginTop: "0.5rem", paddingLeft: "1rem" }}>
                     <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginBottom: "0.75rem" }}>
-                        {description}
+                        <p>{description}</p>
+                        <p>{clickForDetails}</p>
                     </BodyShort>
                     <PackageGroupedContent
                         vulnerabilities={group.vulnerabilities}

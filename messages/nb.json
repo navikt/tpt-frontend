@@ -127,6 +127,7 @@
     "rebuildBaseImageDescription": "Disse sårbarhetene er i OS-pakker og fikses ved å rebuilde container-imaget med en oppdatert base image.",
     "updateDependencies": "Oppdater avhengigheter",
     "updateDependenciesDescription": "Disse sårbarhetene er i applikasjonsavhengigheter og fikses ved å oppdatere pakkeversjonene.",
+    "clickForDetails": "Klikk på CVE-en for å se detaljer om scoring.",
     "osPackageSummary": "{vulnCount} {vulnCount, plural, one {sårbarhet} other {sårbarheter}} i {pkgCount} {pkgCount, plural, one {OS-pakke} other {OS-pakker}}",
     "appPackageSummary": "{vulnCount} {vulnCount, plural, one {sårbarhet} other {sårbarheter}} i {pkgCount} {pkgCount, plural, one {pakke} other {pakker}}",
     "fixableByRebuild": "{count} {count, plural, one {sårbarhet fikses} other {sårbarheter fikses}} ved å bygge base image på nytt",

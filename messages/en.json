@@ -127,6 +127,7 @@
     "rebuildBaseImageDescription": "These vulnerabilities are in OS packages and are fixed by rebuilding the container image with an updated base image.",
     "updateDependencies": "Update dependencies",
     "updateDependenciesDescription": "These vulnerabilities are in application dependencies and are fixed by updating the package versions.",
+    "clickForDetails": "Click the CVE to view soring details.",
     "osPackageSummary": "{vulnCount} {vulnCount, plural, one {vulnerability} other {vulnerabilities}} in {pkgCount} {pkgCount, plural, one {OS package} other {OS packages}}",
     "appPackageSummary": "{vulnCount} {vulnCount, plural, one {vulnerability} other {vulnerabilities}} in {pkgCount} {pkgCount, plural, one {package} other {packages}}",
     "fixableByRebuild": "{count} {count, plural, one {vulnerability fixed} other {vulnerabilities fixed}} by rebuilding base image",
