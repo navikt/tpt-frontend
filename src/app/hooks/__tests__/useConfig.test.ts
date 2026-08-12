@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useConfig, __resetConfigState } from '../../shared/hooks/useConfig';
 
 // Mock Faro instrumentation
-jest.mock('@/instrumentation/faro', () => ({
-  getFaroInstance: jest.fn(() => null),
+vi.mock('@/instrumentation/faro', () => ({
+  getFaroInstance: vi.fn(() => null),
 }));
 
 // Mock the global fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('useConfig hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     __resetConfigState(); // Reset global state between tests
   });
 
@@ -31,10 +32,10 @@ describe('useConfig hook', () => {
       },
     };
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => mockConfig,
-    });
+    } as Response);
 
     const { result } = renderHook(() => useConfig());
 
@@ -49,7 +50,7 @@ describe('useConfig hook', () => {
   });
 
   it('should handle fetch errors', async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'));
 
     const { result } = renderHook(() => useConfig());
 
@@ -63,12 +64,12 @@ describe('useConfig hook', () => {
   });
 
   it('should handle non-ok responses', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
       json: async () => ({ error: 'errors.fetchConfigError' }),
-    });
+    } as Response);
 
     const { result } = renderHook(() => useConfig());
 

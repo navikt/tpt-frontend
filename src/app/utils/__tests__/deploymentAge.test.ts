@@ -1,15 +1,16 @@
+import { vi } from "vitest";
 import { calculateDeploymentAge } from "../deploymentAge";
 
 describe("calculateDeploymentAge", () => {
   const maxAgeDays = 90;
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2026-02-03T00:00:00Z"));
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-02-03T00:00:00Z"));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("should return non-compliant for deployment older than max age", () => {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, startTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import {
@@ -67,6 +67,31 @@ export const useVulnerabilities = () => {
   const [error, setError] = useState<ApiError | null>(null);
 
   const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
+  const [canRefresh, setCanRefresh] = useState(true);
+  const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
+
+  // Update cooldown state whenever lastRefreshTime changes
+  useEffect(() => {
+    if (!lastRefreshTime) {
+      startTransition(() => {
+        setCanRefresh(true);
+        setTimeUntilRefresh(0);
+      });
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(0, REFRESH_COOLDOWN_MS - (Date.now() - lastRefreshTime));
+      startTransition(() => {
+        setCanRefresh(remaining === 0);
+        setTimeUntilRefresh(remaining);
+      });
+    };
+    tick();
+    if (Date.now() - lastRefreshTime < REFRESH_COOLDOWN_MS) {
+      const id = setInterval(tick, 1000);
+      return () => clearInterval(id);
+    }
+  }, [lastRefreshTime]);
 
   // Initialize filters from URL (synchronous)
   const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>(() => {
@@ -249,17 +274,6 @@ export const useVulnerabilities = () => {
     fetchData(true); // isRefresh = true
     return true;
   }, [fetchData, lastRefreshTime]);
-
-  const canRefresh = useMemo(() => {
-    if (!lastRefreshTime) return true;
-    return Date.now() - lastRefreshTime >= REFRESH_COOLDOWN_MS;
-  }, [lastRefreshTime]);
-
-  const timeUntilRefresh = useMemo(() => {
-    if (!lastRefreshTime) return 0;
-    const elapsed = Date.now() - lastRefreshTime;
-    return Math.max(0, REFRESH_COOLDOWN_MS - elapsed);
-  }, [lastRefreshTime]);
 
   // Initialize from IndexedDB and conditionally revalidate
   useEffect(function initializeEffect() {
@@ -492,7 +506,7 @@ export const useVulnerabilities = () => {
             validApplications.has(app)
           )
         );
-        setApplicationFilters(cleanedFilters);
+        startTransition(() => setApplicationFilters(cleanedFilters));
       }
     },
     [availableApplications, teamFilters, data, applicationFilters]
@@ -518,7 +532,7 @@ export const useVulnerabilities = () => {
             validEnvironments.has(env)
           )
         );
-        setEnvironmentFilters(cleanedFilters);
+        startTransition(() => setEnvironmentFilters(cleanedFilters));
       }
     },
     [availableEnvironments, applicationFilters, data, environmentFilters]
@@ -540,7 +554,7 @@ export const useVulnerabilities = () => {
         const cleanedFilters = Object.fromEntries(
           Object.entries(cveFilters).filter(([cve]) => validCves.has(cve))
         );
-        setCveFilters(cleanedFilters);
+        startTransition(() => setCveFilters(cleanedFilters));
       }
     },
     [availableCves, teamFilters, applicationFilters, data, cveFilters]
@@ -566,7 +580,7 @@ export const useVulnerabilities = () => {
             validPackageNames.has(pkg)
           )
         );
-        setPackageNameFilters(cleanedFilters);
+        startTransition(() => setPackageNameFilters(cleanedFilters));
       }
     },
     [availablePackageNames, teamFilters, applicationFilters, cveFilters, data, packageNameFilters]

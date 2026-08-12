@@ -1,9 +1,10 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import WorkloadRiskScoreValue from '../WorkloadRiskScoreValue';
 
-// Mock next-intl to avoid ESM import issues in Jest
-jest.mock('next-intl', () => ({
+// Mock next-intl to avoid ESM import issues in Vitest
+vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
       'riskScore': 'Risk score:',
