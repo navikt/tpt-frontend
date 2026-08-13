@@ -5,11 +5,10 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-RUN --mount=type=secret,id=NODE_AUTH_TOKEN sh -c \
-    'pnpm config set //npm.pkg.github.com/:_authToken=$(cat /run/secrets/NODE_AUTH_TOKEN)'
-
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN --mount=type=secret,id=NODE_AUTH_TOKEN,env=NODE_AUTH_TOKEN \
+    pnpm config set //npm.pkg.github.com/:_authToken="${NODE_AUTH_TOKEN}" && \
+    pnpm install --frozen-lockfile
 
 COPY next.config.ts tsconfig.json ./
 COPY src/ ./src/

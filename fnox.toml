@@ -1,0 +1,2 @@
+[secrets]
+NODE_AUTH_TOKEN= { provider = "keychain", value = "NODE_AUTH_TOKEN" }
