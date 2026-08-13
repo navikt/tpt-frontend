@@ -9,13 +9,13 @@ import {
   KV_KEYS,
 } from "@/app/shared/utils/indexedDbCache";
 
-export const ALL_ROLES = ["DEVELOPER", "TEAM_MEMBER", "PRODUCT_LEADER", "TECH_LEADER"] as const;
+export const ALL_ROLES = ["DEVELOPER", "TEAM_MEMBER", "TEAM_LEADER", "LEADER"] as const;
 export type AppRole = (typeof ALL_ROLES)[number];
 
 // Roles available to all users
 const BASE_ROLES: AppRole[] = ["DEVELOPER", "TEAM_MEMBER"];
 // Additional roles only available to ADMINs
-const ADMIN_ONLY_ROLES: AppRole[] = ["PRODUCT_LEADER", "TECH_LEADER"];
+const ADMIN_ONLY_ROLES: AppRole[] = ["TEAM_LEADER", "LEADER"];
 
 interface RoleContextType {
   selectedRole: string | null;
@@ -67,7 +67,7 @@ export function RoleContextProvider({ children }: { children: ReactNode }) {
   const availableRoles: AppRole[] =
     actualRole === "ADMIN"
       ? [...BASE_ROLES, ...ADMIN_ONLY_ROLES]
-      : [...BASE_ROLES, "PRODUCT_LEADER"];
+      : [...BASE_ROLES, "LEADER"];
 
   // Consider initialized once the fetch has settled — either with data or
   // with an error. Never leave pages spinning forever on a network failure.

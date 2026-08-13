@@ -29,8 +29,8 @@ function RoleCard({
   const subtitleVariant: Record<AppRole, "alt1" | "info" | "warning" | "success"> = {
     DEVELOPER: "alt1",
     TEAM_MEMBER: "info",
-    PRODUCT_LEADER: "warning",
-    TECH_LEADER: "success",
+    LEADER: "warning",
+    TEAM_LEADER: "success",
   };
 
   const bullets = [
