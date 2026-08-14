@@ -39,7 +39,7 @@ export default function CompliancePage() {
     return <TeamMemberView />;
   }
 
-  if (effectiveRole === "LEADER" || effectiveRole === "PRODUCT_LEADER" || effectiveRole === "TECH_LEADER") {
+  if (effectiveRole === "LEADER" || effectiveRole === "TEAM_LEADER") {
     return <LeaderView />;
   }
 

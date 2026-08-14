@@ -1,5 +1,5 @@
 "use client";
-import { Page, InternalHeader, GlobalAlert, Spacer, Alert } from "@navikt/ds-react";
+import { Page, InternalHeader, GlobalAlert, Spacer, Alert, Button, BodyShort } from "@navikt/ds-react";
 import { useUser } from "../shared/hooks/useUser";
 import { useRoleContext, RoleContextProvider } from "../shared/hooks/useRoleContext";
 import { SettingsPanel } from "../components/SettingsPanel";
@@ -8,8 +8,9 @@ import { useTranslations, useLocale } from "next-intl";
 import { moduleNavLinks } from "../shared/navigation";
 import { Providers } from "../contexts/Providers";
 import { useSyncExternalStore } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
+import { PersonRectangleIcon } from "@navikt/aksel-icons";
 
 function subscribe() { return () => {}; }
 function getSnapshot() { return true; }
@@ -21,12 +22,13 @@ function useIsClient() {
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, isLoading: isUserLoading } = useUser();
-  const { effectiveRole, actualRole, isLoading: isRoleLoading } = useRoleContext();
+  const { effectiveRole, actualRole, isLoading: isRoleLoading, setSelectedRole } = useRoleContext();
   const { isSyncing } = useVulnerabilitiesContext();
   const t = useTranslations();
   const locale = useLocale();
   const isClient = useIsClient();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Render nav links only after client mount to avoid hydration mismatch,
   // since role data is client-only (localStorage + API fetch)
@@ -47,6 +49,7 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
       });
 
   const filterParams = searchParams.toString();
+  const pathname = usePathname();
 
   return (
     <Page>
@@ -60,17 +63,37 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
             const href = filterParams
               ? `/${locale}${link.path}?${filterParams}`
               : `/${locale}${link.path}`;
+            const isActive = pathname.startsWith(`/${locale}${link.path}`);
             return (
               <InternalHeader.Title
                 key={link.path}
                 href={href}
-                style={{ fontWeight: 400, color: "rgb(223, 225, 229)" }}
+                aria-current={isActive ? "page" : undefined}
+                style={{
+                  fontWeight: isActive ? 600 : 400,
+                  color: isActive ? "white" : "rgb(223, 225, 229)",
+                  textDecoration: isActive ? "underline" : "none",
+                  textUnderlineOffset: "4px",
+                }}
               >
                 {t(link.labelKey)}
               </InternalHeader.Title>
             );
           })}
         <Spacer />
+        {isClient && !isRoleLoading && (
+          <Button
+            variant="tertiary"
+            size="small"
+            icon={<PersonRectangleIcon aria-hidden />}
+            onClick={() => {
+              setSelectedRole(null);
+              router.push(`/${locale}`);
+            }}
+          >
+            <BodyShort size="small">{t("roleContext.changeRole")}</BodyShort>
+          </Button>
+        )}
         <SettingsPanel />
         {!isUserLoading && user && (
           <div style={{ display: "flex", alignItems: "center", paddingLeft: "1rem" }}>

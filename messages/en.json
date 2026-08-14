@@ -386,32 +386,32 @@
       },
       "TEAM_MEMBER": {
         "title": "Team Member",
-        "subtitle": "Non-technical view",
+        "subtitle": "Technical view",
         "description": "I work in a team and need an overview of our security situation.",
         "bullets": [
-          "Security status for your team",
-          "Overview of what needs action",
+          "Security prioritization and vulnerabilities",
+          "Compliance status for your team",
           "Deployment status and targets"
         ]
       },
-      "PRODUCT_LEADER": {
-        "title": "Product Leader",
+      "LEADER": {
+        "title": "Other leaders",
         "subtitle": "Non-technical view",
-        "description": "I lead a product area and need a high-level view to delegate and prioritize work.",
+        "description": "I'm responsible for multiple teams or departments and need a high-level view to delegate and prioritize work.",
         "bullets": [
           "Security status across teams",
           "Overview of what's urgent",
-          "Risk picture per application"
+          "Risk picture per team"
         ]
       },
-      "TECH_LEADER": {
-        "title": "Tech Leader",
+      "TEAM_LEADER": {
+        "title": "Team Leader",
         "subtitle": "Non-technical view",
-        "description": "I'm responsible for the overall security posture across the organization or my department.",
+        "description": "I lead one to three teams and need an overview of what requires action.",
         "bullets": [
-          "Holistic security picture",
-          "Status across all teams",
-          "Trends and risk development"
+          "Status for my teams",
+          "Overview of what's urgent",
+          "Which teams need to take action"
         ]
       }
     }
@@ -421,8 +421,8 @@
     "changeRole": "Change role",
     "DEVELOPER": "Developer",
     "TEAM_MEMBER": "Team Member",
-    "PRODUCT_LEADER": "Product Leader",
-    "TECH_LEADER": "Tech Leader",
+    "LEADER": "Other leaders",
+    "TEAM_LEADER": "Team Leader",
     "developer": "Developer",
     "teamMember": "Team Member",
     "leader": "Leader",

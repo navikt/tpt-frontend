@@ -36,7 +36,7 @@ export default function LeaderView() {
   const { data: slaData, isLoading: slaLoading } = useSlaOverdue();
   const { effectiveRole } = useRoleContext();
 
-  const chartGroupBy = effectiveRole === "PRODUCT_LEADER" ? "app" : "team";
+  const chartGroupBy = effectiveRole === "LEADER" ? "app" : "team";
 
   const deploymentAgeDays = DEPLOYMENT_AGE_DAYS;
 

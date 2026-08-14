@@ -386,32 +386,32 @@
       },
       "TEAM_MEMBER": {
         "title": "Team Member",
-        "subtitle": "Ikke-teknisk visning",
+        "subtitle": "Teknisk visning",
         "description": "Jeg jobber i et team og trenger oversikt over sikkerhetssituasjonen vår.",
         "bullets": [
-          "Sikkerhetsstatus for teamet ditt",
-          "Oversikt over hva som trenger handling",
+          "Sikkerhetsprioritering og sårbarheter",
+          "Compliance-status for teamet ditt",
           "Deployment-status og målsettinger"
         ]
       },
-      "PRODUCT_LEADER": {
-        "title": "Produktleder",
+      "LEADER": {
+        "title": "Andre ledere",
         "subtitle": "Ikke-teknisk visning",
-        "description": "Jeg leder et produktområde og trenger overblikk for å delegere og prioritere arbeid.",
+        "description": "Jeg har ansvar for flere team eller avdelinger og trenger overblikk for å delegere og prioritere arbeid.",
         "bullets": [
           "Sikkerhetsstatus på tvers av team",
           "Oversikt over hva som haster",
-          "Risikobilde per applikasjon"
+          "Risikobilde per team"
         ]
       },
-      "TECH_LEADER": {
-        "title": "Teknologileder",
+      "TEAM_LEADER": {
+        "title": "Teamleder",
         "subtitle": "Ikke-teknisk visning",
-        "description": "Jeg har ansvar for den helhetlige sikkerhetssituasjonen på tvers av organisasjonen eller avdelingen min.",
+        "description": "Jeg leder ett til tre team og trenger oversikt over hva som trenger handling.",
         "bullets": [
-          "Helhetlig sikkerhetsbilde",
-          "Status på tvers av alle team",
-          "Trender og risikoutvikling"
+          "Status for mine team",
+          "Oversikt over hva som haster",
+          "Hvilke team må ta tak i noe"
         ]
       }
     }
@@ -421,8 +421,8 @@
     "changeRole": "Bytt rolle",
     "DEVELOPER": "Utvikler",
     "TEAM_MEMBER": "Team Member",
-    "PRODUCT_LEADER": "Produktleder",
-    "TECH_LEADER": "Teknologileder",
+    "LEADER": "Andre ledere",
+    "TEAM_LEADER": "Teamleder",
     "developer": "Utvikler",
     "teamMember": "Teammedlem",
     "leader": "Leder",
