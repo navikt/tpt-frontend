@@ -425,6 +425,7 @@
     "TEAM_LEADER": "Team Leader",
     "developer": "Developer",
     "teamMember": "Team Member",
+    "teamLeader": "Team Leader",
     "leader": "Leader",
     "none": "No role"
   },
