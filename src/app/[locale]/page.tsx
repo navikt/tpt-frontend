@@ -24,7 +24,6 @@ function RoleCard({
   onSelect: (role: AppRole) => void;
 }) {
   const t = useTranslations("welcome.roles");
-  const tWelcomeCard = useTranslations("welcome");
 
   const subtitleVariant: Record<AppRole, "alt1" | "info" | "warning" | "success"> = {
     DEVELOPER: "alt1",
@@ -32,12 +31,6 @@ function RoleCard({
     LEADER: "warning",
     TEAM_LEADER: "success",
   };
-
-  const bullets = [
-    t(`${role}.bullets.0`),
-    t(`${role}.bullets.1`),
-    t(`${role}.bullets.2`),
-  ];
 
   return (
     <button
@@ -62,34 +55,6 @@ function RoleCard({
       <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
         {t(`${role}.description`)}
       </BodyShort>
-
-      <Box
-        style={{
-          borderTop: "1px solid var(--a-border-subtle)",
-          paddingTop: "0.75rem",
-        }}
-      >
-        <BodyShort
-          size="small"
-          weight="semibold"
-          style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            color: "var(--a-text-subtle)",
-            marginBottom: "0.5rem",
-          }}
-        >
-          {tWelcomeCard("youWillSee")}
-        </BodyShort>
-        <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-          {bullets.map((bullet) => (
-            <li key={bullet} style={{ display: "flex", alignItems: "flex-start", gap: "0.4rem" }}>
-              <span style={{ color: "var(--a-blue-500)", fontWeight: "bold", lineHeight: "1.4", flexShrink: 0 }}>•</span>
-              <BodyShort size="small">{bullet}</BodyShort>
-            </li>
-          ))}
-        </ul>
-      </Box>
     </button>
   );
 }

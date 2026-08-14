@@ -280,22 +280,6 @@ export default function LeaderView() {
             </VStack>
           </Box>
 
-          {/* Risk Bar Chart */}
-          <Box
-            padding="space-16"
-            borderRadius="8"
-            background="default"
-            borderWidth="1"
-            borderColor="neutral-subtle"
-          >
-            <VStack gap="space-12">
-              <Heading size="medium" level="2">
-                {t(chartGroupBy === "app" ? "chartTitleApp" : "chartTitle")}
-              </Heading>
-              <TeamRiskBarChart teams={filteredTeams} config={config} groupBy={chartGroupBy} />
-            </VStack>
-          </Box>
-
           {/* Team Table */}
           <Box
             padding="space-16"
@@ -388,6 +372,22 @@ export default function LeaderView() {
                   ))}
                 </Table.Body>
               </Table>
+            </VStack>
+          </Box>
+
+          {/* Risk Bar Chart */}
+          <Box
+            padding="space-16"
+            borderRadius="8"
+            background="default"
+            borderWidth="1"
+            borderColor="neutral-subtle"
+          >
+            <VStack gap="space-12">
+              <Heading size="medium" level="2">
+                {t(chartGroupBy === "app" ? "chartTitleApp" : "chartTitle")}
+              </Heading>
+              <TeamRiskBarChart teams={filteredTeams} config={config} groupBy={chartGroupBy} />
             </VStack>
           </Box>
 

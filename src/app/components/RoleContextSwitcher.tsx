@@ -5,13 +5,18 @@ import { useRoleContext } from "../shared/hooks/useRoleContext";
 import { useTranslations } from "next-intl";
 
 function RoleContextSwitcherInner() {
-  const { setSelectedRole, actualRole, effectiveRole } = useRoleContext();
+  const { setSelectedRole, actualRole, effectiveRole, availableRoles } = useRoleContext();
   const t = useTranslations("roleContext");
 
+  const roleLabels: Record<string, string> = {
+    DEVELOPER: t("developer"),
+    TEAM_MEMBER: t("teamMember"),
+    TEAM_LEADER: t("teamLeader"),
+    LEADER: t("leader"),
+  };
+
   const roles = [
-    { value: "DEVELOPER", label: t("developer") },
-    { value: "TEAM_MEMBER", label: t("teamMember") },
-    { value: "LEADER", label: t("leader") },
+    ...availableRoles.map((r) => ({ value: r, label: roleLabels[r] ?? r })),
     { value: "NONE", label: t("none") },
   ];
 

@@ -12,10 +12,7 @@ import {
 export const ALL_ROLES = ["DEVELOPER", "TEAM_MEMBER", "TEAM_LEADER", "LEADER"] as const;
 export type AppRole = (typeof ALL_ROLES)[number];
 
-// Roles available to all users
-const BASE_ROLES: AppRole[] = ["DEVELOPER", "TEAM_MEMBER"];
-// Additional roles only available to ADMINs
-const ADMIN_ONLY_ROLES: AppRole[] = ["TEAM_LEADER", "LEADER"];
+
 
 interface RoleContextType {
   selectedRole: string | null;
@@ -64,10 +61,7 @@ export function RoleContextProvider({ children }: { children: ReactNode }) {
   const effectiveRole = selectedRole || actualRole;
 
   // Roles the current user can choose from
-  const availableRoles: AppRole[] =
-    actualRole === "ADMIN"
-      ? [...BASE_ROLES, ...ADMIN_ONLY_ROLES]
-      : [...BASE_ROLES, "LEADER"];
+  const availableRoles: AppRole[] = [...ALL_ROLES];
 
   // Consider initialized once the fetch has settled — either with data or
   // with an error. Never leave pages spinning forever on a network failure.
