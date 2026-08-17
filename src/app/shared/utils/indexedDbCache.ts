@@ -321,10 +321,8 @@ export const CACHE_KEYS = {
 } as const;
 
 export const KV_KEYS = {
-  TEAM_PREFERENCES: "tpt-team-preferences",
+  TEAM_PREFERENCES:        "tpt-team-preferences",
   GITHUB_TEAM_PREFERENCES: "tpt-github-team-preferences",
-  USER_PREFERENCES: "tpt-user-preferences",
-  ROLE_CONTEXT: "tpt-role-context",
-  LAST_REFRESH_TIME: "tpt-last-refresh-time",
-  LAST_REFRESH_GITHUB: "tpt-last-refresh-github",
+  USER_PREFERENCES:        "tpt-user-preferences",
+  ROLE_CONTEXT:            "tpt-role-context",
 } as const;

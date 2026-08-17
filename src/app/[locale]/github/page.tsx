@@ -12,7 +12,7 @@ import { useState } from "react";
 
 export default function GitHubPage() {
   const t = useTranslations();
-  const { data, teamFilters, setTeamFilters, refresh, canRefresh, isRefreshing, isLoading: isGitHubLoading } = useGitHubVulnerabilities();
+  const { data, teamFilters, setTeamFilters, refresh, isRefreshing, isLoading: isGitHubLoading } = useGitHubVulnerabilities();
   const { config, isLoading } = useConfigContext();
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   
@@ -156,7 +156,7 @@ export default function GitHubPage() {
                   variant="secondary"
                   size="small"
                   onClick={refresh}
-                  disabled={!canRefresh || isRefreshing}
+                  disabled={isRefreshing}
                   loading={isRefreshing}
                 >
                   {t("summary.refresh")}
