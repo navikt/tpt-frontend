@@ -5,8 +5,6 @@ import { useTranslations } from "next-intl";
 import { useTeamsOverview } from "@/app/modules/admin/hooks/useTeamsOverview";
 import { useTeamsSla } from "@/app/modules/admin/hooks/useTeamsSla";
 import { AdminSummaryCards } from "@/app/modules/admin/components/AdminSummaryCards";
-import { SsvcBackfillButton } from "@/app/modules/admin/components/SsvcBackfillButton";
-import { GcveComparisonButton } from "@/app/modules/admin/components/GcveComparisonButton";
 import { TeamsOverviewTable } from "@/app/modules/admin/components/TeamsOverviewTable";
 import { TeamsSlaTable } from "@/app/modules/admin/components/TeamsSlaTable";
 import { VulnerabilitySearch } from "@/app/modules/admin/components/VulnerabilitySearch";
@@ -80,15 +78,6 @@ export default function AdminPage() {
           ) : null}
         </Box>
 
-        <Box>
-          <Heading size="medium" level="2" style={{ marginBottom: "1rem" }}>
-            {t("operations")}
-          </Heading>
-          <VStack gap="space-16">
-            <SsvcBackfillButton />
-            <GcveComparisonButton />
-          </VStack>
-        </Box>
       </VStack>
     </Box>
   );

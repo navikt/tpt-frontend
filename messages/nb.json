@@ -343,27 +343,7 @@
       "title": "Sårbarheter for {teamSlug}",
       "description": "Adminvisning – data er hentet direkte fra NAIS API for dette teamet."
     },
-    "operations": "Driftsoperasjoner",
-    "triggerSsvcBackfill": "Kjør SSVC-etterfylling",
-    "ssvcBackfillConfirmation": "Dette henter alle sporede CVE-er på nytt fra NVD for å fylle inn manglende SSVC-data. Jobben kjører i bakgrunnen og kan ta tid. Fortsette?",
-    "confirm": "Bekreft",
-    "cancel": "Avbryt",
-    "ssvcBackfillStarted": "SSVC-etterfylling startet. Følg med i applikasjonsloggene for fremdrift.",
-    "ssvcBackfillError": "Kunne ikke starte SSVC-etterfylling.",
-    "fetchGcveComparison": "Hent NVD/GCVE-diff",
-    "gcveComparisonError": "Kunne ikke hente NVD/GCVE-sammenligning.",
-    "gcveTotalTracked": "Totalt sporede CVE-er",
-    "gcveCovered": "Dekket av GCVE",
-    "gcveMissing": "Mangler i GCVE",
-    "gcveLastSync": "Siste GCVE-synk",
-    "gcveNeverSynced": "Aldri synkronisert",
-    "gcveMissingSample": "CVE-er som mangler i GCVE ({count})",
-    "gcveCvssDiscrepancies": "CVSS-avvik mellom NVD og GCVE ({count})",
-    "gcveNvdScore": "NVD-score",
-    "gcveGcveScore": "GCVE-score",
-    "gcveNvdSeverity": "NVD-alvorlighet",
-    "gcveGcveSeverity": "GCVE-alvorlighet",
-    "gcveNoDifferences": "Ingen avvik funnet mellom NVD og GCVE."
+
   },
   "welcome": {
     "eyebrow": "Velkommen til TPT",
