@@ -17,7 +17,6 @@ import {
 import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
 import { useSyncEvents } from "@/app/shared/hooks/useSyncEvents";
 
-const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
 // Synchronous sessionStorage flag to skip loading on re-mounts (HMR, refresh)
@@ -66,32 +65,7 @@ export const useVulnerabilities = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
-  const [canRefresh, setCanRefresh] = useState(true);
-  const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
 
-  // Update cooldown state whenever lastRefreshTime changes
-  useEffect(() => {
-    if (!lastRefreshTime) {
-      startTransition(() => {
-        setCanRefresh(true);
-        setTimeUntilRefresh(0);
-      });
-      return;
-    }
-    const tick = () => {
-      const remaining = Math.max(0, REFRESH_COOLDOWN_MS - (Date.now() - lastRefreshTime));
-      startTransition(() => {
-        setCanRefresh(remaining === 0);
-        setTimeUntilRefresh(remaining);
-      });
-    };
-    tick();
-    if (Date.now() - lastRefreshTime < REFRESH_COOLDOWN_MS) {
-      const id = setInterval(tick, 1000);
-      return () => clearInterval(id);
-    }
-  }, [lastRefreshTime]);
 
   // Initialize filters from URL (synchronous)
   const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>(() => {
@@ -227,9 +201,7 @@ export const useVulnerabilities = () => {
           setPackageNameFilters({});
           setAppNameFilter("");
 
-          const now = Date.now();
-          setLastRefreshTime(now);
-          setKvItem(KV_KEYS.LAST_REFRESH_TIME, now);
+
         }
 
         return responseData;
@@ -267,13 +239,8 @@ export const useVulnerabilities = () => {
   });
 
   const refresh = useCallback(() => {
-    const now = Date.now();
-    if (lastRefreshTime && now - lastRefreshTime < REFRESH_COOLDOWN_MS) {
-      return false; // Cooldown not elapsed
-    }
-    fetchData(true); // isRefresh = true
-    return true;
-  }, [fetchData, lastRefreshTime]);
+    fetchData(true);
+  }, [fetchData]);
 
   // Initialize from IndexedDB and conditionally revalidate
   useEffect(function initializeEffect() {
@@ -302,10 +269,6 @@ export const useVulnerabilities = () => {
           setCacheSeed();
           setIsLoading(false);
         }
-
-        // Load last refresh time
-        const lrt = await getKvItem<number>(KV_KEYS.LAST_REFRESH_TIME);
-        if (lrt !== null) setLastRefreshTime(lrt);
 
         // Load team preferences from IDB if no URL filters
         const filtersFromUrl = searchParamsToFilters(searchParams);
@@ -619,8 +582,6 @@ export const useVulnerabilities = () => {
     isSyncing,
     error,
     refresh,
-    canRefresh,
-    timeUntilRefresh,
     teamFilters,
     setTeamFilters: wrappedSetTeamFilters,
     applicationFilters,

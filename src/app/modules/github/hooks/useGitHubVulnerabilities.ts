@@ -10,7 +10,6 @@ import {
 } from "@/app/shared/utils/indexedDbCache";
 import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
 
-const REFRESH_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
 const CACHE_SEED_FLAG = "tpt-gh-cache-seeded";
@@ -39,38 +38,11 @@ export const useGitHubVulnerabilities = () => {
   const [isLoading, setIsLoading] = useState(() => !hasCacheSeed());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null);
-  const [canRefresh, setCanRefresh] = useState(true);
-  const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
-
   const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
 
   const [repositoryFilters, setRepositoryFilters] = useState<Record<string, boolean>>({});
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
   const hasFetchedRef = useRef(false);
-
-  // Update cooldown state whenever lastRefreshTime changes
-  useEffect(() => {
-    if (!lastRefreshTime) {
-      startTransition(() => {
-        setCanRefresh(true);
-        setTimeUntilRefresh(0);
-      });
-      return;
-    }
-    const tick = () => {
-      const remaining = Math.max(0, REFRESH_COOLDOWN_MS - (Date.now() - lastRefreshTime));
-      startTransition(() => {
-        setCanRefresh(remaining === 0);
-        setTimeUntilRefresh(remaining);
-      });
-    };
-    tick();
-    if (Date.now() - lastRefreshTime < REFRESH_COOLDOWN_MS) {
-      const id = setInterval(tick, 1000);
-      return () => clearInterval(id);
-    }
-  }, [lastRefreshTime]);
 
   const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
     try {
@@ -92,11 +64,6 @@ export const useGitHubVulnerabilities = () => {
       setRepositoryFilters({});
       setCveFilters({});
 
-      if (isRefresh) {
-        const now = Date.now();
-        setLastRefreshTime(now);
-        setKvItem(KV_KEYS.LAST_REFRESH_GITHUB, now);
-      }
     } catch (error) {
       console.error("Error fetching GitHub vulnerabilities data:", error);
     } finally {
@@ -106,13 +73,8 @@ export const useGitHubVulnerabilities = () => {
   }, []);
 
   const refresh = useCallback(() => {
-    const now = Date.now();
-    if (lastRefreshTime && now - lastRefreshTime < REFRESH_COOLDOWN_MS) {
-      return false; // Cooldown not elapsed
-    }
-    fetchData(true); // isRefresh = true
-    return true;
-  }, [fetchData, lastRefreshTime]);
+    fetchData(true);
+  }, [fetchData]);
 
   // Initialize from IndexedDB and conditionally revalidate
   useEffect(function initializeEffect() {
@@ -140,10 +102,6 @@ export const useGitHubVulnerabilities = () => {
           setCacheSeed();
           setIsLoading(false);
         }
-
-        // Load last refresh time
-        const lrt = await getKvItem<number>(KV_KEYS.LAST_REFRESH_GITHUB);
-        if (lrt !== null) setLastRefreshTime(lrt);
 
         // Load team preferences
         const savedTeams = await getKvItem<string[]>(KV_KEYS.GITHUB_TEAM_PREFERENCES);
@@ -258,8 +216,6 @@ export const useGitHubVulnerabilities = () => {
     isLoading,
     isRefreshing,
     refresh,
-    canRefresh,
-    timeUntilRefresh,
     teamFilters,
     setTeamFilters,
     repositoryFilters,
