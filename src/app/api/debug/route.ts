@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
-import { mockVulnerabilitiesPayload } from "@/app/mocks/mockPayloads";
+import { mockVulnerabilitiesPayload, mockSlaOverduePayload } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 import { isAbortError } from "@/app/shared/utils/errorHandling";
 
@@ -21,14 +21,16 @@ function getServerEnv() {
 }
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const endpoint = searchParams.get("endpoint") || "vulnerabilities";
+
   if (process.env.MOCKS_ENABLED === "true") {
-    return NextResponse.json(mockVulnerabilitiesPayload);
+    const mockData = endpoint === "sla" ? mockSlaOverduePayload : mockVulnerabilitiesPayload;
+    return NextResponse.json(mockData);
   }
 
   try {
     const { tptBackendUrl } = getServerEnv();
-    const { searchParams } = new URL(request.url);
-    const endpoint = searchParams.get("endpoint") || "vulnerabilities";
 
     let backendToken: string;
 
@@ -56,9 +58,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Support different endpoints via query parameter
-    const backendUrl = endpoint === "github" 
-      ? `${tptBackendUrl}/vulnerabilities/github/user`
-      : `${tptBackendUrl}/vulnerabilities/user`;
+    const backendUrl =
+      endpoint === "github"
+        ? `${tptBackendUrl}/vulnerabilities/github/user`
+        : endpoint === "sla"
+          ? `${tptBackendUrl}/sla/overdue`
+          : `${tptBackendUrl}/vulnerabilities/user`;
 
     const response = await fetch(backendUrl, {
       headers: {

@@ -96,7 +96,7 @@ export default function TeamMemberView() {
     if (!slaData || !slaData.teams) return null;
 
     // Derive activeAppNames here to ensure consistency within this memo
-    const activeAppNames = isFilterActive
+    const activeAppNames = isFilterActive && hasAppFilters
       ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
       : null;
 
@@ -105,7 +105,13 @@ export default function TeamMemberView() {
       : slaData.teams;
 
     const computedTeams = relevantSlaTeams.map((team) => {
-      if (!activeAppNames) return team;
+      // Always derive maxDaysOverdue from criticalOverdueItems (workdays),
+      // not the backend scalar field which is in calendar days
+      const baseMaxDaysOverdue = (team.criticalOverdueItems ?? []).length > 0
+        ? Math.max(...(team.criticalOverdueItems ?? []).map((i) => i.workdaysOverdue))
+        : 0;
+
+      if (!activeAppNames) return { ...team, maxDaysOverdue: baseMaxDaysOverdue };
 
       const criticalItems = (team.criticalOverdueItems ?? []).filter(
         (item) => activeAppNames.has(item.applicationName)
@@ -166,7 +172,7 @@ export default function TeamMemberView() {
         (t) => t.criticalOverdue > 0 || t.nonCriticalOverdue > 0
       ),
     };
-  }, [slaData, filteredTeamSlugs, isFilterActive, applicationFilters]);
+  }, [slaData, filteredTeamSlugs, isFilterActive, hasAppFilters, applicationFilters]);
 
   if (slaLoading || vulnLoading || configLoading || !slaData || !slaTotals || !overview || !deploymentCompliance) {
     return (

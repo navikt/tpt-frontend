@@ -64,11 +64,14 @@ export default function LeaderView() {
       let criticalOverdue = teamSla?.criticalOverdue || 0;
       let nonCriticalOverdue = teamSla?.nonCriticalOverdue || 0;
       let repositoriesOutOfSla = teamSla?.repositoriesOutOfSla || 0;
-      let maxDaysOverdue = teamSla?.maxDaysOverdue || 0;
+      // Always derive maxDaysOverdue from items (workdays), not the backend scalar (calendar days)
+      let maxDaysOverdue = teamSla?.criticalOverdueItems?.length
+        ? Math.max(...(teamSla.criticalOverdueItems.map((i) => i.workdaysOverdue)))
+        : 0;
 
       // When filter is active, reconstruct SLA counts from overdueItems
       // Derive activeAppNames here to ensure consistency within this memo
-      const activeAppNames = isFilterActive
+      const activeAppNames = isFilterActive && hasAppFilters
         ? new Set(Object.keys(applicationFilters).filter((k) => applicationFilters[k]))
         : null;
 
@@ -101,7 +104,7 @@ export default function LeaderView() {
         deploymentsNeedingUpdate,
       };
     });
-  }, [filteredTeams, vulnData, slaData, deploymentAgeDays, isFilterActive, applicationFilters]);
+  }, [filteredTeams, vulnData, slaData, deploymentAgeDays, isFilterActive, hasAppFilters, applicationFilters]);
 
   const sortedTeams = useMemo(() => {
     const sorted = [...teamStatistics];

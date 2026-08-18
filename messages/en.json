@@ -255,7 +255,7 @@
     "criticalOverdue": "Critical needing action",
     "nonCriticalOverdue": "Others needing action",
     "onTrack": "On Track",
-    "repositoriesNeedingAttention": "Repositories needing attention",
+    "repositoriesNeedingAttention": "Applications needing attention",
     "maxWorkdaysOverdue": "Max workdays over target",
     "criticalOnTrack": "Critical on track",
     "nonCriticalOnTrack": "Others on track",
