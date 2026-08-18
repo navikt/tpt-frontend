@@ -342,8 +342,7 @@
     "teamView": {
       "title": "Vulnerabilities for {teamSlug}",
       "description": "Admin view – data is fetched directly from the NAIS API for this team."
-    },
-
+    }
   },
   "welcome": {
     "eyebrow": "Welcome to TPT",

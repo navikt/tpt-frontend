@@ -342,8 +342,7 @@
     "teamView": {
       "title": "Sårbarheter for {teamSlug}",
       "description": "Adminvisning – data er hentet direkte fra NAIS API for dette teamet."
-    },
-
+    }
   },
   "welcome": {
     "eyebrow": "Velkommen til TPT",
