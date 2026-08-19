@@ -12,6 +12,7 @@ import {
 import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
 
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
+const REFRESH_TIMEOUT_MS = 60 * 1000; // 1 minute fallback if SSE complete never arrives
 
 const CACHE_SEED_FLAG = "tpt-gh-cache-seeded";
 
@@ -78,19 +79,43 @@ export const useGitHubVulnerabilities = () => {
     fetchDataRef.current = fetchData;
   });
 
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const { isGitHubSyncing: isSyncing } = useSyncEvents({
     onSyncComplete: useCallback(() => {}, []),
     onGitHubSyncComplete: useCallback(() => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
       fetchDataRef.current(false, false);
+    }, []),
+    onGitHubSyncError: useCallback(() => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
+      setIsRefreshing(false);
     }, []),
   });
 
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    refreshTimeoutRef.current = setTimeout(() => {
+      refreshTimeoutRef.current = null;
+      fetchDataRef.current(false, false);
+    }, REFRESH_TIMEOUT_MS);
     try {
       await fetch("/api/github/refresh");
     } catch (error) {
       console.error("Error triggering GitHub refresh:", error);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
       setIsRefreshing(false);
     }
   }, []);

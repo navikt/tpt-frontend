@@ -8,12 +8,14 @@ interface UseSyncEventsOptions {
   onSyncComplete: () => void;
   onGitHubSyncComplete?: () => void;
   onGitHubSyncStarted?: () => void;
+  onGitHubSyncError?: () => void;
 }
 
 export function useSyncEvents({
   onSyncComplete,
   onGitHubSyncComplete,
   onGitHubSyncStarted,
+  onGitHubSyncError,
 }: UseSyncEventsOptions): {
   isSyncing: boolean;
   isGitHubSyncing: boolean;
@@ -24,6 +26,7 @@ export function useSyncEvents({
   const onSyncCompleteRef = useRef(onSyncComplete);
   const onGitHubSyncCompleteRef = useRef(onGitHubSyncComplete);
   const onGitHubSyncStartedRef = useRef(onGitHubSyncStarted);
+  const onGitHubSyncErrorRef = useRef(onGitHubSyncError);
 
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const githubDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,6 +41,10 @@ export function useSyncEvents({
 
   useEffect(() => {
     onGitHubSyncStartedRef.current = onGitHubSyncStarted;
+  });
+
+  useEffect(() => {
+    onGitHubSyncErrorRef.current = onGitHubSyncError;
   });
 
   useEffect(() => {
@@ -95,6 +102,7 @@ export function useSyncEvents({
       }
       setIsSyncing(false);
       setIsGitHubSyncing(false);
+      onGitHubSyncErrorRef.current?.();
     };
 
     return () => {
