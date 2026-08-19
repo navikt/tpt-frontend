@@ -1,0 +1,9 @@
+.devBanner {
+  --__axc-global-alert-alignment: max(var(--ax-space-20), calc((100% - 1024px) / 2 + var(--ax-space-16)));
+}
+
+@media (min-width: 1024px) {
+  .devBanner {
+    --__axc-global-alert-alignment: max(var(--ax-space-20), calc((100% - 1024px) / 2 + var(--ax-space-48)));
+  }
+}

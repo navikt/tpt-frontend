@@ -11,6 +11,7 @@ import { useSyncExternalStore } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
 import { PersonRectangleIcon } from "@navikt/aksel-icons";
+import styles from "./layout.module.css";
 
 function subscribe() { return () => {}; }
 function getSnapshot() { return true; }
@@ -101,13 +102,15 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </InternalHeader>
-      <GlobalAlert status="announcement">
-        <GlobalAlert.Header>
-          <GlobalAlert.Title>
-            {t("banner.underDevelopment")}
-          </GlobalAlert.Title>
-        </GlobalAlert.Header>
-      </GlobalAlert>
+      {!pathname.includes("/prioritization") && (
+        <GlobalAlert status="announcement" className={styles.devBanner}>
+          <GlobalAlert.Header>
+            <GlobalAlert.Title>
+              {t("banner.underDevelopment")}
+            </GlobalAlert.Title>
+          </GlobalAlert.Header>
+        </GlobalAlert>
+      )}
       {isSyncing && (
         <Alert variant="info" size="small" style={{ borderRadius: 0 }}>
           {t("sync.fetchingInBackground")}
