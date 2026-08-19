@@ -1,6 +1,7 @@
 import type {Vulnerability, RiskScoreFactor} from "../types/vulnerabilities";
 
 export interface RiskFactor {
+    factorKey: string;
     name: string;
     description: string;
     points: number;
@@ -21,6 +22,7 @@ export function getRiskFactors(vuln: Vulnerability, translate?: (key: string) =>
             const isHighOrCritical = factor.impact === "HIGH" || factor.impact === "CRITICAL";
 
             return {
+                factorKey: factor.name,
                 name: getFactorName(factor.name, translate),
                 description: factor.explanation,
                 points: factor.points,

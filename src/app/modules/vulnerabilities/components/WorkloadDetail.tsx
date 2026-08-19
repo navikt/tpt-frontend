@@ -27,8 +27,9 @@ import {
 import {
     getRiskFactors,
     getSeverityColor,
-    getSeverityIconColor
+    getSeverityIconColor,
 } from "@/app/shared/utils/riskFactors";
+import { RiskFactorTooltip } from "@/app/shared/components/RiskFactorTooltip";
 import { useTranslations } from "next-intl";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
@@ -257,7 +258,7 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
                                             <VStack gap="space-4" style={{ flex: 1 }}>
                                                 <HStack gap="space-8" align="end">
                                                     <BodyShort weight="semibold" style={{ flexGrow: 1 }}>
-                                                        {factor.name}
+                                                        <RiskFactorTooltip factorKey={factor.factorKey} label={factor.name} />
                                                     </BodyShort>
                                                     <Tag
                                                         variant={

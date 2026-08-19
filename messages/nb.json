@@ -208,7 +208,14 @@
     "exploitation_evidence": "Utnyttelsesbevis",
     "exposure": "Eksponering",
     "environment": "Miljøkontekst",
-    "actionability": "Handlingsevne"
+    "actionability": "Handlingsevne",
+    "descriptions": {
+      "severity": "Basert på den standardiserte tekniske alvorlighetsvurderingen (CVSSv3) av sårbarheten — uavhengig av kontekst.",
+      "exploitation_evidence": "Vi søker i metadata fra flere kilder for å finne spor av kjent eller aktiv utnyttelse — for eksempel om det finnes offentliggjorte eksempelangrep, eller om sårbarheten er bekreftet aktivt utnyttet i angrep mot andre.",
+      "exposure": "Tar hensyn til om applikasjonen er tilgjengelig fra internett, kun internt i Nav, eller ikke har nettverkstilgang. En eksponert applikasjon øker risikoen betraktelig.",
+      "environment": "Vurderer i hvilket miljø applikasjonen kjører, og om sårbarheten har ligget ubehandlet lenge. Produksjonsmiljøer og eldre funn vektes tyngre.",
+      "actionability": "Ser på om det finnes en tilgjengelig oppdatering som fikser sårbarheten, og om den er kjent brukt i løsepengevirus-angrep. Tilgjengelige fixer øker prioriteten; manglende fix reduserer den."
+    }
   },
   "leaderView": {
     "title": "Teamoversikt",

@@ -1,7 +1,29 @@
 "use client";
 
-import { Box, BodyShort } from "@navikt/ds-react";
+import { Box, BodyShort, Tooltip } from "@navikt/ds-react";
+import { InformationSquareIcon } from "@navikt/aksel-icons";
 import { RiskScoreBreakdown } from "@/app/shared/types/vulnerabilities";
+import { useTranslations } from "next-intl";
+
+function InlineTooltipIcon({ factorKey }: { factorKey: string }) {
+  const t = useTranslations("riskFactors.descriptions");
+  let description: string | null = null;
+  try {
+    description = t(factorKey as Parameters<typeof t>[0]);
+  } catch {
+    description = null;
+  }
+  if (!description) return null;
+  return (
+    <Tooltip content={description} placement="right">
+      <InformationSquareIcon
+        aria-label={description}
+        style={{ cursor: "help", color: "var(--ax-text-neutral-subtle)", flexShrink: 0 }}
+        fontSize="1rem"
+      />
+    </Tooltip>
+  );
+}
 
 interface RiskScoreBreakdownBarsProps {
   breakdown: RiskScoreBreakdown;
@@ -25,6 +47,7 @@ function getBarColor(impact: string): string {
 const EXCLUDED_FACTORS = new Set(["environment", "exposure"]);
 
 export function RiskScoreBreakdownBars({ breakdown }: RiskScoreBreakdownBarsProps) {
+  const t = useTranslations("riskFactors");
   const factors = breakdown.factors.filter((f) => !EXCLUDED_FACTORS.has(f.name));
 
   return (
@@ -50,8 +73,11 @@ export function RiskScoreBreakdownBars({ breakdown }: RiskScoreBreakdownBarsProp
               style={{ display: "flex", alignItems: "center", gap: "1rem" }}
             >
               {/* Label */}
-              <div style={{ width: "160px", flexShrink: 0 }}>
-                <BodyShort size="small">{factor.name}</BodyShort>
+              <div style={{ width: "160px", flexShrink: 0, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <BodyShort size="small" style={{ flex: 1 }}>
+                  {t(factor.name as Parameters<typeof t>[0], { defaultValue: factor.name })}
+                </BodyShort>
+                <InlineTooltipIcon factorKey={factor.name} />
               </div>
 
               {/* Track rendered as a gradient: colored portion + grey remainder */}

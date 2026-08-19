@@ -208,7 +208,14 @@
     "exploitation_evidence": "Exploitation Evidence",
     "exposure": "Exposure",
     "environment": "Environment Context",
-    "actionability": "Actionability"
+    "actionability": "Actionability",
+    "descriptions": {
+      "severity": "Based on the standardised technical severity rating (CVSSv3) of the vulnerability — independent of context.",
+      "exploitation_evidence": "We search metadata from multiple sources for traces of known or active exploitation — for example whether public proof-of-concept exploits exist, or whether the vulnerability has been confirmed actively exploited against others.",
+      "exposure": "Considers whether the application is reachable from the internet, only internally within Nav, or has no network access. An exposed application increases risk considerably.",
+      "environment": "Evaluates which environment the application runs in, and whether the vulnerability has been left unaddressed for a long time. Production environments and older findings are weighted more heavily.",
+      "actionability": "Looks at whether a fix is available for the vulnerability, and whether it is known to be used in ransomware attacks. Available fixes increase priority; a missing fix reduces it."
+    }
   },
   "leaderView": {
     "title": "Team Overview",
