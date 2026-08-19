@@ -61,7 +61,7 @@
     },
     "quickWins": {
       "title": "Quick wins — fixes already open",
-      "sortedByRisk": "Sorted by risk score",
+      "sortedByRisk": "Top 5 of {total} — sorted by risk score",
       "mergeFixPr": "Merge fix PR ↗"
     },
     "filterModal": {

@@ -61,7 +61,7 @@
     },
     "quickWins": {
       "title": "Quick wins — fixes allerede åpne",
-      "sortedByRisk": "Sortert etter risikoscore",
+      "sortedByRisk": "Topp 5 av {total} — sortert etter risikoscore",
       "mergeFixPr": "Merge fix PR ↗"
     },
     "filterModal": {

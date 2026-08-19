@@ -62,14 +62,15 @@ function RiskScoreBadge({ score }: { score: number }) {
 export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
   const t = useTranslations("github.quickWins");
 
-  const quickWins = useMemo(() => {
-    return repositories
+  const { quickWins, totalQuickWins } = useMemo(() => {
+    const all = repositories
       .flatMap((repo) =>
         repo.vulnerabilities
           .filter((v) => v.dependabotUpdatePullRequestUrl != null)
           .map((v) => ({ ...v, repoName: repo.nameWithOwner }))
       )
       .sort((a, b) => b.riskScore - a.riskScore);
+    return { quickWins: all.slice(0, 5), totalQuickWins: all.length };
   }, [repositories]);
 
   if (quickWins.length === 0) return null;
@@ -88,7 +89,7 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
           {t("title")}
         </BodyShort>
         <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-          {t("sortedByRisk")}
+          {t("sortedByRisk", { total: totalQuickWins })}
         </BodyShort>
       </HStack>
 
