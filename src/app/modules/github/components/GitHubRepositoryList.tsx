@@ -14,6 +14,7 @@ interface GitHubRepositoryListProps {
   activeFilterCount: number;
   onRefresh: () => void;
   isRefreshing: boolean;
+  isSyncing: boolean;
 }
 
 const INITIAL_DISPLAY_COUNT = 10;
@@ -24,6 +25,7 @@ export function GitHubRepositoryList({
   activeFilterCount,
   onRefresh,
   isRefreshing,
+  isSyncing,
 }: GitHubRepositoryListProps) {
   const t = useTranslations("github");
   const tRepo = useTranslations("github.repository");
@@ -108,8 +110,8 @@ export function GitHubRepositoryList({
           variant="secondary"
           icon={<ArrowsCirclepathIcon />}
           onClick={onRefresh}
-          disabled={isRefreshing}
-          loading={isRefreshing}
+          disabled={isRefreshing || isSyncing}
+          loading={isRefreshing || isSyncing}
         />
         <Button
           variant={quickWinsOnly ? "primary" : "secondary"}

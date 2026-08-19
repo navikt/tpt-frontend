@@ -22,6 +22,7 @@ export default function GitHubPage() {
     setRepositoryFilters,
     refresh,
     isRefreshing,
+    isSyncing,
     isLoading: isGitHubLoading,
   } = useGitHubVulnerabilities();
 
@@ -156,6 +157,7 @@ export default function GitHubPage() {
           activeFilterCount={activeFilterCount}
           onRefresh={refresh}
           isRefreshing={isRefreshing}
+          isSyncing={isSyncing}
         />
       </VStack>
 

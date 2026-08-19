@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef, startTransition } from "react";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
+import { useSyncEvents } from "@/app/shared/hooks/useSyncEvents";
 import {
   getCachedItemEntry,
   setCachedItem,
@@ -72,9 +73,27 @@ export const useGitHubVulnerabilities = () => {
     }
   }, []);
 
-  const refresh = useCallback(() => {
-    fetchData(true);
-  }, [fetchData]);
+  const fetchDataRef = useRef(fetchData);
+  useEffect(() => {
+    fetchDataRef.current = fetchData;
+  });
+
+  const { isGitHubSyncing: isSyncing } = useSyncEvents({
+    onSyncComplete: useCallback(() => {}, []),
+    onGitHubSyncComplete: useCallback(() => {
+      fetchDataRef.current(false, false);
+    }, []),
+  });
+
+  const refresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await fetch("/api/github/refresh");
+    } catch (error) {
+      console.error("Error triggering GitHub refresh:", error);
+      setIsRefreshing(false);
+    }
+  }, []);
 
   // Initialize from IndexedDB and conditionally revalidate
   useEffect(function initializeEffect() {
@@ -215,6 +234,7 @@ export const useGitHubVulnerabilities = () => {
     data,
     isLoading,
     isRefreshing,
+    isSyncing,
     refresh,
     teamFilters,
     setTeamFilters,
