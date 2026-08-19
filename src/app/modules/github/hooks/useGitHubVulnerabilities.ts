@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef, startTransition } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import {
   getCachedItemEntry,
@@ -9,6 +10,12 @@ import {
   KV_KEYS,
 } from "@/app/shared/utils/indexedDbCache";
 import { needsRevalidation } from "@/app/shared/utils/cacheRevalidation";
+import { deserializeFilters, serializeFilters } from "@/app/modules/vulnerabilities/utils/queryParamHelpers";
+
+const GITHUB_PARAM_KEYS = {
+  team: "team",
+  repo: "repo",
+} as const;
 
 const CACHE_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -33,16 +40,77 @@ function setCacheSeed(): void {
 }
 
 export const useGitHubVulnerabilities = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
   const [data, setData] = useState<VulnerabilitiesResponse | null>(null);
 
   const [isLoading, setIsLoading] = useState(() => !hasCacheSeed());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>({});
+  const [teamFilters, setTeamFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    return deserializeFilters(searchParams.get(GITHUB_PARAM_KEYS.team));
+  });
 
-  const [repositoryFilters, setRepositoryFilters] = useState<Record<string, boolean>>({});
+  const [repositoryFilters, setRepositoryFilters] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    return deserializeFilters(searchParams.get(GITHUB_PARAM_KEYS.repo));
+  });
   const [cveFilters, setCveFilters] = useState<Record<string, boolean>>({});
+
   const hasFetchedRef = useRef(false);
+  const shouldSyncToUrlRef = useRef(false);
+  const lastSyncedParamsRef = useRef<string>("");
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitializedRef = useRef(false);
+
+  // Mark as initialized and detect whether URL already has filters
+  useEffect(() => {
+    const hasUrlFilters =
+      searchParams.has(GITHUB_PARAM_KEYS.team) ||
+      searchParams.has(GITHUB_PARAM_KEYS.repo);
+    if (hasUrlFilters) {
+      shouldSyncToUrlRef.current = true;
+      lastSyncedParamsRef.current = searchParams.toString();
+    }
+    isInitializedRef.current = true;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset sync tracker on route change
+  useEffect(() => {
+    lastSyncedParamsRef.current = "";
+  }, [pathname]);
+
+  // Sync filters to URL (debounced 500ms)
+  useEffect(() => {
+    if (!isInitializedRef.current) return;
+    if (!shouldSyncToUrlRef.current) return;
+
+    if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+
+    updateTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams();
+      const teamParam = serializeFilters(teamFilters);
+      if (teamParam) params.set(GITHUB_PARAM_KEYS.team, teamParam);
+      const repoParam = serializeFilters(repositoryFilters);
+      if (repoParam) params.set(GITHUB_PARAM_KEYS.repo, repoParam);
+
+      const newParamsString = params.toString();
+      if (newParamsString !== lastSyncedParamsRef.current) {
+        lastSyncedParamsRef.current = newParamsString;
+        const newUrl = newParamsString
+          ? `${window.location.pathname}?${newParamsString}`
+          : window.location.pathname;
+        router.replace(newUrl, { scroll: false });
+      }
+    }, 500);
+
+    return () => {
+      if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+    };
+  }, [teamFilters, repositoryFilters, router, pathname]);
 
   const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
     try {
@@ -217,9 +285,15 @@ export const useGitHubVulnerabilities = () => {
     isRefreshing,
     refresh,
     teamFilters,
-    setTeamFilters,
+    setTeamFilters: (filters: Record<string, boolean>) => {
+      shouldSyncToUrlRef.current = true;
+      setTeamFilters(filters);
+    },
     repositoryFilters,
-    setRepositoryFilters,
+    setRepositoryFilters: (filters: Record<string, boolean>) => {
+      shouldSyncToUrlRef.current = true;
+      setRepositoryFilters(filters);
+    },
     cveFilters,
     setCveFilters,
     allTeams,
