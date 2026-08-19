@@ -25,6 +25,76 @@
     border: none !important;
 }
 
+/* Make the accordion header button a flex row so our content span can fill it */
+.packageAccordion :global(.aksel-accordion__header) {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Make the heading span that wraps our children fill the available button width */
+.packageAccordion :global(.aksel-accordion__header > span:last-child) {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+
 .packageAccordion :global(.aksel-accordion__item[data-expanded="false"] > .aksel-accordion__content) {
     display: none;
+}
+
+/* Package group rows nested inside the repo accordion content */
+.packageGroupWrapper {
+    border-bottom: 1px solid var(--ax-border-neutral-subtle);
+}
+
+.packageGroupWrapper:last-child {
+    border-bottom: none;
+}
+
+.packageGroupWrapper :global(.aksel-accordion) {
+    border: none;
+}
+
+.packageGroupWrapper :global(.aksel-accordion__item) {
+    border: none !important;
+}
+
+.packageGroupWrapper :global(.aksel-accordion__header) {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: none !important;
+    background: var(--ax-bg-default);
+}
+
+.packageGroupWrapper :global(.aksel-accordion__header > span:last-child) {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.packageGroupWrapper :global(.aksel-accordion__header-button) {
+    padding: 0.6rem 1rem;
+    border: none !important;
+}
+
+.packageGroupWrapper :global(.aksel-accordion__content) {
+    background: var(--ax-bg-default);
+    padding: 0;
+}
+
+.githubLink {
+    font-size: 0.875rem;
+    color: var(--ax-text-action);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.githubLink:hover {
+    color: var(--ax-text-action-hover);
 }

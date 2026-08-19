@@ -49,7 +49,37 @@
     "repositories": "Repositories",
     "filterRepository": "Filtrer repository",
     "noRepositories": "Ingen repositories funnet",
+    "pageTitle": "GitHub repository-sårbarheter",
+    "pageSubtitle": "Repositories rangert etter risikoscore — et beregnet signal som kombinerer alvorlighetsgrad, utnyttelsesbevis og handlingsevne. Fixes med en åpen pull request er fremhevet separat slik at du kan lukke dem raskt.",
     "pageDescription": "Denne siden viser sårbarheter oppdaget av GitHub i dine repositories. GitHub analyserer avhengighetene dine for kjente sikkerhetshull og rapporterer dem her. Dataene er hentet fra GitHub's avhengighetstjekk.",
+    "sortedByRiskHighToLow": "Sortert etter risikoscore, høy til lav",
+    "stats": {
+      "repositories": "REPOSITORIES",
+      "totalVulnerabilities": "TOTALT SÅRBARHETER",
+      "fixesReadyToMerge": "FIXES KLARE TIL MERGE",
+      "criticalRepositories": "KRITISKE REPOSITORIES"
+    },
+    "quickWins": {
+      "title": "Quick wins — fixes allerede åpne",
+      "sortedByRisk": "Sortert etter risikoscore",
+      "mergeFixPr": "Merge fix PR ↗"
+    },
+    "filterModal": {
+      "title": "Filtrer",
+      "teamsLabel": "Team",
+      "teamsDescription": "Velg hvilke team du vil se data for. Tom betyr alle.",
+      "repositoriesLabel": "Repositories",
+      "repositoriesDescription": "Velg hvilke repositories du vil se. Tom betyr alle.",
+      "repositoriesSearchPlaceholder": "Søk etter repositories...",
+      "repositoriesSelected": "{count} repositories valgt",
+      "noRepositories": "Ingen repositories funnet",
+      "noTeams": "Ingen team funnet",
+      "selectAll": "Velg alle",
+      "clearAll": "Fjern alle",
+      "apply": "Bruk",
+      "cancel": "Avbryt",
+      "reset": "Tilbakestill"
+    },
     "metadata": {
       "teams": "Teams",
       "repositories": "Repositories"
@@ -60,56 +90,33 @@
       "totalVulnerabilities": "sårbarheter totalt",
       "criticalRepositories": "kritiske repositories",
       "highRiskRepositories": "repositories med høy risiko",
-      "noCriticalVulnerabilities": "Ingen kritiske sårbarheter!",
-      "teamStatistics": "Teamstatistikk",
-      "repositoriesShort": "repos",
-      "vulnerabilitiesShort": "sårb.",
-      "avgRisk": "Gj.snitt risiko"
+      "noCriticalVulnerabilities": "Ingen kritiske sårbarheter!"
     },
     "repository": {
       "riskScore": "Risikoscore",
       "vulnerabilities": "Sårbarheter",
-      "vulnerabilityBreakdown": "Sårbarhetsfordeling",
       "vulnerabilityList": "Alle sårbarheter",
-      "highPriority": "Snarest",
-      "mediumPriority": "Middels prioritet",
-      "lowPriority": "Lav prioritet",
-      "securityMetrics": "Sikkerhetsmålinger",
-      "distrolessImage": "Distroless image",
-      "codeScanning": "Code scanning",
-      "lockFiles": "Lock-files",
-      "comingSoon": "Kommer snart",
-      "yes": "Ja",
-      "no": "Nei",
-      "ok": "OK",
-      "notOk": "Ikke OK",
-      "unknown": "Ukjent",
+      "fixReady": "1 fix klar",
+      "fixesReady": "{count} fixes klare",
       "noRepositories": "Ingen repositories å vise",
       "showingTop": "Viser topp {count} repositories etter risikoscore",
       "showMore": "Vis {count} flere",
       "showLess": "Vis færre",
       "searchPlaceholder": "Søk etter repositories...",
       "vulnerabilityCount": "{count} sårbarheter",
-      "viewVulnerabilities": "Se sårbarheter",
-      "openPR": "Åpne fix-PR",
-      "viewDetails": "Se detaljer",
-      "package": "Pakke"
+      "openPR": "Fix PR åpen ↗",
+      "viewDetails": "Se detaljer ↗",
+      "whyThisScore": "Hvorfor denne scoren?",
+      "hideScoreBreakdown": "Skjul score-forklaring",
+      "quickWinsOnly": "Bare quick wins",
+      "noSearchResults": "Ingen repositories matcher søket ditt"
     },
     "riskLevel": {
-      "critical": "Kritisk",
-      "high": "Høy risiko",
-      "medium": "Middels risiko",
-      "low": "Lav risiko",
-      "none": "Ingen risiko"
-    },
-    "filterTeams": "Filtrer team",
-    "teamFilterModal": {
-      "title": "Filtrer team",
-      "selectAll": "Velg alle",
-      "clearAll": "Fjern alle",
-      "noTeams": "Ingen team funnet",
-      "apply": "Bruk",
-      "cancel": "Avbryt"
+      "critical": "CRITICAL",
+      "high": "HIGH",
+      "medium": "MEDIUM",
+      "low": "LOW",
+      "none": "NONE"
     }
   },
   "list": {

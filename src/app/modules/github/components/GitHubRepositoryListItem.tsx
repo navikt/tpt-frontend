@@ -1,382 +1,321 @@
 "use client";
 
-import { useMemo } from "react";
-import { Box, HStack, VStack, BodyShort, Heading, Link as AkselLink, Chips, Accordion, ExpansionCard } from "@navikt/ds-react";
-import { CheckmarkCircleFillIcon, XMarkOctagonFillIcon, QuestionmarkDiamondFillIcon, ExternalLinkIcon } from "@navikt/aksel-icons";
+import { useState, useMemo } from "react";
+import { Box, HStack, VStack, BodyShort, Link as AkselLink, Tag, Accordion } from "@navikt/ds-react";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
 import { useTranslations } from "next-intl";
+import { RiskScoreBreakdownBars } from "./RiskScoreBreakdownBars";
 import styles from "./GitHubRepositoryListItem.module.css";
+
+/** Strip PURL prefix and version — "pkg:npm/axios@1.2.3" → "axios" */
+function extractPackageName(raw: string): string {
+  let name = raw.replace(/^pkg:[^/]+\//, "");
+  const atIdx = name.indexOf("@");
+  if (atIdx !== -1) name = name.slice(0, atIdx);
+  const slashIdx = name.lastIndexOf("/");
+  if (slashIdx !== -1) name = name.slice(slashIdx + 1);
+  return name;
+}
 
 interface GitHubRepositoryListItemProps {
   repository: RepositoryMetrics;
+  rank: number;
 }
 
-function getRiskLevel(
-  score: number
-): "critical" | "high" | "medium" | "low" | "none" {
-  if (score >= 75) return "critical";
-  if (score >= 50) return "high";
-  if (score >= 25) return "medium";
-  if (score > 0) return "low";
-  return "none";
-}
-
-function getRiskColor(level: "critical" | "high" | "medium" | "low" | "none") {
+function getRiskColor(level: string): string {
   switch (level) {
     case "critical":
-      return "var(--a-surface-danger)";
+      return "var(--ax-color-red-600)";
     case "high":
-      return "var(--a-surface-danger-subtle)";
+      return "var(--ax-color-orange-600)";
     case "medium":
-      return "var(--a-surface-warning-subtle)";
+      return "var(--ax-color-yellow-700)";
     case "low":
-      return "var(--a-surface-warning-subtle-hover)";
-    case "none":
-      return "var(--a-surface-success-subtle)";
+      return "var(--ax-color-gray-500)";
+    default:
+      return "var(--ax-color-gray-400)";
   }
 }
 
-function getRiskLabel(
-  level: "critical" | "high" | "medium" | "low" | "none",
-  t: (key: string) => string
-): string {
-  return t(`riskLevel.${level}`);
-}
+function VulnRiskBadge({ score }: { score: number }) {
+  const color =
+    score >= 75
+      ? "var(--ax-color-red-600)"
+      : score >= 50
+        ? "var(--ax-color-orange-600)"
+        : score >= 25
+          ? "var(--ax-color-yellow-700)"
+          : "var(--ax-color-gray-600)";
 
-function SecurityMetricItem({ 
-  label, 
-  value, 
-  icon, 
-  color,
-  hint,
-}: { 
-  label: string; 
-  value: string; 
-  icon: React.ReactNode; 
-  color: string;
-  hint?: string | null;
-}) {
   return (
-    <HStack gap="space-8" align="center">
-      <Box style={{ color, display: "flex", alignItems: "center" }}>
-        {icon}
-      </Box>
-      <div>
-        <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-          {label}
-        </BodyShort>
-        <BodyShort size="small" weight="semibold">
-          {value}
-        </BodyShort>
-        {hint && (
-          <BodyShort size="small" style={{ color: "var(--a-text-danger)" }}>
-            {hint}
-          </BodyShort>
-        )}
-      </div>
-    </HStack>
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minWidth: "2.5rem",
+        height: "2.5rem",
+        borderRadius: "8px",
+        backgroundColor: color,
+        color: "white",
+        fontWeight: 700,
+        fontSize: "0.85rem",
+        flexShrink: 0,
+      }}
+    >
+      {formatNumber(score)}
+    </div>
   );
 }
 
-export function GitHubRepositoryListItem({ repository }: GitHubRepositoryListItemProps) {
-  const t = useTranslations("github");
-  const riskLevel = getRiskLevel(repository.aggregateRiskScore);
-  const riskColor = getRiskColor(riskLevel);
-  const riskLabel = getRiskLabel(riskLevel, t);
-
-  // Determine distroless status
-  const getDistrolessStatus = () => {
-    if (repository.usesDistroless === true) {
-      return {
-        label: t("repository.distrolessImage"),
-        value: `${t("repository.yes")} ✓`,
-        icon: <CheckmarkCircleFillIcon fontSize="1.25rem" />,
-        color: "var(--a-icon-success)",
-      };
-    } else if (repository.usesDistroless === false) {
-      return {
-        label: t("repository.distrolessImage"),
-        value: t("repository.no"),
-        icon: <XMarkOctagonFillIcon fontSize="1.25rem" />,
-        color: "var(--a-icon-danger)",
-      };
-    } else {
-      return {
-        label: t("repository.distrolessImage"),
-        value: t("repository.unknown"),
-        icon: <QuestionmarkDiamondFillIcon fontSize="1.25rem" />,
-        color: "var(--a-icon-info)",
-      };
-    }
-  };
-
-  const distrolessStatus = getDistrolessStatus();
-
-  // Determine code scanning status
-  const getCodeScanningStatus = () => {
-    if (repository.codeScanningStatus === "OK") {
-      return {
-        value: t("repository.ok"),
-        icon: <CheckmarkCircleFillIcon fontSize="1.25rem" />,
-        color: "var(--a-icon-success)",
-        hint: null,
-      };
-    } else if (repository.codeScanningStatus) {
-      return {
-        value: t("repository.notOk"),
-        icon: <XMarkOctagonFillIcon fontSize="1.25rem" />,
-        color: "var(--a-icon-danger)",
-        hint: repository.codeScanningStatus,
-      };
-    } else {
-      return {
-        value: t("repository.unknown"),
-        icon: <QuestionmarkDiamondFillIcon fontSize="1.25rem" />,
-        color: "var(--a-icon-info)",
-        hint: null,
-      };
-    }
-  };
-
-  const codeScanningStatus = getCodeScanningStatus();
-
-  const vulnerabilityGroups = useMemo(() => {
-    const groups = new Map<
-      string,
-      {
-        packageName: string;
-        packageEcosystem?: string;
-        vulnerabilities: RepositoryMetrics["vulnerabilities"];
-      }
-    >();
-
-    repository.vulnerabilities.forEach((vulnerability) => {
-      const packageEcosystem = vulnerability.packageEcosystem;
-      const key = `${vulnerability.packageName}:${packageEcosystem ?? "unknown"}`;
-      const group = groups.get(key);
-
-      if (group) {
-        group.vulnerabilities.push(vulnerability);
-      } else {
-        groups.set(key, {
-          packageName: vulnerability.packageName,
-          packageEcosystem,
-          vulnerabilities: [vulnerability],
-        });
-      }
-    });
-
-    return Array.from(groups.entries())
-      .map(([key, group]) => ({ key, ...group }))
-      .sort(
-        (a, b) =>
-          b.vulnerabilities.length - a.vulnerabilities.length ||
-          a.packageName.localeCompare(b.packageName),
-      );
-  }, [repository.vulnerabilities]);
+function VulnerabilityRow({
+  vuln,
+  isLast,
+}: {
+  vuln: RepositoryMetrics["vulnerabilities"][number];
+  isLast: boolean;
+}) {
+  const t = useTranslations("github.repository");
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   return (
-    <div 
-      className={styles.accordionWrapper}
+    <div
       style={{
-        borderLeft: `6px solid ${riskColor}`,
+        paddingBlock: "0.75rem",
+        paddingInline: "0.75rem",
+        borderBottom: isLast ? undefined : "1px solid var(--ax-border-neutral-subtle)",
       }}
+    >
+      <HStack gap="space-16" align="start">
+        <VulnRiskBadge score={vuln.riskScore} />
+
+        <VStack gap="space-4" style={{ flex: 1, minWidth: 0 }}>
+          <HStack gap="space-8" align="center" wrap>
+            <BodyShort weight="semibold" size="small">
+              {vuln.identifier}
+            </BodyShort>
+            {vuln.packageEcosystem && (
+              <Tag variant="neutral" size="xsmall">
+                {vuln.packageEcosystem.toUpperCase()}
+              </Tag>
+            )}
+            {vuln.dependabotUpdatePullRequestUrl && (
+              <AkselLink
+                href={vuln.dependabotUpdatePullRequestUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--ax-color-green-700)", fontWeight: 600, fontSize: "0.875rem" }}
+              >
+                {t("openPR")}
+              </AkselLink>
+            )}
+          </HStack>
+
+          {vuln.summary && (
+            <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+              {vuln.summary}
+            </BodyShort>
+          )}
+
+          <HStack gap="space-12" align="center">
+            {vuln.vulnerabilityDetailsLink && (
+              <AkselLink
+                href={vuln.vulnerabilityDetailsLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                {t("viewDetails")}
+              </AkselLink>
+            )}
+            {vuln.riskScoreBreakdown && (
+              <button
+                onClick={() => setShowBreakdown((v) => !v)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  color: "var(--ax-text-action)",
+                  fontSize: "0.8125rem",
+                  textDecoration: "underline",
+                }}
+              >
+                {showBreakdown ? t("hideScoreBreakdown") : t("whyThisScore")}
+              </button>
+            )}
+          </HStack>
+
+          {showBreakdown && vuln.riskScoreBreakdown && (
+            <Box paddingBlock="space-8">
+              <RiskScoreBreakdownBars breakdown={vuln.riskScoreBreakdown} />
+            </Box>
+          )}
+        </VStack>
+      </HStack>
+    </div>
+  );
+}
+
+interface PackageGroup {
+  key: string;
+  packageName: string;
+  packageEcosystem?: string;
+  vulnerabilities: RepositoryMetrics["vulnerabilities"];
+}
+
+function PackageGroupAccordion({ group }: { group: PackageGroup }) {
+  const tRepo = useTranslations("github.repository");
+
+  const sortedVulns = useMemo(
+    () => [...group.vulnerabilities].sort((a, b) => b.riskScore - a.riskScore),
+    [group.vulnerabilities]
+  );
+
+  const label = group.packageEcosystem
+    ? `${extractPackageName(group.packageName)} (${group.packageEcosystem.toUpperCase()})`
+    : extractPackageName(group.packageName);
+
+  return (
+    <div className={styles.packageGroupWrapper}>
+      <Accordion>
+        <Accordion.Item>
+          <Accordion.Header>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: "100%" }}>
+              <BodyShort weight="semibold" size="small" style={{ flexShrink: 0 }}>
+                {label}
+              </BodyShort>
+              <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+                {tRepo("vulnerabilityCount", { count: group.vulnerabilities.length })}
+              </BodyShort>
+            </div>
+          </Accordion.Header>
+          <Accordion.Content>
+            <div>
+              {sortedVulns.map((vuln, index) => (
+                <VulnerabilityRow
+                  key={`${vuln.identifier}:${vuln.packageName}:${index}`}
+                  vuln={vuln}
+                  isLast={index === sortedVulns.length - 1}
+                />
+              ))}
+            </div>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
+    </div>
+  );
+}
+
+export function GitHubRepositoryListItem({ repository, rank }: GitHubRepositoryListItemProps) {
+  const t = useTranslations("github");
+  const tRepo = useTranslations("github.repository");
+  const riskColor = getRiskColor(repository.riskLevel);
+
+  const packageGroups: PackageGroup[] = useMemo(() => {
+    const groups = new Map<string, PackageGroup>();
+
+    for (const vuln of repository.vulnerabilities) {
+      const key = `${vuln.packageName}:${vuln.packageEcosystem ?? "unknown"}`;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.vulnerabilities.push(vuln);
+      } else {
+        groups.set(key, {
+          key,
+          packageName: vuln.packageName,
+          packageEcosystem: vuln.packageEcosystem,
+          vulnerabilities: [vuln],
+        });
+      }
+    }
+
+    return Array.from(groups.values()).sort(
+      (a, b) =>
+        b.vulnerabilities.length - a.vulnerabilities.length ||
+        a.packageName.localeCompare(b.packageName)
+    );
+  }, [repository.vulnerabilities]);
+
+  const fixesLabel =
+    repository.fixesReadyCount === 1
+      ? tRepo("fixReady")
+      : repository.fixesReadyCount > 1
+        ? tRepo("fixesReady", { count: repository.fixesReadyCount })
+        : null;
+
+  return (
+    <div
+      className={styles.accordionWrapper}
+      style={{ borderLeft: `6px solid ${riskColor}` }}
     >
       <Accordion className={styles.packageAccordion}>
         <Accordion.Item>
           <Accordion.Header>
-            <HStack justify="space-between" align="center" gap="space-12" style={{ width: "100%" }}>
-              <VStack gap="space-4">
-                <Heading size="small" level="3">
-                  {repository.nameWithOwner}
-                </Heading>
-
-                <HStack gap="space-16" align="center">
-                  <HStack gap="space-4" align="center">
-                    <BodyShort size="small" weight="semibold">
-                      {t("repository.riskScore")}:
-                    </BodyShort>
-                    <BodyShort
-                      size="small"
-                      style={{
-                        color: riskColor,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {formatNumber(repository.aggregateRiskScore)}
-                    </BodyShort>
-                    <BodyShort
-                      size="small"
-                      style={{
-                        color: "var(--a-text-subtle)",
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      ({riskLabel})
-                    </BodyShort>
-                  </HStack>
-
-                  <HStack gap="space-4" align="center">
-                    <BodyShort size="small" weight="semibold">
-                      {t("repository.vulnerabilities")}:
-                    </BodyShort>
-                    <BodyShort size="small">
-                      {repository.vulnerabilityCount}
-                    </BodyShort>
-                  </HStack>
-                </HStack>
-              </VStack>
-            </HStack>
-          </Accordion.Header>
-          <Accordion.Content>
-            <VStack gap="space-12">
-              {/* Security Metrics */}
-              <Box
-                padding="space-8"
-                borderRadius="8"
-                background="neutral-soft"
-                style={{
-                  borderLeft: "4px solid var(--a-border-info)",
-                }}
+            {/* Single-line header: rank · name (N vulns) · GitHub link · [fix badge] · LEVEL score */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: "100%", minWidth: 0 }}>
+              <BodyShort
+                size="small"
+                style={{ color: "var(--ax-text-neutral-subtle)", minWidth: "1.25rem", flexShrink: 0 }}
               >
-              <VStack gap="space-8">
-                <Heading size="xsmall" level="4">
-                  {t("repository.securityMetrics")}
-                </Heading>
-                <HStack gap="space-16" wrap>
-                  <SecurityMetricItem
-                    label={distrolessStatus.label}
-                    value={distrolessStatus.value}
-                    icon={distrolessStatus.icon}
-                    color={distrolessStatus.color}
-                  />
-                  <SecurityMetricItem
-                    label={t("repository.codeScanning")}
-                    value={codeScanningStatus.value}
-                    icon={codeScanningStatus.icon}
-                    color={codeScanningStatus.color}
-                    hint={codeScanningStatus.hint}
-                  />
-                </HStack>
-                <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                  {t("repository.comingSoon")}: {t("repository.lockFiles")}
-                </BodyShort>
-              </VStack>
-            </Box>
+                {rank}
+              </BodyShort>
 
-            {/* Vulnerability List */}
-            <ExpansionCard
-              aria-label={t("repository.vulnerabilityList")}
-              defaultOpen
-              size="small"
-            >
-              <ExpansionCard.Header>
-                <ExpansionCard.Title as="h4" size="small">
-                  {t("repository.vulnerabilityList")} ({repository.vulnerabilities.length})
-                </ExpansionCard.Title>
-              </ExpansionCard.Header>
-              <ExpansionCard.Content>
-                <Box padding="space-8" background="neutral-soft">
-                  <Accordion>
-                    {vulnerabilityGroups.map((group) => (
-                      <Accordion.Item key={group.key}>
-                        <Accordion.Header>
-                          <HStack justify="space-between" align="center" gap="space-8" style={{ width: "100%" }}>
-                            <BodyShort weight="semibold">
-                              {group.packageName}
-                              {group.packageEcosystem && ` (${group.packageEcosystem})`}
-                            </BodyShort>
-                            <BodyShort size="small">
-                              {t("repository.vulnerabilityCount", { count: group.vulnerabilities.length })}
-                            </BodyShort>
-                          </HStack>
-                        </Accordion.Header>
-                        <Accordion.Content>
-                          <VStack gap="space-6">
-                            {group.vulnerabilities
-                              .sort((a, b) => b.riskScore - a.riskScore)
-                              .map((vuln, index) => {
-                                const vulnRiskLevel = getRiskLevel(vuln.riskScore);
-                                const vulnRiskColor = getRiskColor(vulnRiskLevel);
-                                return (
-                                  <Box
-                                    key={`${vuln.identifier}:${vuln.packageName}:${vuln.vulnerabilityDetailsLink ?? "no-link"}:${index}`}
-                                    padding="space-8"
-                                    borderRadius="4"
-                                    background="neutral-soft"
-                                    style={{
-                                      borderLeft: "3px solid var(--a-border-strong)",
-                                    }}
-                                  >
-                                    <VStack gap="space-4">
-                                      <HStack justify="space-between" align="start" gap="space-12">
-                                        <VStack gap="space-4" style={{ flex: 1 }}>
-                                          <HStack gap="space-8" align="center" wrap>
-                                            <BodyShort weight="semibold" size="small">
-                                              {vuln.identifier}
-                                            </BodyShort>
-                                            <Chips size="small">
-                                              <Chips.Removable
-                                                variant="neutral"
-                                                style={{
-                                                  backgroundColor: vulnRiskColor,
-                                                  color: "white",
-                                                  fontWeight: 600,
-                                                  fontSize: "0.75rem",
-                                                }}
-                                              >
-                                                {formatNumber(vuln.riskScore)}
-                                              </Chips.Removable>
-                                            </Chips>
-                                          </HStack>
-                                          <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-                                            {t("repository.package")}: {vuln.packageName}
-                                          </BodyShort>
-                                          {vuln.summary && (
-                                            <BodyShort size="small">{vuln.summary}</BodyShort>
-                                          )}
-                                        </VStack>
-                                        <HStack gap="space-8">
-                                          {vuln.dependabotUpdatePullRequestUrl && (
-                                            <AkselLink
-                                              href={vuln.dependabotUpdatePullRequestUrl}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                            >
-                                              <HStack gap="space-4" align="center">
-                                                <BodyShort size="small">{t("repository.openPR")}</BodyShort>
-                                                <ExternalLinkIcon fontSize="1rem" />
-                                              </HStack>
-                                            </AkselLink>
-                                          )}
-                                          {vuln.vulnerabilityDetailsLink && (
-                                            <AkselLink
-                                              href={vuln.vulnerabilityDetailsLink}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                            >
-                                              <HStack gap="space-4" align="center">
-                                                <BodyShort size="small">{t("repository.viewDetails")}</BodyShort>
-                                                <ExternalLinkIcon fontSize="1rem" />
-                                              </HStack>
-                                            </AkselLink>
-                                          )}
-                                        </HStack>
-                                      </HStack>
-                                    </VStack>
-                                  </Box>
-                                );
-                              })}
-                          </VStack>
-                        </Accordion.Content>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion>
-                </Box>
-              </ExpansionCard.Content>
-            </ExpansionCard>
-            </VStack>
+              <BodyShort weight="semibold" style={{ flexShrink: 0 }}>
+                {repository.nameWithOwner}
+              </BodyShort>
+
+              <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", flexShrink: 0 }}>
+                ({tRepo("vulnerabilityCount", { count: repository.vulnerabilityCount })})
+              </BodyShort>
+
+              <a
+                href={`https://github.com/${repository.nameWithOwner}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className={styles.githubLink}
+              >
+                GitHub ↗
+              </a>
+
+              {/* Push right side to the far end */}
+              <div style={{ flex: 1 }} />
+
+              {/* Right block: fix badge + score — both right-aligned, score centered in its column */}
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
+                {fixesLabel && (
+                  <Tag variant="success" size="small">
+                    {fixesLabel}
+                  </Tag>
+                )}
+
+                <div style={{ textAlign: "center", minWidth: "3.5rem" }}>
+                  <BodyShort
+                    size="small"
+                    weight="semibold"
+                    style={{ color: riskColor, fontSize: "0.7rem", letterSpacing: "0.04em", lineHeight: 1 }}
+                  >
+                    {t(`riskLevel.${repository.riskLevel}`)}
+                  </BodyShort>
+                  <BodyShort
+                    weight="semibold"
+                    style={{ color: riskColor, fontSize: "1.25rem", lineHeight: 1.1 }}
+                  >
+                    {formatNumber(repository.aggregateRiskScore)}
+                  </BodyShort>
+                </div>
+              </div>
+            </div>
+          </Accordion.Header>
+
+          <Accordion.Content>
+            <Box paddingBlock="space-8">
+              {packageGroups.map((group) => (
+                <PackageGroupAccordion key={group.key} group={group} />
+              ))}
+            </Box>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>

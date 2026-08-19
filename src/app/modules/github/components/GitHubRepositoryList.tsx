@@ -1,137 +1,155 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { VStack, Box, Heading, BodyShort, HStack, TextField, Button } from "@navikt/ds-react";
-import { MagnifyingGlassIcon } from "@navikt/aksel-icons";
+import { VStack, Box, BodyShort, HStack, TextField, Button, Tag } from "@navikt/ds-react";
+import { MagnifyingGlassIcon, FilterIcon, ArrowsCirclepathIcon } from "@navikt/aksel-icons";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { GitHubRepositoryListItem } from "./GitHubRepositoryListItem";
+import { QuickWinsPanel } from "./QuickWinsPanel";
 import { useTranslations } from "next-intl";
 
 interface GitHubRepositoryListProps {
   repositories: RepositoryMetrics[];
+  onFilterClick: () => void;
+  activeFilterCount: number;
+  onRefresh: () => void;
+  isRefreshing: boolean;
 }
 
 const INITIAL_DISPLAY_COUNT = 10;
 
-export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps) {
-  const t = useTranslations("github.repository");
-  const tOverview = useTranslations("github.overview");
-  
+export function GitHubRepositoryList({
+  repositories,
+  onFilterClick,
+  activeFilterCount,
+  onRefresh,
+  isRefreshing,
+}: GitHubRepositoryListProps) {
+  const t = useTranslations("github");
+  const tRepo = useTranslations("github.repository");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [quickWinsOnly, setQuickWinsOnly] = useState(false);
 
-  const sortedRepositories = useMemo(() => {
-    return [...repositories].sort(
-      (a, b) => b.aggregateRiskScore - a.aggregateRiskScore
-    );
-  }, [repositories]);
+  const sortedRepositories = useMemo(
+    () => [...repositories].sort((a, b) => b.aggregateRiskScore - a.aggregateRiskScore),
+    [repositories]
+  );
 
   const filteredRepositories = useMemo(() => {
-    if (!searchQuery.trim()) return sortedRepositories;
-    
-    const query = searchQuery.toLowerCase();
-    return sortedRepositories.filter((repo) =>
-      repo.nameWithOwner.toLowerCase().includes(query)
-    );
-  }, [sortedRepositories, searchQuery]);
+    let result = sortedRepositories;
 
-  const displayedRepositories = showAll 
-    ? filteredRepositories 
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((repo) =>
+        repo.nameWithOwner.toLowerCase().includes(query)
+      );
+    }
+
+    if (quickWinsOnly) {
+      result = result.filter((repo) => repo.fixesReadyCount > 0);
+    }
+
+    return result;
+  }, [sortedRepositories, searchQuery, quickWinsOnly]);
+
+  const displayedRepositories = showAll
+    ? filteredRepositories
     : filteredRepositories.slice(0, INITIAL_DISPLAY_COUNT);
 
   const remainingCount = filteredRepositories.length - INITIAL_DISPLAY_COUNT;
 
-  const totalVulnerabilities = repositories.reduce(
-    (sum, r) => sum + r.vulnerabilityCount,
-    0
-  );
-
-  const criticalRepositories = repositories.filter(
-    (r) => r.aggregateRiskScore >= 75
-  ).length;
-
-  const highRiskRepositories = repositories.filter(
-    (r) => r.aggregateRiskScore >= 50 && r.aggregateRiskScore < 75
-  ).length;
-
   return (
     <VStack gap="space-24">
-      <Box
-        padding="space-16"
-        borderRadius="8"
-        style={{ backgroundColor: "var(--a-surface-subtle)" }}
-      >
-        <VStack gap="space-8">
-          <Heading size="medium" level="2">
-            {tOverview("title")}
-          </Heading>
-          <BodyShort>
-            {repositories.length} {tOverview("totalRepositories")} · {totalVulnerabilities}{" "}
-            {tOverview("totalVulnerabilities")}
+      {/* Quick wins panel — always shown when there are fixes ready */}
+      <QuickWinsPanel repositories={sortedRepositories} />
+
+      {/* Search + filter bar */}
+      <HStack gap="space-8" align="center">
+        <div style={{ position: "relative", flex: 1 }}>
+          <MagnifyingGlassIcon
+            fontSize="1.25rem"
+            style={{
+              position: "absolute",
+              left: "0.75rem",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--ax-text-neutral-subtle)",
+              pointerEvents: "none",
+            }}
+          />
+          <TextField
+            label={tRepo("searchPlaceholder")}
+            hideLabel
+            placeholder={tRepo("searchPlaceholder")}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowAll(false);
+            }}
+            autoComplete="off"
+            style={{ paddingInlineStart: "2.25rem" }}
+          />
+        </div>
+        <Button
+          variant="secondary"
+          icon={<FilterIcon />}
+          onClick={onFilterClick}
+        >
+          Filter
+          {activeFilterCount > 0 && (
+            <Tag variant="info" size="xsmall" style={{ marginInlineStart: "0.4rem" }}>
+              {activeFilterCount}
+            </Tag>
+          )}
+        </Button>
+        <Button
+          variant="secondary"
+          icon={<ArrowsCirclepathIcon />}
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          loading={isRefreshing}
+        />
+        <Button
+          variant={quickWinsOnly ? "primary" : "secondary"}
+          onClick={() => {
+            setQuickWinsOnly((v) => !v);
+            setShowAll(false);
+          }}
+        >
+          {tRepo("quickWinsOnly")}
+        </Button>
+      </HStack>
+
+      {/* Repository list header */}
+      {filteredRepositories.length > 0 && (
+        <HStack justify="space-between" align="center">
+          <BodyShort weight="semibold">
+            {t("repositories")} · {filteredRepositories.length}
           </BodyShort>
-          {criticalRepositories > 0 && (
-            <BodyShort
-              weight="semibold"
-              style={{ color: "var(--a-surface-danger)" }}
-            >
-              ⚠️ {criticalRepositories} {tOverview("criticalRepositories")}
-            </BodyShort>
-          )}
-          {criticalRepositories === 0 && highRiskRepositories > 0 && (
-            <BodyShort
-              weight="semibold"
-              style={{ color: "var(--a-surface-warning)" }}
-            >
-              {highRiskRepositories} {tOverview("highRiskRepositories")}
-            </BodyShort>
-          )}
-          {criticalRepositories === 0 && highRiskRepositories === 0 && (
-            <BodyShort
-              weight="semibold"
-              style={{ color: "var(--a-surface-success)" }}
-            >
-              🙌 {tOverview("noCriticalVulnerabilities")}
-            </BodyShort>
-          )}
-        </VStack>
-      </Box>
-
-      {repositories.length > 0 && (
-        <Box>
-          <HStack gap="space-8" align="center">
-            <MagnifyingGlassIcon fontSize="1.5rem" style={{ color: "var(--a-icon-subtle)" }} />
-            <TextField
-              label={t("searchPlaceholder")}
-              hideLabel
-              placeholder={t("searchPlaceholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              autoComplete="off"
-              style={{ flex: 1 }}
-            />
-          </HStack>
-        </Box>
+          <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+            {t("sortedByRiskHighToLow")}
+          </BodyShort>
+        </HStack>
       )}
 
-      {filteredRepositories.length > INITIAL_DISPLAY_COUNT && !showAll && (
-        <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-          {t("showingTop", { count: INITIAL_DISPLAY_COUNT })}
-        </BodyShort>
-      )}
-
-      <VStack gap="space-20">
-        {displayedRepositories.map((repository) => (
-          <GitHubRepositoryListItem key={repository.nameWithOwner} repository={repository} />
+      {/* Repository rows */}
+      <VStack gap="space-8">
+        {displayedRepositories.map((repository, index) => (
+          <GitHubRepositoryListItem
+            key={repository.nameWithOwner}
+            repository={repository}
+            rank={index + 1}
+          />
         ))}
       </VStack>
 
+      {/* Show more / show less */}
       {remainingCount > 0 && !showAll && (
         <Box style={{ textAlign: "center" }}>
-          <Button
-            variant="secondary"
-            onClick={() => setShowAll(true)}
-          >
-            {t("showMore", { count: remainingCount })}
+          <Button variant="secondary" onClick={() => setShowAll(true)}>
+            {tRepo("showMore", { count: remainingCount })}
           </Button>
         </Box>
       )}
@@ -145,18 +163,19 @@ export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
-            {t("showLess")}
+            {tRepo("showLess")}
           </Button>
         </Box>
       )}
 
+      {/* Empty states */}
       {repositories.length === 0 && (
         <Box
           padding="space-24"
           borderRadius="8"
-          style={{ textAlign: "center", backgroundColor: "var(--a-surface-subtle)" }}
+          style={{ textAlign: "center", backgroundColor: "var(--ax-bg-neutral-soft)" }}
         >
-          <BodyShort>{t("noRepositories")}</BodyShort>
+          <BodyShort>{tRepo("noRepositories")}</BodyShort>
         </Box>
       )}
 
@@ -164,9 +183,9 @@ export function GitHubRepositoryList({ repositories }: GitHubRepositoryListProps
         <Box
           padding="space-24"
           borderRadius="8"
-          style={{ textAlign: "center", backgroundColor: "var(--a-surface-subtle)" }}
+          style={{ textAlign: "center", backgroundColor: "var(--ax-bg-neutral-soft)" }}
         >
-          <BodyShort>No repositories match your search</BodyShort>
+          <BodyShort>{tRepo("noSearchResults")}</BodyShort>
         </Box>
       )}
     </VStack>

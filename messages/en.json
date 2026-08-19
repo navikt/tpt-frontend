@@ -49,7 +49,37 @@
     "repositories": "Repositories",
     "filterRepository": "Filter repositories",
     "noRepositories": "No repositories found",
+    "pageTitle": "GitHub Repository Vulnerabilities",
+    "pageSubtitle": "Repositories ranked by risk score — a computed signal that combines severity, exploitation evidence and actionability. Fixes with an open pull request are called out separately so you can close them out fast.",
     "pageDescription": "This page shows vulnerabilities detected by GitHub in your repositories. GitHub analyzes your dependencies for known security issues and reports them here. The data is fetched from GitHub's dependency scanning.",
+    "sortedByRiskHighToLow": "Sorted by risk score, high to low",
+    "stats": {
+      "repositories": "REPOSITORIES",
+      "totalVulnerabilities": "TOTAL VULNERABILITIES",
+      "fixesReadyToMerge": "FIXES READY TO MERGE",
+      "criticalRepositories": "CRITICAL REPOSITORIES"
+    },
+    "quickWins": {
+      "title": "Quick wins — fixes already open",
+      "sortedByRisk": "Sorted by risk score",
+      "mergeFixPr": "Merge fix PR ↗"
+    },
+    "filterModal": {
+      "title": "Filter",
+      "teamsLabel": "Teams",
+      "teamsDescription": "Select which teams to show data for. Empty means all.",
+      "repositoriesLabel": "Repositories",
+      "repositoriesDescription": "Select which repositories to show. Empty means all.",
+      "repositoriesSearchPlaceholder": "Search repositories...",
+      "repositoriesSelected": "{count} repositories selected",
+      "noRepositories": "No repositories found",
+      "noTeams": "No teams found",
+      "selectAll": "Select all",
+      "clearAll": "Clear all",
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "reset": "Reset"
+    },
     "metadata": {
       "teams": "Teams",
       "repositories": "Repositories"
@@ -60,56 +90,33 @@
       "totalVulnerabilities": "vulnerabilities total",
       "criticalRepositories": "critical repositories",
       "highRiskRepositories": "repositories with high risk",
-      "noCriticalVulnerabilities": "No critical vulnerabilities!",
-      "teamStatistics": "Team Statistics",
-      "repositoriesShort": "repos",
-      "vulnerabilitiesShort": "vulns",
-      "avgRisk": "Avg. risk"
+      "noCriticalVulnerabilities": "No critical vulnerabilities!"
     },
     "repository": {
       "riskScore": "Risk score",
       "vulnerabilities": "Vulnerabilities",
-      "vulnerabilityBreakdown": "Vulnerability Breakdown",
       "vulnerabilityList": "All Vulnerabilities",
-      "highPriority": "High priority",
-      "mediumPriority": "Medium priority",
-      "lowPriority": "Low priority",
-      "securityMetrics": "Security Metrics",
-      "distrolessImage": "Distroless image",
-      "codeScanning": "Code scanning",
-      "lockFiles": "Lock-files",
-      "comingSoon": "Coming soon",
-      "yes": "Yes",
-      "no": "No",
-      "ok": "OK",
-      "notOk": "Not OK",
-      "unknown": "Unknown",
+      "fixReady": "1 fix ready",
+      "fixesReady": "{count} fixes ready",
       "noRepositories": "No repositories to show",
       "showingTop": "Showing top {count} repositories by risk score",
       "showMore": "Show {count} more",
       "showLess": "Show less",
       "searchPlaceholder": "Search repositories...",
       "vulnerabilityCount": "{count} vulnerabilities",
-      "viewVulnerabilities": "View vulnerabilities",
-      "openPR": "Open fix PR",
-      "viewDetails": "View details",
-      "package": "Package"
+      "openPR": "Fix PR open ↗",
+      "viewDetails": "View details ↗",
+      "whyThisScore": "Why this score?",
+      "hideScoreBreakdown": "Hide score breakdown",
+      "quickWinsOnly": "Quick wins only",
+      "noSearchResults": "No repositories match your search"
     },
     "riskLevel": {
-      "critical": "Critical",
-      "high": "High risk",
-      "medium": "Medium risk",
-      "low": "Low risk",
-      "none": "No risk"
-    },
-    "filterTeams": "Filter teams",
-    "teamFilterModal": {
-      "title": "Filter teams",
-      "selectAll": "Select all",
-      "clearAll": "Clear all",
-      "noTeams": "No teams found",
-      "apply": "Apply",
-      "cancel": "Cancel"
+      "critical": "CRITICAL",
+      "high": "HIGH",
+      "medium": "MEDIUM",
+      "low": "LOW",
+      "none": "NONE"
     }
   },
   "list": {
