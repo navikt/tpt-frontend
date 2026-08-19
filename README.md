@@ -65,6 +65,18 @@ The application uses the following environment variables (configured in `.env.lo
 
 **Cache busting:** IndexedDB client cache entries are versioned using `NEXT_PUBLIC_APP_VERSION`, falling back to `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` if unset — set automatically on Vercel-style deploys, no manual configuration needed.
 
+### Debug Endpoints
+
+The `/api/debug` endpoint lets authenticated users inspect raw JSON data from the backend. Works both locally and in production:
+
+| `endpoint` parameter | Data |
+|----------------------|------|
+| `vulnerabilities` (default) | Vulnerability data for the current user |
+| `github` | GitHub repository vulnerability data |
+| `sla` | SLA overdue data |
+
+Example: `https://<host>/api/debug?endpoint=github`
+
 ### Pre-commit Hooks
 
 The project uses Husky to run automatic checks before each commit:
