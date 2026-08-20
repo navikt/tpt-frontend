@@ -36,7 +36,11 @@ export function GitHubFilterModal({
 }: GitHubFilterModalProps) {
   const t = useTranslations("github.filterModal");
 
-  const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(selectedTeams);
+  // When selectedTeams/selectedRepositories is resolved to "all" upstream (empty filter = show all),
+  // initialise temp state to all items so every checkbox appears checked.
+  const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(
+    selectedTeams.length > 0 ? selectedTeams : Array.from(new Set(allTeams)).sort()
+  );
   const [tempSelectedRepos, setTempSelectedRepos] = useState<string[]>(selectedRepositories);
   const [repoSearch, setRepoSearch] = useState("");
 
@@ -62,8 +66,11 @@ export function GitHubFilterModal({
   };
 
   const handleApply = () => {
-    onTeamsChange(tempSelectedTeams);
-    onRepositoriesChange(tempSelectedRepos);
+    // If all teams/repos are checked, pass [] to signal "no filter = show all"
+    const teamsToApply = tempSelectedTeams.length === uniqueTeams.length ? [] : tempSelectedTeams;
+    const reposToApply = tempSelectedRepos.length === uniqueRepos.length ? [] : tempSelectedRepos;
+    onTeamsChange(teamsToApply);
+    onRepositoriesChange(reposToApply);
     onClose();
   };
 

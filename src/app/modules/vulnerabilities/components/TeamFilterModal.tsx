@@ -37,13 +37,18 @@ const TeamFilterModal = ({
 }: TeamFilterModalProps) => {
   const t = useTranslations("teamFilter");
   const { data, isLoading, availableApplications } = useVulnerabilitiesContext();
-  const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(selectedTeams);
   const [tempSelectedApplications, setTempSelectedApplications] = useState<string[]>(selectedApplications);
   const [appSearch, setAppSearch] = useState<string>("");
 
   // Get unique teams from data
   const allTeams = data?.teams.map((team) => team.team) || [];
   const uniqueTeams = Array.from(new Set(allTeams)).sort();
+
+  // When selectedTeams is empty it means "all teams" (the default). Initialise
+  // tempSelectedTeams to all available teams so every checkbox appears checked.
+  const [tempSelectedTeams, setTempSelectedTeams] = useState<string[]>(
+    selectedTeams.length > 0 ? selectedTeams : uniqueTeams
+  );
 
   const filteredApplications = availableApplications
     .slice()
@@ -69,7 +74,10 @@ const TeamFilterModal = ({
   };
 
   const handleApply = () => {
-    onTeamsChange(tempSelectedTeams);
+    // If all teams are checked, pass [] to signal "no filter = show all"
+    const teamsToApply =
+      tempSelectedTeams.length === uniqueTeams.length ? [] : tempSelectedTeams;
+    onTeamsChange(teamsToApply);
     onApplicationsChange?.(tempSelectedApplications);
     onClose();
   };
@@ -77,6 +85,7 @@ const TeamFilterModal = ({
   const handleReset = () => {
     onTeamsChange([]);
     onApplicationsChange?.([]);
+    onShowAllBucketsChange?.(false);
     onClose();
   };
 
@@ -122,6 +131,21 @@ const TeamFilterModal = ({
                 <BodyShort>{t("noTeams")}</BodyShort>
               )}
             </VStack>
+
+            {/* Show all buckets toggle — placed between Teams and Applications */}
+            {onShowAllBucketsChange && (
+              <div>
+                <Checkbox
+                  checked={showAllBuckets}
+                  onChange={(e) => onShowAllBucketsChange(e.target.checked)}
+                >
+                  {t("showAllBuckets")}
+                </Checkbox>
+                <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginTop: "0.5rem" }}>
+                  {t("showAllBucketsDescription")}
+                </BodyShort>
+              </div>
+            )}
 
             {/* Application filter — only shown when caller supports it */}
             {onApplicationsChange && (
@@ -171,21 +195,6 @@ const TeamFilterModal = ({
                   )}
                 </div>
               </VStack>
-            )}
-
-            {/* Show all buckets toggle */}
-            {onShowAllBucketsChange && (
-              <div>
-                <Checkbox
-                  checked={showAllBuckets}
-                  onChange={(e) => onShowAllBucketsChange(e.target.checked)}
-                >
-                  {t("showAllBuckets")}
-                </Checkbox>
-                <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", marginTop: "0.5rem" }}>
-                  {t("showAllBucketsDescription")}
-                </BodyShort>
-              </div>
             )}
           </VStack>
         )}
