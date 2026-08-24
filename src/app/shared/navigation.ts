@@ -63,4 +63,10 @@ export const moduleNavLinks: ModuleNavLink[] = [
     order: 5,
     allowedRoles: ["ADMIN"],
   },
+  {
+    labelKey: "header.goldenPath",
+    path: "/goldenpath",
+    order: 6,
+    allowedRoles: ["ADMIN"],
+  },
 ];

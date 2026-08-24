@@ -16,7 +16,8 @@
     "allVulnerabilities": "All vulnerabilities",
     "language": "Language",
     "sarbarhetsprioritering": "Vulnerability Prioritization",
-    "etterlevelse": "Compliance"
+    "etterlevelse": "Compliance",
+    "goldenPath": "Golden Path"
   },
   "banner": {
     "underDevelopment": "This page is a work in progress — feedback and feature requests are welcome!"
