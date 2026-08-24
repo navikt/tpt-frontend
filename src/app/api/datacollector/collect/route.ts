@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
     });
 
-    if (!backendResponse.ok || !backendResponse.body) {
+    if (backendResponse.status !== 202 || !backendResponse.body) {
       return new Response(
         `event: error\ndata: Backend error ${backendResponse.status}\n\n`,
         {

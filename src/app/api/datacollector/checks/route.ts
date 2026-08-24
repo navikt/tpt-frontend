@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       method: "GET",
     });
 
-    if (backendResponse.status !== 202 || !backendResponse.body) {
+    if (!backendResponse.ok || !backendResponse.body) {
       return new Response(
         `event: error\ndata: Backend error ${backendResponse.status}\n\n`,
         {
