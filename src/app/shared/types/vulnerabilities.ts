@@ -67,6 +67,7 @@ export interface Repository {
 
 export interface Team {
   team: string;
+  lastSyncedAt?: string;
   workloads: Workload[];
   repositories?: Repository[];
 }

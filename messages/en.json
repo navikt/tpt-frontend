@@ -53,6 +53,7 @@
     "pageSubtitle": "Repositories ranked by risk score — a computed signal that combines severity, exploitation evidence and actionability. Fixes with an open pull request are called out separately so you can close them out fast.",
     "pageDescription": "This page shows vulnerabilities detected by GitHub in your repositories. GitHub analyzes your dependencies for known security issues and reports them here. The data is fetched from GitHub's dependency scanning.",
     "sortedByRiskHighToLow": "Sorted by risk score, high to low",
+    "dataStale": "Outdated",
     "stats": {
       "repositories": "REPOSITORIES",
       "totalVulnerabilities": "TOTAL VULNERABILITIES",
@@ -78,7 +79,8 @@
       "clearAll": "Clear all",
       "apply": "Apply",
       "cancel": "Cancel",
-      "reset": "Reset"
+      "reset": "Reset",
+      "lastSyncedAt": "Updated {date}"
     },
     "metadata": {
       "teams": "Teams",

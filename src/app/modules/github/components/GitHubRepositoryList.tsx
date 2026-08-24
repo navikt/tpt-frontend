@@ -15,6 +15,7 @@ interface GitHubRepositoryListProps {
   onRefresh: () => void;
   isRefreshing: boolean;
   isSyncing: boolean;
+  isDataStale: boolean;
 }
 
 const INITIAL_DISPLAY_COUNT = 10;
@@ -26,6 +27,7 @@ export function GitHubRepositoryList({
   onRefresh,
   isRefreshing,
   isSyncing,
+  isDataStale,
 }: GitHubRepositoryListProps) {
   const t = useTranslations("github");
   const tRepo = useTranslations("github.repository");
@@ -107,12 +109,18 @@ export function GitHubRepositoryList({
           )}
         </Button>
         <Button
-          variant="secondary"
+          variant={isDataStale ? "primary" : "secondary"}
           icon={<ArrowsCirclepathIcon />}
           onClick={onRefresh}
           disabled={isRefreshing || isSyncing}
           loading={isRefreshing || isSyncing}
-        />
+        >
+          {isDataStale && (
+            <Tag variant="warning" size="xsmall" style={{ marginInlineStart: "0.4rem" }}>
+              {t("dataStale")}
+            </Tag>
+          )}
+        </Button>
         <Button
           variant={quickWinsOnly ? "primary" : "secondary"}
           onClick={() => {

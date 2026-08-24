@@ -171,6 +171,23 @@ export const useGitHubVulnerabilities = () => {
     [data]
   );
 
+  const oldestSyncedAt = useMemo(() => {
+    if (!data?.teams.length) return undefined;
+    const timestamps = data.teams
+      .map((team) => team.lastSyncedAt)
+      .filter((ts): ts is string => !!ts)
+      .map((ts) => new Date(ts).getTime())
+      .filter((ms) => !isNaN(ms));
+    if (!timestamps.length) return undefined;
+    return new Date(Math.min(...timestamps)).toISOString();
+  }, [data]);
+
+  const isDataStale = useMemo(() => {
+    if (!oldestSyncedAt) return true;
+    const ageMs = Date.now() - new Date(oldestSyncedAt).getTime();
+    return ageMs > 24 * 60 * 60 * 1000;
+  }, [oldestSyncedAt]);
+
   // Persist team filters to IndexedDB when they change
   useEffect(() => {
     const selectedTeams = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
@@ -261,6 +278,8 @@ export const useGitHubVulnerabilities = () => {
     isRefreshing,
     isSyncing,
     refresh,
+    isDataStale,
+    oldestSyncedAt,
     teamFilters,
     setTeamFilters,
     repositoryFilters,

@@ -23,6 +23,7 @@ export default function GitHubPage() {
     refresh,
     isRefreshing,
     isSyncing,
+    isDataStale,
     isLoading: isGitHubLoading,
   } = useGitHubVulnerabilities();
 
@@ -51,6 +52,15 @@ export default function GitHubPage() {
   const handleRepositoriesChange = (repos: string[]) => {
     setRepositoryFilters(Object.fromEntries(repos.map((r) => [r, true])));
   };
+
+  // Build a map of team -> lastSyncedAt for the filter modal
+  const teamLastSyncedAt = useMemo(
+    () =>
+      Object.fromEntries(
+        (data?.teams ?? []).map((team) => [team.team, team.lastSyncedAt])
+      ) as Record<string, string | undefined>,
+    [data]
+  );
 
   // All available options for the filter modal
   const allTeams = useMemo(
@@ -158,6 +168,7 @@ export default function GitHubPage() {
           onRefresh={refresh}
           isRefreshing={isRefreshing}
           isSyncing={isSyncing}
+          isDataStale={isDataStale}
         />
       </VStack>
 
@@ -165,6 +176,7 @@ export default function GitHubPage() {
         open={filterModalOpen}
         onClose={() => setFilterModalOpen(false)}
         allTeams={allTeams}
+        teamLastSyncedAt={teamLastSyncedAt}
         selectedTeams={selectedTeams}
         onTeamsChange={handleTeamsChange}
         allRepositories={allRepositories}

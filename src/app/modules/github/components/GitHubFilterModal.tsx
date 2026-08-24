@@ -11,12 +11,13 @@ import {
   TextField,
   Label,
 } from "@navikt/ds-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface GitHubFilterModalProps {
   open: boolean;
   onClose: () => void;
   allTeams: string[];
+  teamLastSyncedAt: Record<string, string | undefined>;
   selectedTeams: string[];
   onTeamsChange: (teams: string[]) => void;
   allRepositories: string[];
@@ -28,6 +29,7 @@ export function GitHubFilterModal({
   open,
   onClose,
   allTeams,
+  teamLastSyncedAt,
   selectedTeams,
   onTeamsChange,
   allRepositories,
@@ -35,6 +37,7 @@ export function GitHubFilterModal({
   onRepositoriesChange,
 }: GitHubFilterModalProps) {
   const t = useTranslations("github.filterModal");
+  const locale = useLocale();
 
   // When selectedTeams/selectedRepositories is resolved to "all" upstream (empty filter = show all),
   // initialise temp state to all items so every checkbox appears checked.
@@ -46,6 +49,19 @@ export function GitHubFilterModal({
 
   const uniqueTeams = Array.from(new Set(allTeams)).sort();
   const uniqueRepos = Array.from(new Set(allRepositories)).sort();
+
+  const formatSyncDate = (iso: string | undefined): string | null => {
+    if (!iso) return null;
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return null;
+    return date.toLocaleString(locale === "nb" ? "nb-NO" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const filteredRepos = repoSearch.trim()
     ? uniqueRepos.filter((r) =>
@@ -102,15 +118,30 @@ export function GitHubFilterModal({
               <BodyShort size="small">{t("noTeams")}</BodyShort>
             ) : (
               <VStack gap="space-8">
-                {uniqueTeams.map((team) => (
-                  <Checkbox
-                    key={team}
-                    checked={tempSelectedTeams.includes(team)}
-                    onChange={() => handleTeamToggle(team)}
-                  >
-                    {team}
-                  </Checkbox>
-                ))}
+                {uniqueTeams.map((team) => {
+                  const syncedAt = formatSyncDate(teamLastSyncedAt[team]);
+                  return (
+                    <VStack key={team} gap="space-4">
+                      <Checkbox
+                        checked={tempSelectedTeams.includes(team)}
+                        onChange={() => handleTeamToggle(team)}
+                      >
+                        {team}
+                      </Checkbox>
+                      {syncedAt && (
+                        <BodyShort
+                          size="small"
+                          style={{
+                            color: "var(--ax-text-neutral-subtle)",
+                            paddingInlineStart: "1.75rem",
+                          }}
+                        >
+                          {t("lastSyncedAt", { date: syncedAt })}
+                        </BodyShort>
+                      )}
+                    </VStack>
+                  );
+                })}
               </VStack>
             )}
           </VStack>
