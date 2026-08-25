@@ -15,9 +15,10 @@
   "header": {
     "allVulnerabilities": "Alle sårbarheter",
     "language": "Språk",
-    "sarbarhetsprioritering": "Sårbarhetsprioritering",
+    "sarbarhetsprioritering": "Prioritering",
     "etterlevelse": "Etterlevelse",
-    "goldenPath": "Golden Path"
+    "goldenPath": "Golden Path",
+    "vulnerabilities": "Sårbarheter"
   },
   "banner": {
     "underDevelopment": "Denne siden er under utvikling — vi ønsker tilbakemeldinger og forslag!"
