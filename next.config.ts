@@ -6,6 +6,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/@swc/helpers/**"],
+  },
   logging: {
     fetches: { fullUrl: true },
     incomingRequests: {
