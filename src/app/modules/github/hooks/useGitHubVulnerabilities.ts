@@ -182,11 +182,8 @@ export const useGitHubVulnerabilities = () => {
     return new Date(Math.min(...timestamps)).toISOString();
   }, [data]);
 
-  const isDataStale = useMemo(() => {
-    if (!oldestSyncedAt) return true;
-    const ageMs = Date.now() - new Date(oldestSyncedAt).getTime();
-    return ageMs > 24 * 60 * 60 * 1000;
-  }, [oldestSyncedAt]);
+  const [now] = useState(() => Date.now());
+  const isDataStale = !oldestSyncedAt || now - new Date(oldestSyncedAt).getTime() > 24 * 60 * 60 * 1000;
 
   // Persist team filters to IndexedDB when they change
   useEffect(() => {
