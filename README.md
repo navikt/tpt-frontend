@@ -10,12 +10,16 @@ TPT analyzes and ranks vulnerabilities based on multiple factors such as KEV (Kn
 
 - Node.js (version 24 or newer — the Docker image pins `node:24`; `.mise/config.toml` pins `25` for local tool management)
 - pnpm
-- A GitHub Personal Access Token (PAT) with `read:packages` scope — required to install `@navikt/*` packages from GitHub Packages. Create one at https://github.com/settings/tokens and add it to `.env.local` as `NODE_AUTH_TOKEN`.
+- A GitHub Personal Access Token (PAT) with `read:packages` scope — required to install `@navikt/*` packages from GitHub Packages. Create one at https://github.com/settings/tokens, then register it once with pnpm:
+  ```bash
+  pnpm config set //npm.pkg.github.com/:_authToken <your_pat>
+  ```
+  This writes the token to your user-level pnpm config (never to the repo). See [pnpm auth docs](https://pnpm.io/npmrc#environment-variables-in-auth-settings) for details.
 
 ### Installation and Running
 
 ```bash
-# Copy the example env file and fill in your NODE_AUTH_TOKEN
+# Copy the example env file
 cp .env.example .env.local
 
 # Install dependencies
@@ -56,7 +60,6 @@ The application uses the following environment variables (configured in `.env.lo
 
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
-| `NODE_AUTH_TOKEN` | GitHub PAT with `read:packages` scope — used by pnpm to install `@navikt/*` packages | - | Yes (install) |
 | `LOCAL_DEV` | Enables local development mode (bypasses authentication) | `false` | No |
 | `LOCAL_DEV_EMAIL` | Email address for mock user in local mode | `lokal.utvikler@nav.no` | No |
 | `MOCKS_ENABLED` | Serves mocked API responses instead of calling the backend (set by `pnpm run dev:mocks`) | `false` | No |
