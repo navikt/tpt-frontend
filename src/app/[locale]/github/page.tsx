@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { GitHubRepositoryList } from "../../modules/github/components/GitHubRepositoryList";
 import { GitHubFilterModal } from "../../modules/github/components/GitHubFilterModal";
 import { GitHubSummaryStats } from "../../modules/github/components/GitHubSummaryStats";
@@ -11,6 +11,14 @@ import { useTranslations } from "next-intl";
 import { Box, BodyShort, Loader, VStack, Heading } from "@navikt/ds-react";
 
 export default function GitHubPage() {
+  return (
+    <Suspense>
+      <GitHubPageContent />
+    </Suspense>
+  );
+}
+
+function GitHubPageContent() {
   const t = useTranslations("github");
   const tHome = useTranslations("home");
 
