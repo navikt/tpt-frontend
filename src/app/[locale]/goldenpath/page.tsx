@@ -33,7 +33,7 @@ const groupedChecks = (fetchResult: RepoChecks) =>
     }
     const results = fetchResult[repoName]
     results?.forEach(result => {
-      if (result.type == "AllGood") { repo.good.push(result) } else { repo.bad.push(result) }
+      if (result.reasons) { repo.bad.push(result) } else { repo.good.push(result) }
     })
     return repo
   })
@@ -44,7 +44,7 @@ const format = (fetchResult: RepoChecks) => {
     {grouped.map(g =>
       <details  key={g.name}>
         <summary>{g.name} ({g.bad.length})</summary>
-        <ul>{g.bad.map(b => <li key="{b.name}">{b.desc}</li>)}</ul>
+        <ul>{g.bad.map(b => <li key="{b.name}">{b.reasons?.join()}</li>)}</ul>
         <p>Nr of good checks: {g.bad.length}</p>
       </details>)
     }
@@ -54,22 +54,14 @@ const format = (fetchResult: RepoChecks) => {
 
 type RepoName = string
 
-type CheckResult =
-  | {
-    type: "AllGood";
+type CheckResult = {
+    type: "AllGood" | "NeedsWork";
     name: string;
     desc: string;
     severity: "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN";
     whenChecked: string;
+    reasons?: string[];
   }
-  | {
-    type: "NeedsWork";
-    name: string;
-    desc: string;
-    whenChecked: string;
-    reasons: string[];
-    severity?: "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN"
-  };
 
 type RepoChecks = Record<RepoName, CheckResult[]>
 
