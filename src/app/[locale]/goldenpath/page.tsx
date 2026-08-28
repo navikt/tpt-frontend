@@ -19,6 +19,62 @@ export default function GoldenPathPage() {
   if (!checkResults) return <p>Nothing to see here</p>
 
   return <section>
-    <div id="check-results">{ Object.keys(checkResults).map(key => <div key={key}><h3 >{key}</h3><p>{ JSON.stringify(checkResults[key]) }</p></div> )} </div>
+    <div id="check-results">{format(checkResults)}</div>
   </section>;
+}
+
+
+const groupedChecks = (fetchResult: RepoChecks) =>
+  Object.keys(fetchResult).map(repoName => {
+    const repo: RepoWithGroupedChecks = {
+      name: repoName,
+      good: [],
+      bad: []
+    }
+    const results = fetchResult[repoName]
+    results?.forEach(result => {
+      if (result.type == "AllGood") { repo.good.push(result) } else { repo.bad.push(result) }
+    })
+    return repo
+  })
+
+const format = (fetchResult: RepoChecks) => {
+  const grouped = groupedChecks(fetchResult)
+  return (<div>
+    {grouped.map(g =>
+      <details  key={g.name}>
+        <summary>{g.name} ({g.bad.length})</summary>
+        <ul>{g.bad.map(b => <li key="{b.name}">{b.desc}</li>)}</ul>
+        <p>Nr of good checks: {g.bad.length}</p>
+      </details>)
+    }
+  </div>)
+}
+
+
+type RepoName = string
+
+type CheckResult =
+  | {
+    type: "AllGood";
+    name: string;
+    desc: string;
+    severity: "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN";
+    whenChecked: string;
+  }
+  | {
+    type: "NeedsWork";
+    name: string;
+    desc: string;
+    whenChecked: string;
+    reasons: string[];
+    severity?: "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN"
+  };
+
+type RepoChecks = Record<RepoName, CheckResult[]>
+
+type RepoWithGroupedChecks = {
+  name: string,
+  good: CheckResult[],
+  bad: CheckResult[]
 }
