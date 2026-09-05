@@ -47,7 +47,7 @@ const display = (checks: RepoWithGroupedChecks[]) => {
     {reposWithIssues.map(g =>
       <details key={g.name}>
         <summary>{g.name} ({g.bad.length})</summary>
-        <ul>{g.bad.map(b => <li key={b.name}>{b.severity} - {b.reasons?.join()}</li>)}</ul>
+        <ul>{g.bad.map(b => <li key={b.name}>{b.name} - {b.severity} - {b.reasons?.join()}</li>)}</ul>
         <p>Nr of good checks: {g.good.length}</p>
       </details>)
     }
