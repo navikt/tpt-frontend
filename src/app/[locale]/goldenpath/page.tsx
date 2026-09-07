@@ -1,42 +1,14 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
+import { RepoWithGroupedChecks, useCheckResults } from "@/app/modules/goldenpath/useCheckResults"
 
 export default function GoldenPathPage() {
-  const empty: RepoWithGroupedChecks[] = []
-  const [checkResults, setCheckResults] = useState(empty)
-  const [isLoading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetch("/api/datacollector/checks")
-      .then((res) => res.json())
-      .then((backendReply) => {
-        setCheckResults(groupedChecks(backendReply))
-        setLoading(false)
-      })
-  }, [])
-
-  if (isLoading) return <p>Loading...</p>
-  if (!checkResults) return <p>Nothing to see here</p>
+  const {checkResults, isLoading} = useCheckResults()
 
   return <section>
+    {isLoading && <div>Loading...</div>}
     <div id="check-results">{display(checkResults)}</div>
-  </section>;
-}
-
-const groupedChecks = (backendReply: RepoChecks) => {
-  return Object.keys(backendReply).map(repoName => {
-    const repo: RepoWithGroupedChecks = {
-      name: repoName,
-      good: [],
-      bad: []
-    }
-    const results = backendReply[repoName]
-    results?.forEach(result => {
-      if ('reasons' in result) { repo.bad.push(result) } else { repo.good.push(result) }
-    })
-    return repo
-  })
+  </section>
 }
 
 const display = (checks: RepoWithGroupedChecks[]) => { 
@@ -56,22 +28,3 @@ const display = (checks: RepoWithGroupedChecks[]) => {
   </div>
 }
 
-
-type RepoName = string
-
-type CheckResult = {
-  type: "AllGood" | "NeedsWork";
-  name: string;
-  desc: string;
-  severity: "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN";
-  whenChecked: string;
-  reasons?: string[];
-}
-
-type RepoChecks = Record<RepoName, CheckResult[]>
-
-type RepoWithGroupedChecks = {
-  name: string,
-  good: CheckResult[],
-  bad: CheckResult[]
-}
