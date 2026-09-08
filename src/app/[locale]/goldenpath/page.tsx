@@ -1,5 +1,6 @@
 "use client"
 
+import GoldenPathStatus from "@/app/components/goldenpath/GoldenPathStatusForRepo"
 import { RepoWithGroupedChecks, useCheckResults } from "@/app/modules/goldenpath/useCheckResults"
 
 export default function GoldenPathPage() {
@@ -12,19 +13,12 @@ export default function GoldenPathPage() {
 }
 
 const display = (checks: RepoWithGroupedChecks[]) => { 
-  const allGoodRepos = checks.filter(c => c.bad.length === 0)
   const reposWithIssues = checks.filter(c => c.bad.length !== 0)
-  return <div>
-    <h2>Repos with issues</h2>
-    {reposWithIssues.map(g =>
-      <details key={g.name}>
-        <summary>{g.name} ({g.bad.length})</summary>
-        <ul>{g.bad.map(b => <li key={b.name}>{b.name} - {b.severity} - {b.reasons?.join()}</li>)}</ul>
-        <p>Nr of good checks: {g.good.length}</p>
-      </details>)
-    }
-    <h2>Repos with no issues</h2>
-    <p>{allGoodRepos.map(r => r.name).join()}</p>
-  </div>
+  return (
+    <div>
+    <h2>Ting å ta tak i</h2>
+    {reposWithIssues.map(g => <GoldenPathStatus{...g} key={g.name} /> )}
+    </div>
+  )
 }
 
