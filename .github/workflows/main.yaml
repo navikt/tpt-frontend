@@ -32,12 +32,12 @@ jobs:
       - run: pnpm run lint
       - run: pnpm test
       - run: pnpm run build
-      - uses: nais/docker-build-push@8e41f1f58749b9248e376c25d33bfbdd2b1163c0 # v0
+      - uses: nais/docker-build-push@0e73849f69ff260ee27597553c0a7848ca4e9795 # v0
         id: docker-push
         with:
           team: appsec
           build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
-      - uses: nais/deploy/actions/deploy@849e900e3cfa7faf7ad1532bb3a3e6499c932199 # v2
+      - uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
         env:
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais.yaml
@@ -89,6 +89,6 @@ jobs:
           format: 'sarif'
           scanners: 'secret'
           output: 'trivy.sarif'
-      - uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+      - uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
           sarif_file: 'trivy.sarif'
