@@ -25,7 +25,7 @@
   },
   "home": {
     "title": "Sårbarhetsprioritering som gir <i>mening</i>",
-    " ": "Titt på ting er et prioriteringsverktøy ment for å filtrere bort støy og usikkerhet.",
+    "description1": "Titt på ting er et prioriteringsverktøy ment for å filtrere bort støy og usikkerhet.",
     "description2": "Ikke alle sårbarheter er født like og vi har gjort jobben for med deg å analysere og rangere de mest kritiske sårbarhetene i teamene du tilhører. Sårbarhetslisten hentes fra Nais API.",
     "loadingVulnerabilities": "Henter sårbarheter..."
   },
