@@ -16,10 +16,23 @@ export const useCheckResults = () => {
             })
     }
 
+    const triggerCheckRun = () => {
+        fetch("/api/datacollector/collect", { method: "POST" })
+            .then((res) => console.log(`Triggered checks run: ${res.status}`))
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
     useEffect(() => {
         load()
+        triggerCheckRun()
         const loadInterval = setInterval(load, 60 * 15 * 1000)
-        return () => clearTimeout(loadInterval)
+        const checkInterval = setInterval(load, 60 * 15 * 1000)
+        return () => {
+            clearTimeout(loadInterval)
+            clearTimeout(checkInterval)
+        }
     }, [])
 
 

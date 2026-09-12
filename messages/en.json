@@ -457,5 +457,8 @@
     "traceId": "Trace ID",
     "copyId": "Copy ID",
     "copiedId": "Copied!"
+  },
+  "goldenpath": {
+    "title": "Status for my things"
   }
 }
