@@ -459,6 +459,8 @@
     "copiedId": "Copied!"
   },
   "goldenpath": {
-    "title": "Status for my things"
+    "title": "Status for my things",
+    "good": "Things that are Good",
+    "bad": "Things you should look at"
   }
 }
