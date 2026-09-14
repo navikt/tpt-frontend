@@ -66,7 +66,7 @@ export default function GoldenPathPage() {
             {whatToView === "bad" && <ul>
               {repo.bad.flatMap((check) => <li>{check.reasons}</li>)}
             </ul>}
-            {repo.bad.flatMap((check) => <p>{check.desc}</p>)}
+            {(whatToView === "good" ? repo.good : repo.bad).flatMap((check) => <p>{check.desc}</p>)}
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>
