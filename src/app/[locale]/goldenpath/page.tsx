@@ -63,9 +63,10 @@ export default function GoldenPathPage() {
         <Accordion.Item key={repo.name}>
           <Accordion.Header>{`${repo.name} (${whatToView === "good" ? repo.good.length : repo.bad.length})`}</Accordion.Header>
           <Accordion.Content>
-            {whatToView === "bad" && <ul>
-              {repo.bad.flatMap((check) => <li>{check.reasons}</li>)}
-            </ul>}
+            {whatToView === "bad" && 
+              <ul>
+                {repo.bad.flatMap((check) => <li>({check.severity}) - {check.reasons}</li>)}
+              </ul>}
             {(whatToView === "good" ? repo.good : repo.bad).flatMap((check) => <p>{check.desc}</p>)}
           </Accordion.Content>
         </Accordion.Item>
