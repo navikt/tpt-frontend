@@ -69,7 +69,7 @@ export const navSections: NavSection[] = [
     labelKey: "header.goldenPath",
     path: "/goldenpath",
     order: 3,
-    allowedRoles: ["ADMIN"],
+    allowedRoles: ["DEVELOPER"],
   },
 ];
 
