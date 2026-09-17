@@ -459,9 +459,8 @@
     "copiedId": "Kopiert!"
   },
   "goldenpath": {
-    "title": "Status for mine ting",
     "good": "ting som er bra i",
-    "bad": "ting du bør se på i",
+    "bad": "ting du bør titte på i",
     "repos": "repo",
     "nothingtosee": "Ingenting å se her"
   }

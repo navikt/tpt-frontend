@@ -27,7 +27,7 @@ export default function GoldenPathPage() {
           minWidth: "140px",
         }}
       >
-        {totalNrOfBadChecks} { t("good") } {nrOfReposWithBadChecks} { t("repos") } 👀
+        {totalNrOfBadChecks} { t("bad") } {nrOfReposWithBadChecks} { t("repos") } 👀
       </Box>
       <Box
         key="good"
@@ -39,7 +39,7 @@ export default function GoldenPathPage() {
           minWidth: "140px",
         }}
       >
-        {totalNrOfGoodChecks} ting som er bra i {nrOfReposWithGoodChecks} repo ✅
+        {totalNrOfGoodChecks} { t("good") } {nrOfReposWithGoodChecks} repo ✅
       </Box>
     </HStack>
 
