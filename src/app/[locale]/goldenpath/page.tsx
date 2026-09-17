@@ -53,7 +53,7 @@ export default function GoldenPathPage() {
             marginBottom: "1rem"
           }}>Ting som bør tittes på</Heading>
         <VStack>
-          {checkResults.map(repo =>
+          {checkResults.filter(repo => repo.bad.length !== 0).map(repo =>
             <Accordion key="acc">
               <Accordion.Item key={repo.name}>
                 <Accordion.Header>{`${repo.name} (${repo.bad.length})`}</Accordion.Header>
