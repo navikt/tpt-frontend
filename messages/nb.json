@@ -460,7 +460,9 @@
   },
   "goldenpath": {
     "title": "Status for mine ting",
-    "good": "Ting som er bra",
-    "bad": "Ting du bør se på"
+    "good": "ting som er bra i",
+    "bad": "ting du bør se på i",
+    "repos": "repo",
+    "nothingtosee": "Ingenting å se her"
   }
 }

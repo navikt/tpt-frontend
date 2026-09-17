@@ -460,7 +460,9 @@
   },
   "goldenpath": {
     "title": "Status for my things",
-    "good": "Things that are Good",
-    "bad": "Things you should look at"
+    "good": "things that are good in",
+    "bad": "things you should look at in",
+    "repos": "repositories",
+    "nothingtosee": "Nothing to see here"
   }
 }
