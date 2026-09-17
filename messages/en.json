@@ -459,6 +459,7 @@
     "copiedId": "Copied!"
   },
   "goldenpath": {
+    "heading": "Things you should look at",
     "good": "things that are good in",
     "bad": "things you should look at in",
     "repos": "repositories",

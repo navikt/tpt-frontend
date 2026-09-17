@@ -51,7 +51,7 @@ export default function GoldenPathPage() {
           style={{
             marginTop: "1rem",
             marginBottom: "1rem"
-          }}>Ting som bør tittes på</Heading>
+          }}>{t("heading")}</Heading>
         <VStack>
           {checkResults.filter(repo => repo.bad.length !== 0).map(repo =>
             <Accordion key="acc">
