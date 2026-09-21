@@ -27,14 +27,7 @@ export const useCheckResults = () => {
     useEffect(() => {
         load()
         triggerCheckRun()
-        const loadInterval = setInterval(load, 60 * 15 * 1000)
-        const checkInterval = setInterval(load, 60 * 15 * 1000)
-        return () => {
-            clearTimeout(loadInterval)
-            clearTimeout(checkInterval)
-        }
     }, [])
-
 
     return {
         checkResults, isLoading
