@@ -19,11 +19,12 @@ export default defineConfig({
   ],
   webServer: {
     command: process.env.CI
-      ? "MOCKS_ENABLED=true pnpm run start"
-      : "MOCKS_ENABLED=true pnpm run dev",
+      ? "node node_modules/next/dist/bin/next start"
+      : "node node_modules/next/dist/bin/next dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
     env: {
       MOCKS_ENABLED: "true",
     },
