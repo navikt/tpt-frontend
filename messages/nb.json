@@ -64,8 +64,13 @@
     },
     "quickWins": {
       "title": "Quick wins — fixes allerede åpne",
-      "sortedByRisk": "Topp 5 av {total} — sortert etter risikoscore",
-      "mergeFixPr": "Merge fix PR ↗"
+      "sortedByRisk": "Viser {shown} av {total} åpne PR-er, sortert etter risikoscore",
+      "riskScore": "Risikoscore",
+      "pullRequest": "Pull request",
+      "fixesOne": "Fikser 1 sårbarhet",
+      "fixesMany": "Fikser {count} sårbarheter",
+      "openPr": "Åpne PR #{number} ↗",
+      "openPrGeneric": "Åpne PR ↗"
     },
     "filterModal": {
       "title": "Filtrer",

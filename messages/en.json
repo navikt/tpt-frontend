@@ -64,8 +64,13 @@
     },
     "quickWins": {
       "title": "Quick wins — fixes already open",
-      "sortedByRisk": "Top 5 of {total} — sorted by risk score",
-      "mergeFixPr": "Merge fix PR ↗"
+      "sortedByRisk": "Showing {shown} of {total} open PRs, sorted by risk score",
+      "riskScore": "Risk score",
+      "pullRequest": "Pull request",
+      "fixesOne": "Fixes 1 vulnerability",
+      "fixesMany": "Fixes {count} vulnerabilities",
+      "openPr": "Open PR #{number} ↗",
+      "openPrGeneric": "Open PR ↗"
     },
     "filterModal": {
       "title": "Filter",

@@ -10,16 +10,19 @@ interface QuickWinsPanelProps {
   repositories: RepositoryMetrics[];
 }
 
-/** Strip PURL prefix and version suffix — "pkg:npm/axios@1.2.3" → "axios" */
-function extractPackageName(raw: string): string {
-  // Remove "pkg:ecosystem/" prefix
-  let name = raw.replace(/^pkg:[^/]+\//, "");
-  // For Go-style paths like "github.com/gin-gonic/gin@v1.9.1" keep the last path segment
-  const atIdx = name.indexOf("@");
-  if (atIdx !== -1) name = name.slice(0, atIdx);
-  // For paths like "github.com/foo/bar" take the last segment
-  const slashIdx = name.lastIndexOf("/");
-  if (slashIdx !== -1) name = name.slice(slashIdx + 1);
+interface QuickWin {
+  repoName: string;
+  pullRequestUrl: string;
+  pullRequestNumber?: string;
+  dependencyNames: Set<string>;
+  vulnerabilityIds: Set<string>;
+  riskScore: number;
+}
+
+function extractDependencyName(raw: string): string {
+  let name = raw.replace(/^pkg:[^/]+\//, "").split(/[?#]/, 1)[0] ?? raw;
+  const versionIndex = name.lastIndexOf("@");
+  if (versionIndex > 0) name = name.slice(0, versionIndex);
   return name;
 }
 
@@ -63,13 +66,37 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
   const t = useTranslations("github.quickWins");
 
   const { quickWins, totalQuickWins } = useMemo(() => {
-    const all = repositories
-      .flatMap((repo) =>
-        repo.vulnerabilities
-          .filter((v) => v.dependabotUpdatePullRequestUrl != null)
-          .map((v) => ({ ...v, repoName: repo.nameWithOwner }))
-      )
-      .sort((a, b) => b.riskScore - a.riskScore);
+    const groupedByPullRequest = new Map<string, QuickWin>();
+
+    for (const repo of repositories) {
+      for (const vulnerability of repo.vulnerabilities) {
+        const pullRequestUrl = vulnerability.dependabotUpdatePullRequestUrl;
+        if (pullRequestUrl == null) continue;
+
+        const pullRequestNumber = pullRequestUrl.match(/\/pull\/(\d+)(?:[/?#]|$)/)?.[1];
+        const key = JSON.stringify([
+          repo.nameWithOwner,
+          pullRequestNumber ?? pullRequestUrl,
+        ]);
+        const group = groupedByPullRequest.get(key) ?? {
+          repoName: repo.nameWithOwner,
+          pullRequestUrl,
+          pullRequestNumber,
+          dependencyNames: new Set<string>(),
+          vulnerabilityIds: new Set<string>(),
+          riskScore: vulnerability.riskScore,
+        };
+
+        group.dependencyNames.add(extractDependencyName(vulnerability.packageName));
+        group.vulnerabilityIds.add(vulnerability.identifier);
+        group.riskScore = Math.max(group.riskScore, vulnerability.riskScore);
+        groupedByPullRequest.set(key, group);
+      }
+    }
+
+    const all = [...groupedByPullRequest.values()].sort(
+      (a, b) => b.riskScore - a.riskScore
+    );
     return { quickWins: all.slice(0, 5), totalQuickWins: all.length };
   }, [repositories]);
 
@@ -89,14 +116,14 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
           {t("title")}
         </BodyShort>
         <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-          {t("sortedByRisk", { total: totalQuickWins })}
+          {t("sortedByRisk", { shown: quickWins.length, total: totalQuickWins })}
         </BodyShort>
       </HStack>
 
       <VStack gap="space-0">
         {quickWins.map((win, index) => (
           <HStack
-            key={`${win.identifier}:${win.repoName}:${index}`}
+            key={`${win.repoName}:${win.pullRequestUrl}`}
             align="center"
             gap="space-16"
             style={{
@@ -107,19 +134,30 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
                   : undefined,
             }}
           >
-            <RiskScoreBadge score={win.riskScore} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.25rem",
+                flexShrink: 0,
+              }}
+            >
+              <BodyShort size="small">{t("riskScore")}</BodyShort>
+              <RiskScoreBadge score={win.riskScore} />
+            </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
-              <HStack gap="space-8" align="baseline" wrap>
-                <BodyShort weight="semibold" size="small">
-                  {win.identifier}
-                </BodyShort>
-                {win.packageName && (
-                  <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-                    · {extractPackageName(win.packageName)}
-                  </BodyShort>
-                )}
-              </HStack>
+              <BodyShort weight="semibold" size="small">
+                {win.dependencyNames.size > 0
+                  ? [...win.dependencyNames].join(", ")
+                  : t("pullRequest")}
+              </BodyShort>
+              <BodyShort size="small">
+                {win.vulnerabilityIds.size === 1
+                  ? t("fixesOne")
+                  : t("fixesMany", { count: win.vulnerabilityIds.size })}
+              </BodyShort>
               <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
                 {win.repoName}
               </BodyShort>
@@ -127,7 +165,7 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
 
             <Button
               as="a"
-              href={win.dependabotUpdatePullRequestUrl!}
+              href={win.pullRequestUrl}
               target="_blank"
               rel="noopener noreferrer"
               variant="secondary"
@@ -138,7 +176,9 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
                 color: "var(--ax-text-success)",
               }}
             >
-              {t("mergeFixPr")}
+              {win.pullRequestNumber
+                ? t("openPr", { number: win.pullRequestNumber })
+                : t("openPrGeneric")}
             </Button>
           </HStack>
         ))}

@@ -4,6 +4,8 @@ Frontend application for Titt på Ting - a vulnerability prioritization tool for
 
 TPT analyzes and ranks vulnerabilities based on multiple factors such as KEV (Known Exploited Vulnerabilities), EPSS (Exploit Prediction Scoring System), exposure, production environment, and build age. This enables teams to focus on the most critical vulnerabilities that pose actual risk.
 
+The GitHub view groups open Dependabot pull requests and shows how many distinct vulnerabilities each PR fixes.
+
 ## Getting Started
 
 ### Prerequisites
