@@ -90,10 +90,13 @@ Example: `https://<host>/api/debug?endpoint=github`
 ### Pre-commit Hooks
 
 The project uses Husky to run automatic checks before each commit:
-- Linter runs on all files
+- Biome lints changed TypeScript files without reformatting or sorting imports
 - Tests run on changed files
 
 This ensures code quality before code is pushed to the repository.
+
+Run `pnpm lint` to lint all code and `pnpm test:coverage` for the V8 coverage report.
+Biome preserves supported ESLint rules, but does not fully replace Next.js's React Compiler checks.
 
 ## Contact
 

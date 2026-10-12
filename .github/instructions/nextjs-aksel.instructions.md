@@ -15,8 +15,9 @@ applyTo: "src/**/*.{tsx,ts}"
 - Remove dead code, unused imports, and obsolete files as part of every change.
 - Prefer small, focused components and functions with a single responsibility.
 - Use TypeScript strictly — avoid `any`, prefer explicit types, and leverage inference where it keeps code readable.
-- `tsconfig.json` has `strict: true` and `noUncheckedIndexedAccess: true` — lean on the compiler, but note there
-  are no custom ESLint rules enforcing the patterns below (`eslint.config.mjs` only extends `eslint-config-next`).
+- `tsconfig.json` has `strict: true` and `noUncheckedIndexedAccess: true` — lean on the compiler.
+- `biome.json` preserves supported rules from `eslint-config-next`, but does not enforce all React Compiler checks
+  or the defensive coding patterns below. Formatting and import sorting are disabled to avoid unrelated changes.
 
 ### Defensive Coding for Optional/Nullable Data
 

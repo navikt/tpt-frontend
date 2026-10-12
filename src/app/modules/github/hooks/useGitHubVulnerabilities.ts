@@ -69,6 +69,7 @@ export const useGitHubVulnerabilities = () => {
   const isInitializedRef = useRef(false);
 
   // Mark as initialized and detect whether URL already has filters
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Read initial URL filters only on mount.
   useEffect(() => {
     const hasUrlFilters =
       searchParams.has(GITHUB_PARAM_KEYS.team) ||
@@ -78,7 +79,7 @@ export const useGitHubVulnerabilities = () => {
       lastSyncedParamsRef.current = searchParams.toString();
     }
     isInitializedRef.current = true;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset sync tracker on route change
   useEffect(() => {
@@ -189,6 +190,7 @@ export const useGitHubVulnerabilities = () => {
   }, []);
 
   // Initialize from IndexedDB and conditionally revalidate
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Initialize the cache and preferences only on mount.
   useEffect(function initializeEffect() {
     if (hasFetchedRef.current) return;
 
@@ -231,7 +233,6 @@ export const useGitHubVulnerabilities = () => {
         fetchData(false, true);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const allTeams = useMemo(

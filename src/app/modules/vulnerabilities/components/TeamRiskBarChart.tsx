@@ -60,7 +60,7 @@ export default function TeamRiskBarChart({
     if (a11yLoaded) return;
     a11yLoaded = true;
     import("highcharts/modules/accessibility").then((mod) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: Highcharts accessibility modules have different export shapes.
       const init = (mod as any).default ?? mod;
       if (typeof init === "function") init(Highcharts);
     });
@@ -231,7 +231,7 @@ export default function TeamRiskBarChart({
       borderColor: gridCol,
       style: { color: textCol },
       formatter() {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint/suspicious/noExplicitAny: Highcharts tooltip context varies between versions.
         const ctx = this as any;
         const total: number = ctx.point?.stackTotal ?? ctx.total ?? 0;
         return `<b>${this.x}</b><br/>${this.series.name}: <b>${this.y}</b><br/>${t("tooltipTotal")}: <b>${total}</b>`;

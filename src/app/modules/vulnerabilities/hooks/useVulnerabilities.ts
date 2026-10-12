@@ -114,6 +114,7 @@ export const useVulnerabilities = () => {
   const teamPrefsLoadedRef = useRef(false);
 
   // Mark as initialized and set URL sync flag
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Read initial URL filters only on mount.
   useEffect(() => {
     const filtersFromUrl = searchParamsToFilters(searchParams);
     const hasUrlFilters = Object.values(filtersFromUrl).some(
@@ -128,7 +129,7 @@ export const useVulnerabilities = () => {
     }
 
     isInitializedRef.current = true;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchData = useCallback(async (isRefresh = false, showLoading = true) => {
     // If fetch is already in progress, wait for it
@@ -243,6 +244,7 @@ export const useVulnerabilities = () => {
   }, [fetchData]);
 
   // Initialize from IndexedDB and conditionally revalidate
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Initialize the cache and preferences only on mount.
   useEffect(function initializeEffect() {
     if (hasFetchedRef.current) return;
 
@@ -294,7 +296,6 @@ export const useVulnerabilities = () => {
         fetchData(false, true);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const allTeams = useMemo(

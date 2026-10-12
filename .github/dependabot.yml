@@ -29,11 +29,6 @@ updates:
         patterns:
           - "next"
           - "next-*"
-      eslint:
-        dependency-type: "development"
-        patterns:
-          - "eslint"
-          - "eslint-*"
       grafana:
         patterns:
           - "@grafana/faro*"

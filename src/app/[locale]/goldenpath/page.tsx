@@ -59,7 +59,7 @@ export default function GoldenPathPage() {
                 <Accordion.Header>{`${repo.name} (${repo.bad.length})`}</Accordion.Header>
                 <Accordion.Content>
                   <ul>
-                    {repo.bad.flatMap((check) => <li>({check.severity}) - {check.reasons}</li>)}
+                    {repo.bad.flatMap((check) => <li key={check.name}>({check.severity}) - {check.reasons}</li>)}
                   </ul>
                 </Accordion.Content>
               </Accordion.Item>

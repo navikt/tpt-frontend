@@ -4,7 +4,7 @@ export const useCheckResults = () => {
     const [checkResults, setCheckResults] = useState<RepoWithGroupedChecks[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
 
-    const load = () => {
+    useEffect(() => {
         fetch("/api/datacollector/checks")
             .then((res) => res.json())
             .then((backendReply) => {
@@ -14,19 +14,11 @@ export const useCheckResults = () => {
                 setIsLoading(false)
                 console.error(err)
             })
-    }
-
-    const triggerCheckRun = () => {
         fetch("/api/datacollector/collect", { method: "POST" })
             .then((res) => console.log(`Triggered checks run: ${res.status}`))
             .catch((err) => {
                 console.error(err)
             })
-    }
-
-    useEffect(() => {
-        load()
-        triggerCheckRun()
     }, [])
 
     return {

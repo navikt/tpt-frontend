@@ -13,7 +13,6 @@ export function ThemeToggle() {
   useEffect(() => {
     // This runs only once on mount, after initial render
     // This is the recommended pattern for next-themes to avoid hydration mismatch
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
