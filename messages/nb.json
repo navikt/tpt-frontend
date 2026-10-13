@@ -226,6 +226,75 @@
       "actionability": "Ser på om det finnes en tilgjengelig oppdatering som fikser sårbarheten, og om den er kjent brukt i løsepengevirus-angrep. Tilgjengelige fixer øker prioriteten; manglende fix reduserer den."
     }
   },
+  "compliance": {
+    "sectionTitle": "Sikkerhetsstatus for din seksjon",
+    "sectionSubtitle": "Din seksjon har {teams} team og {apps} applikasjoner.",
+    "areaTitle": "Sikkerhetsstatus for dine team",
+    "areaSubtitle": "Ditt område har {teams} team og {apps} applikasjoner.",
+    "developerTitle": "Sikkerhetsstatus for dine team",
+    "developerSubtitle": "Du er med i {teams} team med {apps} applikasjoner.",
+    "developerViewTag": "Utviklervisning",
+    "targetsBasedOn": "Målsettinger er basert på etterlevelseskrav",
+    "last6Months": "Siste 6 måneder",
+    "backToOverview": "Tilbake til oversikten",
+    "loadingData": "Laster sikkerhetsstatus..."
+  },
+  "complianceStatus": {
+    "onTrack": "På rett spor",
+    "needsAttention": "Trenger oppmerksomhet",
+    "actNow": "Må følges opp"
+  },
+  "complianceLevel": {
+    "new": "Ny",
+    "ongoing": "Pågående",
+    "chronic": "Kronisk"
+  },
+  "complianceQuestions": {
+    "areWeExposed": "Er vi sårbare akkurat nå?",
+    "isItGettingBetterOrWorse": "Går det bedre eller verre?",
+    "areWeKeepingUpWithMaintenance": "Holder vi tritt med grunnleggende vedlikehold?",
+    "noTeamsPastDeadline": "Ingen team har applikasjoner over tidsfristen",
+    "teamsHavePastDeadline": "{count} av {total} team har applikasjoner over tidsfristen",
+    "trendComparison": "Verre i {worse} team, bedre i {better}, stabilt i {stable}",
+    "allTeamsOnMaintenance": "Alle team holder tritt med vedlikehold",
+    "teamsBehindOnMaintenance": "{count} av {total} team henger etter med vedlikehold"
+  },
+  "complianceTrend": {
+    "gettingWorse": "Går feil vei",
+    "stable": "Stabilt",
+    "improving": "Bedring"
+  },
+  "complianceSummary": {
+    "allOnTrack": "Alle {total} team er på rett spor.",
+    "teamsNeedFollowUp": "{count} av {total} team må følges opp.",
+    "teamsNeedAttention": "{count} av {total} team trenger oppmerksomhet:",
+    "chronicDetail": "{team} har hengt etter på alle tre områder i 6 måneder.",
+    "exposedDetail": "{team} har {count} applikasjoner over tidsfristen.",
+    "attentionDetail": "{team} trenger oppfølging.",
+    "teamPastDeadlineBacklogGrowing": "{team} har {count} applikasjoner over tidsfristen, og etterslepet vokser.",
+    "teamBacklogGrowing": "etterslepet i {team} vokser."
+  },
+  "complianceTable": {
+    "title": "Team som må følges opp",
+    "teamHeader": "Team",
+    "last6MonthsHeader": "Siste 6 måneder",
+    "nonePastDeadline": "Ingen over tidsfristen",
+    "appsPastDeadlineCount": "{count} apper over tidsfristen",
+    "upToDateFraction": "{upToDate} av {total} oppdatert",
+    "open": "Åpne",
+    "teamsOnTrackCount": "{count} team på rett spor"
+  },
+  "complianceCard": {
+    "applicationsCount": "{count} applikasjoner",
+    "noAppsPastDeadline": "Ingen applikasjoner over tidsfristen",
+    "appsPastDeadlineCount": "{count} applikasjoner over tidsfristen",
+    "pastDeadlineSubheading": "Over tidsfristen",
+    "workdaysOver": "{days} arbeidsdager over",
+    "overdueRebuildSubheading": "Forfalt for gjenoppbygging (hver 30. dag)",
+    "daysOver": "{days} dager over",
+    "showAll": "Vis alle",
+    "showFewer": "Vis færre"
+  },
   "leaderView": {
     "title": "Teamoversikt",
     "description": "En oversikt over alle team og deres sårbarheter.",
@@ -447,6 +516,7 @@
     "fetchVulnerabilitiesError": "Kunne ikke laste sårbarhetsdata",
     "fetchTeamsOverviewError": "Kunne ikke hente teamoversikt",
     "fetchTeamsSlaError": "Kunne ikke hente team SLA-data",
+    "fetchSecurityStatusError": "Kunne ikke hente sikkerhetsstatus",
     "badRequest": "Ugyldig forespørsel. Vennligst sjekk inndata.",
     "unauthorized": "Du er ikke autorisert. Vennligst logg inn på nytt.",
     "forbidden": "Du har ikke tilgang til denne ressursen.",

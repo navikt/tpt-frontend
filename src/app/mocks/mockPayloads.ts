@@ -1,5 +1,6 @@
 import type { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import type { SlaOverdueData } from "@/app/shared/hooks/useSlaOverdue";
+import type { SecurityStatusResponse } from "@/app/types/securityStatus";
 
 // ---------------------------------------------------------------------------
 // mockVulnerabilitiesPayload
@@ -1087,3 +1088,211 @@ export const mockConfigPayload = {
     actionabilityMax: 10,
   },
 };
+
+// ---------------------------------------------------------------------------
+// mockSecurityStatusPayload
+// Shape: SecurityStatusResponse
+// Matches spec in design_handoff_security_status
+// Used by: GET /api/security-status
+// ---------------------------------------------------------------------------
+export const mockSecurityStatusPayload: SecurityStatusResponse = {
+  teams: [
+    {
+      team: "team-hav",
+      applicationCount: 14,
+      level: "chronic",
+      history: ["red", "red", "red", "red", "red", "red"],
+      exposed: {
+        status: "red",
+        since: "2026-05-01T00:00:00Z",
+        appsPastDeadline: [
+          { app: "soknad-api", workdaysOver: 6 },
+          { app: "vedtak-worker", workdaysOver: 5 },
+          { app: "utbetaling", workdaysOver: 3 },
+        ],
+      },
+      trend: {
+        status: "red",
+        since: "2026-05-01T00:00:00Z",
+        direction: "worse",
+        appsWithOverduePerMonth: [2, 3, 3, 4, 4, 5],
+      },
+      maintenance: {
+        status: "red",
+        since: "2026-05-01T00:00:00Z",
+        upToDate: 9,
+        total: 14,
+        overdueRebuild: [
+          { app: "soknad-api", daysOver: 14 },
+          { app: "vedtak-worker", daysOver: 10 },
+          { app: "gammel-rapport", daysOver: 4 },
+        ],
+      },
+    },
+    {
+      team: "team-nordlys",
+      applicationCount: 11,
+      level: "ongoing",
+      history: ["green", "green", "green", "green", "yellow", "red"],
+      exposed: {
+        status: "red",
+        since: "2026-10-01T00:00:00Z",
+        appsPastDeadline: [
+          { app: "soknad-api", workdaysOver: 6 },
+          { app: "vedtak-worker", workdaysOver: 2 },
+        ],
+      },
+      trend: {
+        status: "red",
+        since: "2026-09-01T00:00:00Z",
+        direction: "worse",
+        appsWithOverduePerMonth: [1, 1, 2, 2, 3, 4],
+      },
+      maintenance: {
+        status: "yellow",
+        since: "2026-09-01T00:00:00Z",
+        upToDate: 9,
+        total: 11,
+        overdueRebuild: [
+          { app: "gammel-rapport", daysOver: 11 },
+          { app: "soknad-api", daysOver: 4 },
+        ],
+      },
+    },
+    {
+      team: "team-skog",
+      applicationCount: 12,
+      level: "ongoing",
+      history: ["green", "green", "green", "green", "yellow", "yellow"],
+      exposed: {
+        status: "green",
+        appsPastDeadline: [],
+      },
+      trend: {
+        status: "yellow",
+        since: "2026-09-01T00:00:00Z",
+        direction: "worse",
+        appsWithOverduePerMonth: [0, 0, 0, 0, 1, 1],
+      },
+      maintenance: {
+        status: "green",
+        upToDate: 12,
+        total: 12,
+        overdueRebuild: [],
+      },
+    },
+    {
+      team: "team-myr",
+      applicationCount: 13,
+      level: "new",
+      history: ["green", "green", "green", "green", "green", "yellow"],
+      exposed: {
+        status: "yellow",
+        since: "2026-10-10T00:00:00Z",
+        appsPastDeadline: [
+          { app: "arbeidsgiver-innsyn", workdaysOver: 1 },
+        ],
+      },
+      trend: {
+        status: "green",
+        direction: "stable",
+        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
+      },
+      maintenance: {
+        status: "yellow",
+        since: "2026-10-10T00:00:00Z",
+        upToDate: 10,
+        total: 13,
+        overdueRebuild: [
+          { app: "arbeidsgiver-innsyn", daysOver: 3 },
+        ],
+      },
+    },
+    {
+      team: "team-fjell",
+      applicationCount: 7,
+      level: null,
+      history: ["green", "green", "green", "green", "green", "green"],
+      exposed: {
+        status: "green",
+        appsPastDeadline: [],
+      },
+      trend: {
+        status: "green",
+        direction: "improving",
+        appsWithOverduePerMonth: [3, 3, 2, 2, 1, 1],
+      },
+      maintenance: {
+        status: "green",
+        upToDate: 7,
+        total: 7,
+        overdueRebuild: [],
+      },
+    },
+    {
+      team: "team-kyst",
+      applicationCount: 13,
+      level: null,
+      history: ["green", "green", "green", "green", "green", "green"],
+      exposed: {
+        status: "green",
+        appsPastDeadline: [],
+      },
+      trend: {
+        status: "green",
+        direction: "stable",
+        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
+      },
+      maintenance: {
+        status: "green",
+        upToDate: 13,
+        total: 13,
+        overdueRebuild: [],
+      },
+    },
+    {
+      team: "team-elv",
+      applicationCount: 13,
+      level: null,
+      history: ["green", "green", "green", "green", "green", "green"],
+      exposed: {
+        status: "green",
+        appsPastDeadline: [],
+      },
+      trend: {
+        status: "green",
+        direction: "stable",
+        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
+      },
+      maintenance: {
+        status: "green",
+        upToDate: 13,
+        total: 13,
+        overdueRebuild: [],
+      },
+    },
+    {
+      team: "team-is",
+      applicationCount: 13,
+      level: null,
+      history: ["green", "green", "green", "green", "green", "green"],
+      exposed: {
+        status: "green",
+        appsPastDeadline: [],
+      },
+      trend: {
+        status: "green",
+        direction: "stable",
+        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
+      },
+      maintenance: {
+        status: "green",
+        upToDate: 13,
+        total: 13,
+        overdueRebuild: [],
+      },
+    },
+  ],
+  generatedAt: "2026-10-13T10:00:00Z",
+};
+

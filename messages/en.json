@@ -226,6 +226,75 @@
       "actionability": "Looks at whether a fix is available for the vulnerability, and whether it is known to be used in ransomware attacks. Available fixes increase priority; a missing fix reduces it."
     }
   },
+  "compliance": {
+    "sectionTitle": "Security status for your section",
+    "sectionSubtitle": "Your section has {teams} teams and {apps} applications.",
+    "areaTitle": "Security status for your teams",
+    "areaSubtitle": "Your area has {teams} teams and {apps} applications.",
+    "developerTitle": "Security status for your teams",
+    "developerSubtitle": "You are on {teams} teams with {apps} applications.",
+    "developerViewTag": "Developer view",
+    "targetsBasedOn": "Targets are based on compliance requirement",
+    "last6Months": "Last 6 months",
+    "backToOverview": "Back to overview",
+    "loadingData": "Loading security status..."
+  },
+  "complianceStatus": {
+    "onTrack": "On track",
+    "needsAttention": "Needs attention",
+    "actNow": "Act now"
+  },
+  "complianceLevel": {
+    "new": "New",
+    "ongoing": "Ongoing",
+    "chronic": "Chronic"
+  },
+  "complianceQuestions": {
+    "areWeExposed": "Are we exposed right now?",
+    "isItGettingBetterOrWorse": "Is it getting better or worse?",
+    "areWeKeepingUpWithMaintenance": "Are we keeping up with basic maintenance?",
+    "noTeamsPastDeadline": "No teams have applications past deadline",
+    "teamsHavePastDeadline": "{count} of {total} teams have applications past deadline",
+    "trendComparison": "Worse in {worse} teams, better in {better}, stable in {stable}",
+    "allTeamsOnMaintenance": "All teams are keeping up with maintenance",
+    "teamsBehindOnMaintenance": "{count} of {total} teams are behind on maintenance"
+  },
+  "complianceTrend": {
+    "gettingWorse": "Getting worse",
+    "stable": "Stable",
+    "improving": "Improving"
+  },
+  "complianceSummary": {
+    "allOnTrack": "All {total} teams are on track.",
+    "teamsNeedFollowUp": "{count} of {total} teams need follow-up.",
+    "teamsNeedAttention": "{count} of {total} teams needs attention:",
+    "chronicDetail": "{team} has been behind on all three areas for 6 months.",
+    "exposedDetail": "{team} has {count} applications past their deadline.",
+    "attentionDetail": "{team} needs follow-up.",
+    "teamPastDeadlineBacklogGrowing": "{team} has {count} applications past their deadline, and its backlog is growing.",
+    "teamBacklogGrowing": "{team}'s backlog is growing."
+  },
+  "complianceTable": {
+    "title": "Teams to follow up",
+    "teamHeader": "Team",
+    "last6MonthsHeader": "Last 6 months",
+    "nonePastDeadline": "None past deadline",
+    "appsPastDeadlineCount": "{count} apps past deadline",
+    "upToDateFraction": "{upToDate} of {total} up to date",
+    "open": "Open",
+    "teamsOnTrackCount": "{count} teams on track"
+  },
+  "complianceCard": {
+    "applicationsCount": "{count} applications",
+    "noAppsPastDeadline": "No applications past deadline",
+    "appsPastDeadlineCount": "{count} applications past deadline",
+    "pastDeadlineSubheading": "Past deadline",
+    "workdaysOver": "{days} workdays over",
+    "overdueRebuildSubheading": "Overdue for rebuild (every 30 days)",
+    "daysOver": "{days} days over",
+    "showAll": "Show all",
+    "showFewer": "Show fewer"
+  },
   "leaderView": {
     "title": "Team Overview",
     "description": "An overview of all teams and their vulnerabilities.",
@@ -447,6 +516,7 @@
     "fetchVulnerabilitiesError": "Could not load vulnerability data",
     "fetchTeamsOverviewError": "Could not fetch teams overview",
     "fetchTeamsSlaError": "Could not fetch teams SLA data",
+    "fetchSecurityStatusError": "Could not fetch security status",
     "badRequest": "Invalid request. Please check your input.",
     "unauthorized": "You are not authorized. Please log in again.",
     "forbidden": "You don't have permission to access this resource.",
