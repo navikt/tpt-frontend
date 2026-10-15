@@ -9,33 +9,12 @@ interface QuestionCardsProps {
   teams: TeamSecurityStatus[];
 }
 
-function getWorstStatusAndEarliestSince(
-  statuses: { status: SecurityStatusColor; since?: string }[]
-): { worstStatus: SecurityStatusColor; earliestSince?: string } {
-  const hasRed = statuses.some((s) => s.status === "red");
-  const hasYellow = statuses.some((s) => s.status === "yellow");
-
-  const worstStatus: SecurityStatusColor = hasRed
-    ? "red"
-    : hasYellow
-      ? "yellow"
-      : "green";
-
-  if (worstStatus === "green") {
-    return { worstStatus: "green" };
-  }
-
-  // Find earliest since among those with the worst status
-  const withDates = statuses
-    .filter((s) => s.status === worstStatus && !!s.since)
-    .map((s) => ({ ...s, time: new Date(s.since!).getTime() }))
-    .filter((s) => !isNaN(s.time))
-    .sort((a, b) => a.time - b.time);
-
-  return {
-    worstStatus,
-    earliestSince: withDates[0]?.since,
-  };
+function getWorstStatus(
+  statuses: { status: SecurityStatusColor }[]
+): SecurityStatusColor {
+  if (statuses.some((s) => s.status === "red")) return "red";
+  if (statuses.some((s) => s.status === "yellow")) return "yellow";
+  return "green";
 }
 
 export function QuestionCards({ teams }: QuestionCardsProps) {
@@ -45,14 +24,14 @@ export function QuestionCards({ teams }: QuestionCardsProps) {
 
   // Question 1: Exposed
   const exposedStatuses = teams.map((t) => t.exposed);
-  const q1Agg = getWorstStatusAndEarliestSince(exposedStatuses);
+  const q1Status = getWorstStatus(exposedStatuses);
   const teamsWithOverdue = teams.filter(
     (t) => t.exposed.appsPastDeadline.length > 0
   ).length;
 
   // Question 2: Trend
   const trendStatuses = teams.map((t) => t.trend);
-  const q2Agg = getWorstStatusAndEarliestSince(trendStatuses);
+  const q2Status = getWorstStatus(trendStatuses);
   const worseCount = teams.filter((t) => t.trend.direction === "worse").length;
   const betterCount = teams.filter(
     (t) => t.trend.direction === "improving"
@@ -61,7 +40,7 @@ export function QuestionCards({ teams }: QuestionCardsProps) {
 
   // Question 3: Maintenance
   const maintStatuses = teams.map((t) => t.maintenance);
-  const q3Agg = getWorstStatusAndEarliestSince(maintStatuses);
+  const q3Status = getWorstStatus(maintStatuses);
   const behindMaintCount = teams.filter((t) => t.maintenance.status !== "green").length;
 
   return (
@@ -79,7 +58,7 @@ export function QuestionCards({ teams }: QuestionCardsProps) {
             {t("areWeExposed")}
           </Heading>
           <div>
-            <StatusTag status={q1Agg.worstStatus} since={q1Agg.earliestSince} size="small" />
+            <StatusTag status={q1Status} size="small" />
           </div>
           <BodyShort size="small">
             {teamsWithOverdue === 0
@@ -102,7 +81,7 @@ export function QuestionCards({ teams }: QuestionCardsProps) {
             {t("isItGettingBetterOrWorse")}
           </Heading>
           <div>
-            <StatusTag status={q2Agg.worstStatus} since={q2Agg.earliestSince} size="small" />
+            <StatusTag status={q2Status} size="small" />
           </div>
           <BodyShort size="small">
             {t("trendComparison", {
@@ -127,7 +106,7 @@ export function QuestionCards({ teams }: QuestionCardsProps) {
             {t("areWeKeepingUpWithMaintenance")}
           </Heading>
           <div>
-            <StatusTag status={q3Agg.worstStatus} since={q3Agg.earliestSince} size="small" />
+            <StatusTag status={q3Status} size="small" />
           </div>
           <BodyShort size="small">
             {behindMaintCount === 0

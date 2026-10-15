@@ -31,7 +31,11 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
           {t("sync.fetchingInBackground")}
         </Alert>
       )}
-      <Page.Block as="main" width="lg" gutters>
+      <Page.Block
+        as="main"
+        width={pathname.includes("/compliance") ? "xl" : "lg"}
+        gutters
+      >
         {children}
       </Page.Block>
       <FeedbackButton />

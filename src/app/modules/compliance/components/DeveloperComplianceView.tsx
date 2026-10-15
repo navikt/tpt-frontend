@@ -19,7 +19,6 @@ export function DeveloperComplianceView({ teams }: DeveloperComplianceViewProps)
   return (
     <Box
       paddingBlock={{ xs: "space-16", md: "space-24" }}
-      paddingInline={{ xs: "space-16", md: "space-40" }}
     >
       <VStack gap="space-24">
         {/* Header */}

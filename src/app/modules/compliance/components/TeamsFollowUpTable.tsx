@@ -91,7 +91,6 @@ export function TeamsFollowUpTable({
           <VStack gap="space-4" align="start">
             <StatusTag
               status={team.exposed.status}
-              since={team.exposed.since}
               size="small"
             />
             <BodyShort size="small">{exposedText}</BodyShort>
@@ -102,7 +101,6 @@ export function TeamsFollowUpTable({
           <VStack gap="space-4" align="start">
             <StatusTag
               status={team.trend.status}
-              since={team.trend.since}
               size="small"
             />
             <BodyShort size="small">{trendText}</BodyShort>
@@ -113,7 +111,6 @@ export function TeamsFollowUpTable({
           <VStack gap="space-4" align="start">
             <StatusTag
               status={team.maintenance.status}
-              since={team.maintenance.since}
               size="small"
             />
             <BodyShort size="small">{maintText}</BodyShort>

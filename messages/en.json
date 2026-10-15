@@ -247,7 +247,12 @@
   "complianceLevel": {
     "new": "New",
     "ongoing": "Ongoing",
-    "chronic": "Chronic"
+    "chronic": "Chronic",
+    "newDetail": "Just became off track (less than a week)",
+    "ongoingDetail": "Off track for a while, or behind on several areas",
+    "chronicDetail": "Off track for 3 months or more, or behind on all three areas",
+    "exposedExplanation": "Exposed means vulnerabilities in your applications have not been fixed within the deadline.",
+    "legendTitle": "Time off track"
   },
   "complianceQuestions": {
     "areWeExposed": "Are we exposed right now?",

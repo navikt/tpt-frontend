@@ -1,29 +1,5 @@
 import type { TeamSecurityStatus } from "@/app/types/securityStatus";
 
-export function formatSince(sinceIso: string | undefined, locale: string = "nb"): string | null {
-  if (!sinceIso) return null;
-
-  try {
-    const sinceDate = new Date(sinceIso);
-    if (isNaN(sinceDate.getTime())) return null;
-
-    const now = new Date();
-    const diffMs = now.getTime() - sinceDate.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays >= 0 && diffDays <= 7) {
-      const weekday = sinceDate.toLocaleDateString(locale === "nb" ? "nb-NO" : "en-US", { weekday: "long" });
-      const capitalized = weekday.charAt(0).toUpperCase() + weekday.slice(1);
-      return locale === "nb" ? `siden ${capitalized.toLowerCase()}` : `since ${capitalized}`;
-    }
-
-    const month = sinceDate.toLocaleDateString(locale === "nb" ? "nb-NO" : "en-US", { month: "short" });
-    const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
-    return locale === "nb" ? `siden ${capitalizedMonth.toLowerCase()}` : `since ${capitalizedMonth}`;
-  } catch {
-    return null;
-  }
-}
 
 export function getLast6MonthsInfo(locale: string = "nb"): { initial: string; fullName: string }[] {
   const result: { initial: string; fullName: string }[] = [];

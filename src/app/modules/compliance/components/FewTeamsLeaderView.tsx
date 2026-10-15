@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import type { TeamSecurityStatus } from "@/app/types/securityStatus";
 import { ComplianceBanner } from "./ComplianceBanner";
 import { QuestionCards } from "./QuestionCards";
+import { LevelLegend } from "./LevelLegend";
 import { TeamCard } from "./TeamCard";
 import { sortTeamsForLeader } from "../utils/complianceFormatters";
 
@@ -22,7 +23,6 @@ export function FewTeamsLeaderView({ teams }: FewTeamsLeaderViewProps) {
   return (
     <Box
       paddingBlock={{ xs: "space-16", md: "space-24" }}
-      paddingInline={{ xs: "space-16", md: "space-40" }}
     >
       <VStack gap="space-24">
         {/* Header */}
@@ -42,6 +42,7 @@ export function FewTeamsLeaderView({ teams }: FewTeamsLeaderViewProps) {
         <QuestionCards teams={teams} />
 
         {/* Separate box for each team, ordered chronic > ongoing > new > on-track */}
+        <LevelLegend />
         <VStack gap="space-16">
           {sortedTeams.map((team) => (
             <TeamCard key={team.team} team={team} variant="5b" />

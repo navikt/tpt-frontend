@@ -247,7 +247,12 @@
   "complianceLevel": {
     "new": "Ny",
     "ongoing": "Pågående",
-    "chronic": "Kronisk"
+    "chronic": "Kronisk",
+    "newDetail": "Nylig blitt utenfor mål (under en uke)",
+    "ongoingDetail": "Utenfor mål en stund, eller på etterskudd på flere områder",
+    "chronicDetail": "Utenfor mål i 3 måneder eller mer, eller på etterskudd på alle tre områder",
+    "exposedExplanation": "Eksponert betyr at sårbarheter i applikasjonene ikke er utbedret innen fristen.",
+    "legendTitle": "Tid utenfor mål"
   },
   "complianceQuestions": {
     "areWeExposed": "Er vi sårbare akkurat nå?",

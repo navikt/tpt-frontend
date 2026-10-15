@@ -17,7 +17,7 @@ export function LevelBadge({ level, size = "small" }: LevelBadgeProps) {
 
   if (level === "new") {
     return (
-      <Tag variant="outline" data-color="neutral" size={size}>
+      <Tag variant="moderate" data-color="info" size={size}>
         {t("new")}
       </Tag>
     );
@@ -25,7 +25,7 @@ export function LevelBadge({ level, size = "small" }: LevelBadgeProps) {
 
   if (level === "ongoing") {
     return (
-      <Tag variant="moderate" data-color="neutral" size={size}>
+      <Tag variant="moderate" data-color="warning" size={size}>
         {t("ongoing")}
       </Tag>
     );
@@ -34,7 +34,7 @@ export function LevelBadge({ level, size = "small" }: LevelBadgeProps) {
   return (
     <Tag
       variant="strong"
-      data-color="neutral"
+      data-color="danger"
       size={size}
       icon={<ExclamationmarkTriangleFillIcon aria-hidden />}
     >

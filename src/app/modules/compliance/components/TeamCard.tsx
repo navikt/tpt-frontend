@@ -83,7 +83,6 @@ export function TeamCard({ team, variant }: TeamCardProps) {
               <div>
                 <StatusTag
                   status={team.exposed.status}
-                  since={team.exposed.since}
                   size="small"
                 />
               </div>
@@ -104,7 +103,6 @@ export function TeamCard({ team, variant }: TeamCardProps) {
               <div>
                 <StatusTag
                   status={team.trend.status}
-                  since={team.trend.since}
                   size="small"
                 />
               </div>
@@ -125,7 +123,6 @@ export function TeamCard({ team, variant }: TeamCardProps) {
               <div>
                 <StatusTag
                   status={team.maintenance.status}
-                  since={team.maintenance.since}
                   size="small"
                 />
               </div>

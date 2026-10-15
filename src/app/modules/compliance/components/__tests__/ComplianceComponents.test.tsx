@@ -28,10 +28,10 @@ describe("Compliance Components", () => {
     const { rerender } = render(<StatusTag status="green" />);
     expect(screen.getByText("complianceStatus.onTrack")).toBeInTheDocument();
 
-    rerender(<StatusTag status="yellow" since="2026-05-01T00:00:00Z" />);
+    rerender(<StatusTag status="yellow" />);
     expect(screen.getByText("complianceStatus.needsAttention")).toBeInTheDocument();
 
-    rerender(<StatusTag status="red" since="2026-10-01T00:00:00Z" />);
+    rerender(<StatusTag status="red" />);
     expect(screen.getByText("complianceStatus.actNow")).toBeInTheDocument();
   });
 

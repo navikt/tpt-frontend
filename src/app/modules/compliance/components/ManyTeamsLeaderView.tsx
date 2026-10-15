@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import type { TeamSecurityStatus } from "@/app/types/securityStatus";
 import { ComplianceBanner } from "./ComplianceBanner";
 import { QuestionCards } from "./QuestionCards";
+import { LevelLegend } from "./LevelLegend";
 import { TeamsFollowUpTable } from "./TeamsFollowUpTable";
 
 interface ManyTeamsLeaderViewProps {
@@ -20,7 +21,6 @@ export function ManyTeamsLeaderView({ teams }: ManyTeamsLeaderViewProps) {
   return (
     <Box
       paddingBlock={{ xs: "space-16", md: "space-24" }}
-      paddingInline={{ xs: "space-16", md: "space-40" }}
     >
       <VStack gap="space-24">
         {/* Header */}
@@ -38,6 +38,7 @@ export function ManyTeamsLeaderView({ teams }: ManyTeamsLeaderViewProps) {
 
         {/* 5a Overview */}
         <QuestionCards teams={teams} />
+        <LevelLegend />
         <TeamsFollowUpTable teams={teams} />
       </VStack>
     </Box>

@@ -6,21 +6,16 @@ import {
   ExclamationmarkTriangleFillIcon,
   XMarkOctagonFillIcon,
 } from "@navikt/aksel-icons";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { SecurityStatusColor } from "@/app/types/securityStatus";
-import { formatSince } from "../utils/complianceFormatters";
 
 interface StatusTagProps {
   status: SecurityStatusColor;
-  since?: string;
   size?: "small" | "medium";
 }
 
-export function StatusTag({ status, since, size = "small" }: StatusTagProps) {
+export function StatusTag({ status, size = "small" }: StatusTagProps) {
   const t = useTranslations("complianceStatus");
-  const locale = useLocale();
-
-  const sinceText = formatSince(since, locale);
 
   const tagStyle: React.CSSProperties = {
     whiteSpace: "nowrap",
@@ -39,7 +34,7 @@ export function StatusTag({ status, since, size = "small" }: StatusTagProps) {
         icon={<CheckmarkCircleFillIcon aria-hidden />}
         style={tagStyle}
       >
-        <span style={{ whiteSpace: "nowrap" }}>{t("onTrack")}</span>
+        {t("onTrack")}
       </Tag>
     );
   }
@@ -53,12 +48,7 @@ export function StatusTag({ status, since, size = "small" }: StatusTagProps) {
         icon={<ExclamationmarkTriangleFillIcon aria-hidden />}
         style={tagStyle}
       >
-        <span style={{ whiteSpace: "nowrap" }}>{t("needsAttention")}</span>
-        {sinceText && (
-          <span style={{ marginLeft: "4px", whiteSpace: "nowrap" }}>
-            · {sinceText}
-          </span>
-        )}
+        {t("needsAttention")}
       </Tag>
     );
   }
@@ -71,12 +61,7 @@ export function StatusTag({ status, since, size = "small" }: StatusTagProps) {
       icon={<XMarkOctagonFillIcon aria-hidden />}
       style={tagStyle}
     >
-      <span style={{ whiteSpace: "nowrap" }}>{t("actNow")}</span>
-      {sinceText && (
-        <span style={{ marginLeft: "4px", whiteSpace: "nowrap" }}>
-          · {sinceText}
-        </span>
-      )}
+      {t("actNow")}
     </Tag>
   );
 }
