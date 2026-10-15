@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { useSecurityStatus } from "@/app/shared/hooks/useSecurityStatus";
-import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import { ManyTeamsLeaderView } from "@/app/modules/compliance/components/ManyTeamsLeaderView";
 import { FewTeamsLeaderView } from "@/app/modules/compliance/components/FewTeamsLeaderView";
@@ -14,17 +13,11 @@ import { useTranslations } from "next-intl";
 
 export default function CompliancePage() {
   const { data: statusData, isLoading: isStatusLoading, error: statusError } = useSecurityStatus();
-  const { teamFilters } = useVulnerabilitiesContext();
   const { effectiveRole, isInitialized, isLoading: isRoleLoading } = useRoleContext();
   const t = useTranslations("errors");
   const tCompliance = useTranslations("compliance");
 
-  const teams = useMemo(() => {
-    if (!statusData?.teams) return [];
-    const hasActiveTeamFilters = Object.values(teamFilters).some((v) => v === true);
-    if (!hasActiveTeamFilters) return statusData.teams;
-    return statusData.teams.filter((t) => teamFilters[t.team] === true);
-  }, [statusData, teamFilters]);
+  const teams = useMemo(() => statusData?.teams ?? [], [statusData]);
 
   // Wait for role and status data to be ready
   if (isRoleLoading || !isInitialized || isStatusLoading) {

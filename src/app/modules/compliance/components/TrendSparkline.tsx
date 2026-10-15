@@ -18,6 +18,7 @@ const STATUS_COLOR_MAP: Record<SecurityStatusColor, string> = {
 
 export function TrendSparkline({ status, direction, values }: TrendSparklineProps) {
   const t = useTranslations("complianceTrend");
+  const tCompliance = useTranslations("compliance");
 
   // Ensure 6 values
   const normalizedValues = [...values];
@@ -52,7 +53,7 @@ export function TrendSparkline({ status, direction, values }: TrendSparklineProp
         ? t("improving")
         : t("stable");
 
-  const ariaLabel = `${directionText}. Siste 6 måneder: ${pointsData.join(", ")}`;
+  const ariaLabel = `${directionText}. ${tCompliance("last6Months")}: ${pointsData.join(", ")}`;
 
   return (
     <HStack gap="space-8" align="center">

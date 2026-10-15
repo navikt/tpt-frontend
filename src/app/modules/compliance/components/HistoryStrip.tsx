@@ -93,6 +93,7 @@ export function HistoryStrip({
             <Tooltip key={`square-${idx}-${m.fullName}`} content={tooltipContent}>
               <span
                 role="img"
+                tabIndex={0}
                 style={{
                   display: "inline-block",
                   width: "14px",

@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      if (response.status === 404) {
+      if (response.status === 404 && isLocalDev()) {
         return NextResponse.json(mockSecurityStatusPayload);
       }
       return NextResponse.json(
