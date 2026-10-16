@@ -2,11 +2,25 @@ import { describe, it, expect } from "vitest";
 import {
   evaluateExposedStatus,
   evaluateTrendStatus,
+  deriveTrendDirection,
   evaluateMaintenanceStatus,
   evaluateTeamLevel,
 } from "../complianceEvaluators";
 
 describe("complianceEvaluators", () => {
+  describe("deriveTrendDirection", () => {
+    it("is worse for a rising series", () => {
+      expect(deriveTrendDirection([0, 0, 1, 1, 2, 3])).toBe("worse");
+    });
+    it("is improving for a falling series", () => {
+      expect(deriveTrendDirection([3, 2, 2, 1, 0, 0])).toBe("improving");
+    });
+    it("is stable for flat or too short series", () => {
+      expect(deriveTrendDirection([1, 1, 1])).toBe("stable");
+      expect(deriveTrendDirection([2])).toBe("stable");
+    });
+  });
+
   describe("evaluateExposedStatus", () => {
     it("returns green when no apps are past deadline", () => {
       expect(evaluateExposedStatus([])).toBe("green");

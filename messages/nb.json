@@ -242,7 +242,8 @@
   "complianceStatus": {
     "onTrack": "På rett spor",
     "needsAttention": "Trenger oppmerksomhet",
-    "actNow": "Må følges opp"
+    "actNow": "Må følges opp",
+    "noData": "Ingen data"
   },
   "complianceLevel": {
     "new": "Ny",

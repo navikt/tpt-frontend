@@ -17,6 +17,8 @@ const STATUS_COLOR_MAP: Record<SecurityStatusColor, string> = {
   red: "var(--ax-bg-danger-strong, #C30000)",
 };
 
+const NO_DATA_COLOR = "var(--ax-bg-neutral-moderate, #CFD3D8)";
+
 export function HistoryStrip({
   history,
   showInitials = false,
@@ -29,20 +31,24 @@ export function HistoryStrip({
   const months = getLast6MonthsInfo(locale);
   // Pad or slice history so it's always exactly 6 entries
   const paddedHistory = [...history];
-  while (paddedHistory.length < 6) {
-    paddedHistory.unshift("green");
-  }
-  const historySlice = paddedHistory.slice(-6);
+  const missing = Math.max(0, 6 - paddedHistory.length);
+  const historySlice: (SecurityStatusColor | null)[] = [
+    ...Array<null>(missing).fill(null),
+    ...paddedHistory,
+  ].slice(-6);
+
+  const getStatusText = (status: SecurityStatusColor | null | undefined) =>
+    status === "green"
+      ? tStatus("onTrack")
+      : status === "yellow"
+        ? tStatus("needsAttention")
+        : status === "red"
+          ? tStatus("actNow")
+          : tStatus("noData");
 
   const summaryLabel = months
     .map((m, idx) => {
-      const status = historySlice[idx] ?? "green";
-      const statusText =
-        status === "green"
-          ? tStatus("onTrack")
-          : status === "yellow"
-            ? tStatus("needsAttention")
-            : tStatus("actNow");
+      const statusText = getStatusText(historySlice[idx]);
       return `${m.fullName}: ${statusText}`;
     })
     .join(", ");
@@ -80,13 +86,8 @@ export function HistoryStrip({
         }}
       >
         {months.map((m, idx) => {
-          const status = historySlice[idx] ?? "green";
-          const statusText =
-            status === "green"
-              ? tStatus("onTrack")
-              : status === "yellow"
-                ? tStatus("needsAttention")
-                : tStatus("actNow");
+          const status = historySlice[idx] ?? null;
+          const statusText = getStatusText(status);
           const tooltipContent = `${m.fullName}: ${statusText}`;
 
           return (
@@ -99,7 +100,7 @@ export function HistoryStrip({
                   width: "14px",
                   height: "14px",
                   borderRadius: "3px",
-                  backgroundColor: STATUS_COLOR_MAP[status],
+                  backgroundColor: status ? STATUS_COLOR_MAP[status] : NO_DATA_COLOR,
                   cursor: "default",
                 }}
                 aria-label={tooltipContent}

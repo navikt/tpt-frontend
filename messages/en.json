@@ -242,7 +242,8 @@
   "complianceStatus": {
     "onTrack": "On track",
     "needsAttention": "Needs attention",
-    "actNow": "Act now"
+    "actNow": "Act now",
+    "noData": "No data"
   },
   "complianceLevel": {
     "new": "New",

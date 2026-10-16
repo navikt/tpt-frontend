@@ -3,6 +3,7 @@ import type {
   SecurityLevel,
   TrendDirection,
   AppPastDeadline,
+  TeamSecurityStatus,
 } from "@/app/types/securityStatus";
 
 export interface EvaluationThresholds {
@@ -67,6 +68,23 @@ export function evaluateTrendStatus(
   }
 
   return "green";
+}
+
+export function deriveTrendDirection(appsWithOverduePerMonth: number[]): TrendDirection {
+  const first = appsWithOverduePerMonth[0];
+  const last = appsWithOverduePerMonth[appsWithOverduePerMonth.length - 1];
+  if (first === undefined || last === undefined || appsWithOverduePerMonth.length < 2) {
+    return "stable";
+  }
+  if (last > first) return "worse";
+  if (last < first) return "improving";
+  return "stable";
+}
+
+export function withSeriesTrend(team: TeamSecurityStatus): TeamSecurityStatus {
+  const direction = deriveTrendDirection(team.trend.appsWithOverduePerMonth ?? []);
+  const status = evaluateTrendStatus(direction, team.exposed.appsPastDeadline.length > 0);
+  return { ...team, trend: { ...team.trend, direction, status } };
 }
 
 /**
