@@ -540,10 +540,41 @@
     "copiedId": "Kopiert!"
   },
   "goldenpath": {
-    "heading": "Ting som bør tittes på",
-    "good": "ting som er bra i",
-    "bad": "ting du bør titte på i",
-    "repos": "repo",
-    "nothingtosee": "Ingenting å se her"
+    "title": "Golden Path",
+    "intro": "Sikkerhets- og vedlikeholdssjekker på tvers av teamets GitHub-repositorier. Se hva som bør følges opp, og velg hva dere vil rette først.",
+    "lastChecked": "Sist sjekket {date}",
+    "noCheckTime": "Tidspunkt for sjekk mangler",
+    "checksNeedWork": "{count, plural, one {# sjekk bør følges opp} other {# sjekker bør følges opp}} i {repositories, plural, one {# repo} other {# repoer}}",
+    "checksPassing": "sjekker er godkjent",
+    "repositoriesWithPassingChecks": "{count, plural, one {# repo har godkjente sjekker} other {# repoer har godkjente sjekker}}",
+    "countNote": "Tallene viser sjekker, ikke unike sårbarheter. Ett problem kan føre til at flere sjekker feiler.",
+    "needsWork": "Bør følges opp",
+    "search": "Søk etter repository eller sjekk",
+    "filterBySeverity": "Filtrer etter alvorlighetsgrad",
+    "sort": "Sorter",
+    "sortBy": {
+      "severity": "Høyeste alvorlighetsgrad",
+      "checks": "Flest sjekker",
+      "repository": "Repositorynavn"
+    },
+    "severity": {
+      "high": "Høy",
+      "medium": "Middels",
+      "low": "Lav",
+      "unknown": "Ukjent"
+    },
+    "resultsCount": "{checks, plural, one {# sjekk} other {# sjekker}} i {repositories, plural, one {# repo} other {# repoer}}",
+    "expandAll": "Utvid alle",
+    "collapseAll": "Fold sammen alle",
+    "checked": "Sjekket {date}",
+    "openRepository": "Åpne {repository} på GitHub",
+    "noChecksNeedWork": "Ingen av sjekkene i tilgjengelige resultater trenger oppfølging.",
+    "noChecksNeedWorkSection": "Ingen sjekker trenger oppfølging ({count, plural, one {# repo} other {# repoer}})",
+    "availableResultsNote": "Disse repoene har godkjente sjekker og ingen rapporterte feil. Resultatene dekker ikke nødvendigvis alle relevante sjekker.",
+    "passingCheckCount": "{count, plural, one {# godkjent sjekk} other {# godkjente sjekker}}",
+    "passing": "Godkjent",
+    "noMatchingChecks": "Ingen repositorier passer med søket eller alvorlighetsfiltrene.",
+    "loading": "Laster sjekker ...",
+    "loadError": "Klarte ikke å laste sjekkeresultater. Prøv igjen senere."
   }
 }

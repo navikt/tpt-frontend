@@ -31,9 +31,14 @@ describe("useCheckResults", () => {
             severity: "HIGH",
             reasons: ["Missing configuration"],
         };
+        const badWithoutReason: CheckResult = {
+            ...bad,
+            name: "bad-check-without-reason",
+            reasons: [],
+        };
         fetchMock
             .mockResolvedValueOnce(new Response(JSON.stringify({
-                "test-repo": [good, bad],
+                "test-repo": [good, bad, badWithoutReason],
             })))
             .mockResolvedValueOnce(new Response(null, { status: 202 }));
 
@@ -42,7 +47,7 @@ describe("useCheckResults", () => {
         expect(result.current.isLoading).toBe(true);
         await waitFor(() => expect(result.current.isLoading).toBe(false));
         expect(result.current.checkResults).toEqual([
-            { name: "test-repo", good: [good], bad: [bad] },
+            { name: "test-repo", good: [good], bad: [bad, badWithoutReason] },
         ]);
         expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/datacollector/checks");
         expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/datacollector/collect", { method: "POST" });
@@ -63,6 +68,7 @@ describe("useCheckResults", () => {
 
         await waitFor(() => expect(result.current.isLoading).toBe(false));
         expect(result.current.checkResults).toEqual([]);
+        expect(result.current.hasError).toBe(true);
         expect(errorLog).toHaveBeenCalledWith(loadError);
         expect(errorLog).toHaveBeenCalledWith(collectError);
 

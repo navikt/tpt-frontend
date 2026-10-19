@@ -1,6 +1,83 @@
 import type { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import type { SlaOverdueData } from "@/app/shared/hooks/useSlaOverdue";
 import type { SecurityStatusResponse } from "@/app/types/securityStatus";
+import type { RepoChecks } from "@/app/modules/goldenpath/useCheckResults";
+
+// These synthetic example-org repositories are intentionally fake preview data.
+export const mockGoldenPathChecks: RepoChecks = {
+  "example-org/golden-path-demo": [
+    {
+      type: "NeedsWork",
+      name: "CriticalDependencyAlerts",
+      desc: "Critical dependency vulnerabilities",
+      severity: "HIGH",
+      whenChecked: "2026-10-19T09:12:00Z",
+      reasons: ["2 open critical alerts: demo-library 2.1.0, example-parser 4.1.68"],
+    },
+    {
+      type: "NeedsWork",
+      name: "DeploymentRefresh",
+      desc: "Deployment not refreshed recently",
+      severity: "MEDIUM",
+      whenChecked: "2026-10-19T09:12:00Z",
+      reasons: ["demo-cluster / golden-path-demo last refreshed 94 days ago"],
+    },
+    {
+      type: "AllGood",
+      name: "BranchProtection",
+      desc: "Default branch is protected",
+      severity: "HIGH",
+      whenChecked: "2026-10-19T09:12:00Z",
+    },
+    {
+      type: "AllGood",
+      name: "CodeOwners",
+      desc: "CODEOWNERS file is present",
+      severity: "MEDIUM",
+      whenChecked: "2026-10-19T09:12:00Z",
+    },
+  ],
+  "example-org/demo-api": [
+    {
+      type: "NeedsWork",
+      name: "RepositoryReadme",
+      desc: "Repository is missing a README",
+      severity: "LOW",
+      whenChecked: "2026-10-19T09:10:00Z",
+      reasons: ["README.md was not found in the repository"],
+    },
+    {
+      type: "AllGood",
+      name: "CriticalDependencyAlerts",
+      desc: "No critical dependency vulnerabilities",
+      severity: "HIGH",
+      whenChecked: "2026-10-19T09:10:00Z",
+    },
+    {
+      type: "AllGood",
+      name: "BranchProtection",
+      desc: "Default branch is protected",
+      severity: "HIGH",
+      whenChecked: "2026-10-19T09:10:00Z",
+    },
+  ],
+  "example-org/healthy-demo": [
+    {
+      type: "AllGood",
+      name: "CriticalDependencyAlerts",
+      desc: "No critical dependency vulnerabilities",
+      severity: "HIGH",
+      whenChecked: "2026-10-19T09:08:00Z",
+    },
+    {
+      type: "AllGood",
+      name: "BranchProtection",
+      desc: "Default branch is protected",
+      severity: "HIGH",
+      whenChecked: "2026-10-19T09:08:00Z",
+    },
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // mockVulnerabilitiesPayload
@@ -1295,4 +1372,3 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
   ],
   generatedAt: "2026-10-13T10:00:00Z",
 };
-

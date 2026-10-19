@@ -540,10 +540,41 @@
     "copiedId": "Copied!"
   },
   "goldenpath": {
-    "heading": "Things you should look at",
-    "good": "things that are good in",
-    "bad": "things you should look at in",
-    "repos": "repositories",
-    "nothingtosee": "Nothing to see here"
+    "title": "Golden Path",
+    "intro": "Security and maintenance checks across your team's repositories. Review what needs work and decide what to fix first.",
+    "lastChecked": "Last checked {date}",
+    "noCheckTime": "Check time unavailable",
+    "checksNeedWork": "{count, plural, one {# check needs work} other {# checks need work}} in {repositories, plural, one {# repository} other {# repositories}}",
+    "checksPassing": "checks passing",
+    "repositoriesWithPassingChecks": "{count, plural, one {# repository has passing checks} other {# repositories have passing checks}}",
+    "countNote": "Counts are checks, not distinct vulnerabilities. One issue can fail several checks.",
+    "needsWork": "Needs work",
+    "search": "Search repository or check",
+    "filterBySeverity": "Filter by severity",
+    "sort": "Sort",
+    "sortBy": {
+      "severity": "Highest severity",
+      "checks": "Most checks",
+      "repository": "Repository name"
+    },
+    "severity": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "unknown": "Unknown"
+    },
+    "resultsCount": "{checks, plural, one {# check} other {# checks}} in {repositories, plural, one {# repository} other {# repositories}}",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "checked": "Checked {date}",
+    "openRepository": "Open {repository} on GitHub",
+    "noChecksNeedWork": "No checks need work in the results available.",
+    "noChecksNeedWorkSection": "No checks need work ({count, plural, one {# repository} other {# repositories}})",
+    "availableResultsNote": "These repositories have passing checks and no reported failures. Results may not include every applicable check.",
+    "passingCheckCount": "{count, plural, one {# passing check} other {# passing checks}}",
+    "passing": "Passing",
+    "noMatchingChecks": "No repositories match your search or severity filters.",
+    "loading": "Loading checks...",
+    "loadError": "Check results could not be loaded. Try again later."
   }
 }

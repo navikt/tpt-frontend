@@ -1,5 +1,6 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getToken, requestOboToken } from "@navikt/oasis";
+import { mockGoldenPathChecks } from "@/app/mocks/mockPayloads";
 import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
 
 function getServerEnv() {
@@ -18,6 +19,10 @@ function getServerEnv() {
 }
 
 export async function GET(request: NextRequest) {
+  if (process.env.MOCKS_ENABLED === "true") {
+    return NextResponse.json(mockGoldenPathChecks);
+  }
+
   try {
     const { tptBackendUrl } = getServerEnv();
 

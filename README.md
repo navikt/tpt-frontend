@@ -6,6 +6,9 @@ TPT analyzes and ranks vulnerabilities based on multiple factors such as KEV (Kn
 
 The GitHub view groups open Dependabot pull requests and shows how many distinct vulnerabilities each PR fixes.
 
+The Golden Path view groups repository security and maintenance checks by severity, with search, filtering, and sorting.
+Repositories with passing results and no reported failures appear in a separate collapsed section.
+
 ## Getting Started
 
 ### Prerequisites
@@ -35,6 +38,7 @@ pnpm run build
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+The mocked Golden Path view uses clearly synthetic `example-org/*` repositories.
 
 ### Local Development Against Backend
 

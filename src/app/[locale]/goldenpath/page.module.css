@@ -1,0 +1,104 @@
+.page {
+  display: grid;
+  gap: var(--ax-space-24);
+  margin-block-start: var(--ax-space-24);
+  padding-block-end: var(--ax-space-40);
+}
+
+.pageHeader {
+  gap: var(--ax-space-16);
+}
+
+.intro {
+  max-width: 38rem;
+  margin-block-start: var(--ax-space-8);
+  color: var(--ax-text-neutral-subtle);
+}
+
+.lastChecked,
+.summaryNote,
+.countNote,
+.checkDate {
+  color: var(--ax-text-neutral-subtle);
+}
+
+.lastChecked {
+  text-align: end;
+}
+
+.summaryCard {
+  border: 1px solid var(--ax-border-neutral-subtle);
+  padding: var(--ax-space-20);
+}
+
+.dangerValue {
+  color: var(--ax-text-danger);
+}
+
+.successValue {
+  color: var(--ax-text-success);
+}
+
+.summaryTags,
+.summaryNote {
+  margin-block-start: var(--ax-space-12);
+}
+
+.sectionHeading {
+  margin-block-end: var(--ax-space-16);
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) auto auto;
+  align-items: end;
+  gap: var(--ax-space-16);
+}
+
+.resultsHeader {
+  min-height: var(--ax-space-40);
+  margin-block: var(--ax-space-12);
+}
+
+.repositoryList {
+  border-block-end: 1px solid var(--ax-border-neutral-subtle);
+}
+
+.repositoryHeader {
+  width: 100%;
+  padding-inline: var(--ax-space-8);
+}
+
+.checkList {
+  padding-block: var(--ax-space-8);
+}
+
+.checkCard {
+  display: grid;
+  gap: var(--ax-space-8);
+  padding: var(--ax-space-16);
+}
+
+.checkDescription {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.reasons {
+  padding-inline-start: var(--ax-space-16);
+}
+
+.emptyState {
+  padding: var(--ax-space-24);
+}
+
+@media (max-width: 48rem) {
+  .toolbar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .lastChecked {
+    text-align: start;
+  }
+}

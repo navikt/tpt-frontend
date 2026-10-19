@@ -18,6 +18,10 @@ function getServerEnv() {
 }
 
 export async function POST(request: NextRequest) {
+  if (process.env.MOCKS_ENABLED === "true") {
+    return new Response(null, { status: 202 });
+  }
+
   try {
     const { tptBackendUrl } = getServerEnv();
 
