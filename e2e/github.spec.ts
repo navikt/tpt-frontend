@@ -59,10 +59,11 @@ test.describe("GitHub page — update button", () => {
 
     await page.goto("/nb/github");
 
-    // Filter button confirms the toolbar has loaded
-    await expect(page.getByRole("button", { name: /filter/i })).toBeVisible();
-    // At least one repository row is rendered
-    await expect(page.getByText("navikt/test-repo").first()).toBeVisible();
+    // The repository-level filter is gone — the global navbar filter is used instead
+    await expect(page.getByRole("button", { name: "Filtrer repositories" })).toHaveCount(0);
+    // Repositories are listed as team/repo, not owner/repo
+    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
+    await expect(page.getByText("navikt/test-repo")).toHaveCount(0);
   });
 
   test("fresh data: update button uses secondary (muted) variant", async ({ page }) => {
@@ -74,11 +75,11 @@ test.describe("GitHub page — update button", () => {
     );
 
     await page.goto("/nb/github");
-    await expect(page.getByRole("button", { name: /filter/i })).toBeVisible();
+    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
 
-    // When fresh the refresh button is icon-only (no accessible text) — locate by position
+    // When fresh the refresh button is icon-only (no accessible text) — it is the first toolbar button
     const toolbar = page.locator(".aksel-hstack").first();
-    const refreshButton = toolbar.getByRole("button").nth(1);
+    const refreshButton = toolbar.getByRole("button").nth(0);
     await expect(refreshButton).toHaveAttribute("data-variant", "secondary");
   });
 
@@ -93,7 +94,7 @@ test.describe("GitHub page — update button", () => {
     );
 
     await page.goto("/nb/github");
-    await expect(page.getByRole("button", { name: /filter/i })).toBeVisible();
+    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
 
     // When stale, the Tag text ("Utdatert" in nb locale) becomes the button's accessible name
     const refreshButton = page.getByRole("button", { name: "Utdatert" });
@@ -112,10 +113,10 @@ test.describe("GitHub page — update button", () => {
     await page.route("**/api/github/refresh", () => {});
 
     await page.goto("/nb/github");
-    await expect(page.getByRole("button", { name: /filter/i })).toBeVisible();
+    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
 
     const toolbar = page.locator(".aksel-hstack").first();
-    const refreshButton = toolbar.getByRole("button").nth(1);
+    const refreshButton = toolbar.getByRole("button").nth(0);
     await refreshButton.click();
 
     await expect(refreshButton).toBeDisabled();

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { Repository } from "@/app/shared/types/vulnerabilities";
+import type { TeamRepository } from "../utils/filterRepositoriesByWorkContext";
 
 export type RiskLevel = "critical" | "high" | "medium" | "low" | "none";
 
-export interface RepositoryMetrics extends Repository {
+export interface RepositoryMetrics extends TeamRepository {
   aggregateRiskScore: number;
   vulnerabilityCount: number;
   highPriorityCount: number;
@@ -14,7 +14,7 @@ export interface RepositoryMetrics extends Repository {
 }
 
 interface UseRepositoryMetricsProps {
-  repositories: Repository[];
+  repositories: TeamRepository[];
   criticalThreshold?: number;
   highThreshold?: number;
   mediumThreshold?: number;

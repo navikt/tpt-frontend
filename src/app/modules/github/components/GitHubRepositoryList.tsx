@@ -2,16 +2,15 @@
 
 import { useState, useMemo } from "react";
 import { VStack, Box, BodyShort, HStack, TextField, Button, Tag } from "@navikt/ds-react";
-import { MagnifyingGlassIcon, FilterIcon, ArrowsCirclepathIcon } from "@navikt/aksel-icons";
+import { MagnifyingGlassIcon, ArrowsCirclepathIcon } from "@navikt/aksel-icons";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { GitHubRepositoryListItem } from "./GitHubRepositoryListItem";
 import { QuickWinsPanel } from "./QuickWinsPanel";
+import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 import { useTranslations } from "next-intl";
 
 interface GitHubRepositoryListProps {
   repositories: RepositoryMetrics[];
-  onFilterClick: () => void;
-  activeFilterCount: number;
   onRefresh: () => void;
   isRefreshing: boolean;
   isSyncing: boolean;
@@ -22,8 +21,6 @@ const INITIAL_DISPLAY_COUNT = 10;
 
 export function GitHubRepositoryList({
   repositories,
-  onFilterClick,
-  activeFilterCount,
   onRefresh,
   isRefreshing,
   isSyncing,
@@ -46,8 +43,10 @@ export function GitHubRepositoryList({
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter((repo) =>
-        repo.nameWithOwner.toLowerCase().includes(query)
+      result = result.filter(
+        (repo) =>
+          getTeamRepositoryDisplayName(repo).toLowerCase().includes(query) ||
+          repo.nameWithOwner.toLowerCase().includes(query)
       );
     }
 
@@ -96,18 +95,6 @@ export function GitHubRepositoryList({
             style={{ paddingInlineStart: "2.25rem" }}
           />
         </div>
-        <Button
-          variant="secondary"
-          icon={<FilterIcon />}
-          onClick={onFilterClick}
-        >
-          Filter
-          {activeFilterCount > 0 && (
-            <Tag variant="info" size="xsmall" style={{ marginInlineStart: "0.4rem" }}>
-              {activeFilterCount}
-            </Tag>
-          )}
-        </Button>
         <Button
           variant={isDataStale ? "primary" : "secondary"}
           icon={<ArrowsCirclepathIcon />}

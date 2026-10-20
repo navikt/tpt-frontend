@@ -1,0 +1,9 @@
+.label {
+  display: inline;
+}
+
+@media (max-width: 1200px) {
+  .label {
+    display: none;
+  }
+}

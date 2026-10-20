@@ -3,12 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CheckResult } from "@/app/modules/goldenpath/useCheckResults";
 import GoldenPathPage from "../page";
 
-const { useCheckResultsMock } = vi.hoisted(() => ({
+const { useCheckResultsMock, useVulnerabilitiesContextMock } = vi.hoisted(() => ({
   useCheckResultsMock: vi.fn(),
+  useVulnerabilitiesContextMock: vi.fn(),
 }));
 
 vi.mock("@/app/modules/goldenpath/useCheckResults", () => ({
   useCheckResults: useCheckResultsMock,
+}));
+
+vi.mock("@/app/contexts/VulnerabilitiesContext", () => ({
+  useVulnerabilitiesContext: useVulnerabilitiesContextMock,
 }));
 
 vi.mock("next-intl", () => ({
@@ -33,32 +38,54 @@ const check = (
 
 describe("GoldenPathPage", () => {
   beforeEach(() => {
+    useVulnerabilitiesContextMock.mockReturnValue({
+      data: { teams: [] },
+      teamFilters: {},
+      applicationFilters: {},
+    });
     useCheckResultsMock.mockReturnValue({
       isLoading: false,
       hasError: false,
       checkResults: [
         {
           name: "navikt/high-repo",
+          owners: ["team-a"],
           good: [],
           bad: [check("NeedsWork", "high-check", "HIGH", ["High risk reason"])],
         },
         {
           name: "navikt/medium-repo",
+          owners: ["team-b"],
           good: [check("AllGood", "good-check", "LOW")],
           bad: [check("NeedsWork", "medium-check", "MEDIUM", ["Missing branch protection"])],
         },
         {
           name: "example-org/healthy-demo",
+          owners: ["team-a"],
           good: [check("AllGood", "passing-check", "HIGH")],
           bad: [],
         },
         {
           name: "example-org/no-results",
+          owners: ["team-a"],
           good: [],
           bad: [],
         },
       ],
     });
+  });
+
+  it("only shows repositories owned by teams selected in the work context filter", () => {
+    useVulnerabilitiesContextMock.mockReturnValue({
+      data: { teams: [] },
+      teamFilters: { "team-b": true },
+      applicationFilters: {},
+    });
+
+    render(<GoldenPathPage />);
+
+    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
   });
 
   it("filters repository results by severity", () => {

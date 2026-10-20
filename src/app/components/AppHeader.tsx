@@ -1,18 +1,37 @@
 "use client";
 
-import { InternalHeader, Spacer, Tabs, Button, BodyShort } from "@navikt/ds-react";
+import {
+  InternalHeader,
+  Spacer,
+  Tabs,
+  Button,
+  BodyShort,
+} from "@navikt/ds-react";
 import { useTranslations, useLocale } from "next-intl";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRoleContext } from "../shared/hooks/useRoleContext";
 import { useUser } from "../shared/hooks/useUser";
-import { navSections, type NavSection, type SubNavLink } from "../shared/navigation";
+import {
+  navSections,
+  type NavSection,
+  type SubNavLink,
+} from "../shared/navigation";
 import { AvatarMenu } from "./AvatarMenu";
 import { useSyncExternalStore } from "react";
 import { PersonRectangleIcon } from "@navikt/aksel-icons";
+import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
+import { serializeFilters } from "../modules/vulnerabilities/utils/queryParamHelpers";
+import WorkContextFilter from "./WorkContextFilter";
 
-function subscribe() { return () => {}; }
-function getSnapshot() { return true; }
-function getServerSnapshot() { return false; }
+function subscribe() {
+  return () => {};
+}
+function getSnapshot() {
+  return true;
+}
+function getServerSnapshot() {
+  return false;
+}
 
 function useIsClient() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
@@ -33,23 +52,42 @@ export function AppHeader() {
   const t = useTranslations();
   const locale = useLocale();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { effectiveRole, actualRole, isLoading: isRoleLoading, setSelectedRole } = useRoleContext();
+  const {
+    effectiveRole,
+    actualRole,
+    isLoading: isRoleLoading,
+    setSelectedRole,
+  } = useRoleContext();
   const { user, isLoading: isUserLoading } = useUser();
   const router = useRouter();
   const isClient = useIsClient();
 
-  const filterParams = searchParams.toString();
+  const { teamFilters, applicationFilters } = useVulnerabilitiesContext();
+  const globalFilterParams = new URLSearchParams();
+  const teamParam = serializeFilters(teamFilters);
+  const applicationParam = serializeFilters(applicationFilters);
+  if (teamParam) globalFilterParams.set("team", teamParam);
+  if (applicationParam) globalFilterParams.set("app", applicationParam);
+  const filterParams = globalFilterParams.toString();
 
   function href(path: string) {
-    return filterParams ? `/${locale}${path}?${filterParams}` : `/${locale}${path}`;
+    return filterParams
+      ? `/${locale}${path}?${filterParams}`
+      : `/${locale}${path}`;
   }
 
-  const visibleSections: NavSection[] = !isClient || isRoleLoading
-    ? []
-    : navSections
-        .filter((s) => filterByRole(s.allowedRoles, effectiveRole ?? null, actualRole ?? null))
-        .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  const visibleSections: NavSection[] =
+    !isClient || isRoleLoading
+      ? []
+      : navSections
+          .filter((s) =>
+            filterByRole(
+              s.allowedRoles,
+              effectiveRole ?? null,
+              actualRole ?? null
+            )
+          )
+          .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
   // Determine the active section: the one whose path (or any sub-link path) matches the current pathname
   const activeSection = visibleSections.find((section) => {
@@ -65,7 +103,13 @@ export function AppHeader() {
   const visibleSubLinks: SubNavLink[] = !activeSection?.subLinks
     ? []
     : activeSection.subLinks
-        .filter((sub) => filterByRole(sub.allowedRoles, effectiveRole ?? null, actualRole ?? null))
+        .filter((sub) =>
+          filterByRole(
+            sub.allowedRoles,
+            effectiveRole ?? null,
+            actualRole ?? null
+          )
+        )
         .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
   const showSubNav = visibleSubLinks.length > 1;
@@ -103,6 +147,7 @@ export function AppHeader() {
         })}
 
         <Spacer />
+        <WorkContextFilter />
         {isClient && !isRoleLoading && (
           <Button
             variant="tertiary"
@@ -127,7 +172,10 @@ export function AppHeader() {
             paddingInline: "var(--a-spacing-4)",
           }}
         >
-          <Tabs value={activeSubPath ?? visibleSubLinks[0]?.path ?? ""} onChange={() => {}}>
+          <Tabs
+            value={activeSubPath ?? visibleSubLinks[0]?.path ?? ""}
+            onChange={() => {}}
+          >
             <Tabs.List>
               {visibleSubLinks.map((sub) => (
                 <Tabs.Tab

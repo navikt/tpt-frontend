@@ -37,11 +37,11 @@
   },
   "summary": {
     "priorityWarning": "Prioritization is based on available information. A vulnerability can be critical even if it's prioritized low, for example if it hasn't been analyzed yet.",
-    "filterTeam": "Filter teams",
     "settings": "Settings",
     "refresh": "Refresh",
     "fetchNewData": "Fetch new data from backend",
-    "wait": "Wait"
+    "wait": "Wait",
+    "showAllBuckets": "Show all priority buckets"
   },
   "sync": {
     "fetchingInBackground": "Updating vulnerability data in the background..."
@@ -71,23 +71,6 @@
       "fixesMany": "Fixes {count} vulnerabilities",
       "openPr": "Open PR #{number} ↗",
       "openPrGeneric": "Open PR ↗"
-    },
-    "filterModal": {
-      "title": "Filter",
-      "teamsLabel": "Teams",
-      "teamsDescription": "Select which teams to show data for. Empty means all.",
-      "repositoriesLabel": "Repositories",
-      "repositoriesDescription": "Select which repositories to show. Empty means all.",
-      "repositoriesSearchPlaceholder": "Search repositories...",
-      "repositoriesSelected": "{count} repositories selected",
-      "noRepositories": "No repositories found",
-      "noTeams": "No teams found",
-      "selectAll": "Select all",
-      "clearAll": "Clear all",
-      "apply": "Apply",
-      "cancel": "Cancel",
-      "reset": "Reset",
-      "lastSyncedAt": "Updated {date}"
     },
     "metadata": {
       "teams": "Teams",
@@ -149,24 +132,22 @@
     "fixableByRebuild": "{count} {count, plural, one {vulnerability fixed} other {vulnerabilities fixed}} by rebuilding base image",
     "actionsLabel": "{count} {count, plural, one {action} other {actions}}"
   },
-  "teamFilter": {
-    "title": "Filter",
+  "workContextFilter": {
+    "title": "Choose teams and applications",
     "buttonLabel": "Filter",
-    "loadingTeams": "Loading data...",
+    "buttonLabelWithCount": "Filter, {count} active filter groups",
     "teamsLabel": "Teams",
-    "description": "Select which teams you want to see data for. Only selected teams will be shown.",
+    "teamsDescription": "Select the teams or subteams whose data should be shown across Titt På Ting.",
     "noTeams": "No teams found",
-    "appsLabel": "Applications",
-    "appsDescription": "Select which applications you want to see data for. Empty means all.",
-    "appsSearchLabel": "Search applications",
-    "appsSearchPlaceholder": "Search by app name...",
-    "appsSelected": "{count} applications selected",
-    "noApps": "No applications found",
+    "applicationsLabel": "Applications",
+    "applicationsDescription": "Applications are limited to the selected teams. No selection means all applications.",
+    "applicationsSearchLabel": "Search applications",
+    "applicationsSearchPlaceholder": "Search by application name...",
+    "applicationsSelected": "{count} applications selected",
+    "noApplications": "No applications found",
     "cancel": "Cancel",
-    "apply": "Apply filter",
-    "reset": "Reset filter",
-    "showAllBuckets": "Show all priority buckets",
-    "showAllBucketsDescription": "By default, only the three highest priority buckets are shown to reduce noise."
+    "apply": "Apply",
+    "reset": "Reset"
   },
   "vulnerabilitiesPage": {
     "title": "Vulnerabilities",
@@ -210,7 +191,12 @@
   "filter": {
     "searchPlaceholder": "Search {filterName}...",
     "noResults": "No results",
-    "showingLimited": "Showing {showing} of {total}. Search to narrow down."
+    "showingLimited": "Showing {showing} of {total}. Search to narrow down.",
+    "labels": {
+      "environment": "Environment",
+      "cve": "CVE",
+      "package": "Package"
+    }
   },
   "riskFactors": {
     "severity": "Severity",

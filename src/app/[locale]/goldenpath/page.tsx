@@ -19,6 +19,8 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { useCheckResults } from "@/app/modules/goldenpath/useCheckResults";
 import type { CheckResult } from "@/app/modules/goldenpath/useCheckResults";
+import { filterGoldenPathChecks } from "@/app/modules/goldenpath/filterCheckResults";
+import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import styles from "./page.module.css";
 
 type Severity = CheckResult["severity"];
@@ -39,7 +41,17 @@ const severityColors: Record<Severity, "danger" | "warning" | "neutral" | "info"
 };
 
 export default function GoldenPathPage() {
-  const { checkResults, isLoading, hasError } = useCheckResults();
+  const { checkResults: allCheckResults, isLoading, hasError } = useCheckResults();
+  const { data, teamFilters, applicationFilters } = useVulnerabilitiesContext();
+  // Scope everything on the page to the global work context filter (navbar).
+  const checkResults = useMemo(
+    () =>
+      filterGoldenPathChecks(allCheckResults, data?.teams ?? [], {
+        teamFilters,
+        applicationFilters,
+      }),
+    [allCheckResults, data, teamFilters, applicationFilters],
+  );
   const t = useTranslations("goldenpath");
   const locale = useLocale();
   const [query, setQuery] = useState("");

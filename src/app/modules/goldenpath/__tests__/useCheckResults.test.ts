@@ -37,9 +37,13 @@ describe("useCheckResults", () => {
             reasons: [],
         };
         fetchMock
-            .mockResolvedValueOnce(new Response(JSON.stringify({
-                "test-repo": [good, bad, badWithoutReason],
-            })))
+            .mockResolvedValueOnce(new Response(JSON.stringify([
+                {
+                    repoName: "test-repo",
+                    repoOwners: ["team-a", "team-b"],
+                    results: [good, bad, badWithoutReason],
+                },
+            ])))
             .mockResolvedValueOnce(new Response(null, { status: 202 }));
 
         const { result, rerender } = renderHook(() => useCheckResults());
@@ -47,7 +51,7 @@ describe("useCheckResults", () => {
         expect(result.current.isLoading).toBe(true);
         await waitFor(() => expect(result.current.isLoading).toBe(false));
         expect(result.current.checkResults).toEqual([
-            { name: "test-repo", good: [good], bad: [bad, badWithoutReason] },
+            { name: "test-repo", owners: ["team-a", "team-b"], good: [good], bad: [bad, badWithoutReason] },
         ]);
         expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/datacollector/checks");
         expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/datacollector/collect", { method: "POST" });

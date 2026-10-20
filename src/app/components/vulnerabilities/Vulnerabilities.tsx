@@ -8,18 +8,14 @@ const Vulnerabilities = () => {
     data,
     isLoading,
     teamFilters,
-    setTeamFilters,
     applicationFilters,
-    setApplicationFilters,
     environmentFilters,
     setEnvironmentFilters,
     cveFilters,
     setCveFilters,
     packageNameFilters,
     setPackageNameFilters,
-    allTeams,
     availableEnvironments,
-    availableApplications,
     availableCves,
     availablePackageNames,
   } = useVulnerabilitiesContext();
@@ -41,35 +37,21 @@ const Vulnerabilities = () => {
             }}
           >
             <FilterActionMenu
-              filterName="Team"
-              filterOptions={allTeams}
-              selectedFilters={teamFilters}
-              setFilter={setTeamFilters}
-            />
-            <FilterActionMenu
-              style={{ marginLeft: "1rem" }}
-              filterName="Environment"
+              filterName="environment"
               filterOptions={availableEnvironments}
               selectedFilters={environmentFilters}
               setFilter={setEnvironmentFilters}
             />
             <FilterActionMenu
               style={{ marginLeft: "1rem" }}
-              filterName="Application"
-              filterOptions={availableApplications}
-              selectedFilters={applicationFilters}
-              setFilter={setApplicationFilters}
-            />
-            <FilterActionMenu
-              style={{ marginLeft: "1rem" }}
-              filterName="CVE"
+              filterName="cve"
               filterOptions={availableCves}
               selectedFilters={cveFilters}
               setFilter={setCveFilters}
             />
             <FilterActionMenu
               style={{ marginLeft: "1rem" }}
-              filterName="Package"
+              filterName="package"
               filterOptions={availablePackageNames}
               selectedFilters={packageNameFilters}
               setFilter={setPackageNameFilters}

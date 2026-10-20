@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
-  
+
   return {
     title: "Titt på ting",
     description: t("description"),

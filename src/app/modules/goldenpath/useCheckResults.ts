@@ -32,22 +32,19 @@ export const useCheckResults = () => {
 }
 
 
-const groupedChecks = (backendReply: RepoChecks) => {
-    return Object.keys(backendReply).map(repoName => {
+const groupedChecks = (backendReply: RepoChecks): RepoWithGroupedChecks[] =>
+    backendReply.map(({ repoName, repoOwners, results }) => {
         const repo: RepoWithGroupedChecks = {
             name: repoName,
+            owners: repoOwners ?? [],
             good: [],
             bad: []
         }
-        const results = backendReply[repoName]
         results?.forEach(result => {
             if (result.type === "NeedsWork") { repo.bad.push(result) } else { repo.good.push(result) }
         })
         return repo
     })
-}
-
-export type RepoName = string
 
 export type CheckResult = {
     type: "AllGood" | "NeedsWork";
@@ -58,10 +55,17 @@ export type CheckResult = {
     reasons?: string[];
 }
 
-export type RepoChecks = Record<RepoName, CheckResult[]>
+export type RepoCheckResults = {
+    repoName: string,
+    repoOwners: string[],
+    results: CheckResult[]
+}
+
+export type RepoChecks = RepoCheckResults[]
 
 export type RepoWithGroupedChecks = {
     name: string,
+    owners: string[],
     good: CheckResult[],
     bad: CheckResult[]
 }

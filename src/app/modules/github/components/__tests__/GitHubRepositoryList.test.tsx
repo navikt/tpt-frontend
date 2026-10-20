@@ -17,21 +17,26 @@ vi.mock("../GitHubRepositoryListItem", () => ({
 
 const baseProps = {
   repositories: [],
-  onFilterClick: vi.fn(),
-  activeFilterCount: 0,
   onRefresh: vi.fn(),
   isRefreshing: false,
   isSyncing: false,
   isDataStale: false,
 };
 
-// The refresh button is always the second button in the toolbar (after Filter).
+// The refresh button is always the first button in the toolbar.
 // When fresh it is icon-only (no accessible name); when stale the Tag text becomes its name.
 function getRefreshButton() {
   const buttons = screen.getAllByRole("button");
-  // buttons[0] = Filter, buttons[1] = refresh (icon-only or stale), buttons[2] = quickWinsOnly
-  return buttons[1];
+  // buttons[0] = refresh (icon-only or stale), buttons[1] = quickWinsOnly
+  return buttons[0];
 }
+
+describe("GitHubRepositoryList — toolbar", () => {
+  it("does not render a repository filter button", () => {
+    render(<GitHubRepositoryList {...baseProps} />);
+    expect(screen.queryByText("filterModal.title")).not.toBeInTheDocument();
+  });
+});
 
 describe("GitHubRepositoryList — update button", () => {
   it("renders with secondary variant when data is fresh", () => {

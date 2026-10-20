@@ -112,6 +112,7 @@ export const useVulnerabilities = () => {
   const lastSyncedParamsRef = useRef<string>("");
   const isFirstDataLoadRef = useRef(true);
   const teamPrefsLoadedRef = useRef(false);
+  const previousPathnameRef = useRef(pathname);
 
   // Mark as initialized and set URL sync flag
   // biome-ignore lint/correctness/useExhaustiveDependencies: Read initial URL filters only on mount.
@@ -193,16 +194,13 @@ export const useVulnerabilities = () => {
         setCacheSeed();
         setCachedItem(CACHE_KEYS.VULNERABILITIES, responseData);
 
-        // Only clear filters when doing a manual refresh (not initial load)
+        // Refreshing data must preserve the global team/application work context.
+        // Only page-specific filters are reset.
         if (isRefresh) {
-          setTeamFilters({});
-          setApplicationFilters({});
           setEnvironmentFilters({});
           setCveFilters({});
           setPackageNameFilters({});
           setAppNameFilter("");
-
-
         }
 
         return responseData;
@@ -310,9 +308,16 @@ export const useVulnerabilities = () => {
     setKvItem(KV_KEYS.TEAM_PREFERENCES, selectedTeams);
   }, [teamFilters]);
 
-  // Reset URL sync tracking when navigating to a new page so filters
-  // are re-written to the new pathname's query string.
+  // Preserve the global team/application work context between pages, but do
+  // not carry page-specific table filters into another module.
   useEffect(() => {
+    if (previousPathnameRef.current !== pathname) {
+      previousPathnameRef.current = pathname;
+      setEnvironmentFilters({});
+      setCveFilters({});
+      setPackageNameFilters({});
+      setAppNameFilter("");
+    }
     lastSyncedParamsRef.current = "";
   }, [pathname]);
 

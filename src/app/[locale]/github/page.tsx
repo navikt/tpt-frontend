@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState, Suspense } from "react";
+import { useMemo, Suspense } from "react";
 import { GitHubRepositoryList } from "../../modules/github/components/GitHubRepositoryList";
-import { GitHubFilterModal } from "../../modules/github/components/GitHubFilterModal";
 import { GitHubSummaryStats } from "../../modules/github/components/GitHubSummaryStats";
 import { useGitHubVulnerabilities } from "../../modules/github/hooks/useGitHubVulnerabilities";
 import { useRepositoryMetrics } from "../../modules/github/hooks/useRepositoryMetrics";
 import { useConfigContext } from "../../contexts/ConfigContext";
+import { useVulnerabilitiesContext } from "../../contexts/VulnerabilitiesContext";
+import { filterRepositoriesByWorkContext } from "../../modules/github/utils/filterRepositoriesByWorkContext";
 import { useTranslations } from "next-intl";
 import { Box, BodyShort, Loader, VStack, Heading } from "@navikt/ds-react";
 
@@ -24,93 +25,30 @@ function GitHubPageContent() {
 
   const {
     data,
-    teamFilters,
-    setTeamFilters,
-    repositoryFilters,
-    setRepositoryFilters,
     refresh,
     isRefreshing,
     isSyncing,
     isDataStale,
     isLoading: isGitHubLoading,
   } = useGitHubVulnerabilities();
+  const {
+    data: applicationData,
+    teamFilters,
+    applicationFilters,
+  } = useVulnerabilitiesContext();
 
   const { config, isLoading: isConfigLoading } = useConfigContext();
-  const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-  // Derive selected teams and repos from filter records
-  const selectedTeams = useMemo(() => {
-    const filtered = Object.keys(teamFilters).filter((k) => teamFilters[k] === true);
-    if (filtered.length === 0 && data?.teams) {
-      return Array.from(new Set(data.teams.map((t) => t.team)));
-    }
-    return filtered;
-  }, [teamFilters, data]);
-
-  const selectedRepositories = useMemo(() => {
-    return Object.keys(repositoryFilters ?? {}).filter(
-      (k) => (repositoryFilters as Record<string, boolean>)[k] === true
-    );
-  }, [repositoryFilters]);
-
-  const handleTeamsChange = (teams: string[]) => {
-    setTeamFilters(Object.fromEntries(teams.map((t) => [t, true])));
-  };
-
-  const handleRepositoriesChange = (repos: string[]) => {
-    setRepositoryFilters(Object.fromEntries(repos.map((r) => [r, true])));
-  };
-
-  // Build a map of team -> lastSyncedAt for the filter modal
-  const teamLastSyncedAt = useMemo(
+  // Repositories are scoped by the global work context filter (navbar).
+  const filteredRepositories = useMemo(
     () =>
-      Object.fromEntries(
-        (data?.teams ?? []).map((team) => [team.team, team.lastSyncedAt])
-      ) as Record<string, string | undefined>,
-    [data]
+      filterRepositoriesByWorkContext(
+        data?.teams ?? [],
+        applicationData?.teams ?? [],
+        { teamFilters, applicationFilters }
+      ).filter((repo) => repo.vulnerabilities.length > 0),
+    [data, applicationData, teamFilters, applicationFilters]
   );
-
-  // All available options for the filter modal
-  const allTeams = useMemo(
-    () => Array.from(new Set(data?.teams.map((t) => t.team) ?? [])).sort(),
-    [data]
-  );
-
-  const allRepositories = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          data?.teams.flatMap((t) => (t.repositories ?? []).map((r) => r.nameWithOwner)) ?? []
-        )
-      ).sort(),
-    [data]
-  );
-
-  // Count active filters for the badge on the Filter button
-  const activeFilterCount =
-    (teamFilters ? Object.values(teamFilters).filter(Boolean).length : 0) +
-    (repositoryFilters ? Object.values(repositoryFilters as Record<string, boolean>).filter(Boolean).length : 0);
-
-  // Derive filtered repos: team filter first, then repo filter
-  const filteredRepositories = useMemo(() => {
-    if (!data) return [];
-
-    const seen = new Set<string>();
-    return data.teams
-      .filter((team) => selectedTeams.length === 0 || selectedTeams.includes(team.team))
-      .flatMap((team) => team.repositories ?? [])
-      .filter((repo) => {
-        if (seen.has(repo.nameWithOwner)) return false;
-        seen.add(repo.nameWithOwner);
-        return true;
-      })
-      .filter((repo) => repo.vulnerabilities.length > 0)
-      .filter(
-        (repo) =>
-          selectedRepositories.length === 0 ||
-          selectedRepositories.includes(repo.nameWithOwner)
-      );
-  }, [data, selectedTeams, selectedRepositories]);
 
   const repositoryMetrics = useRepositoryMetrics({
     repositories: filteredRepositories,
@@ -168,29 +106,15 @@ function GitHubPageContent() {
           criticalRepositories={criticalRepositories}
         />
 
-        {/* Repository list with search, filter, quick wins */}
+        {/* Repository list with search and quick wins */}
         <GitHubRepositoryList
           repositories={repositoryMetrics}
-          onFilterClick={() => setFilterModalOpen(true)}
-          activeFilterCount={activeFilterCount}
           onRefresh={refresh}
           isRefreshing={isRefreshing}
           isSyncing={isSyncing}
           isDataStale={isDataStale}
         />
       </VStack>
-
-      <GitHubFilterModal
-        open={filterModalOpen}
-        onClose={() => setFilterModalOpen(false)}
-        allTeams={allTeams}
-        teamLastSyncedAt={teamLastSyncedAt}
-        selectedTeams={selectedTeams}
-        onTeamsChange={handleTeamsChange}
-        allRepositories={allRepositories}
-        selectedRepositories={selectedRepositories}
-        onRepositoriesChange={handleRepositoriesChange}
-      />
     </div>
   );
 }

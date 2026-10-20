@@ -37,11 +37,11 @@
   },
   "summary": {
     "priorityWarning": "Prioriteringen er basert på tilgjengelig informasjon. En sårbarhet kan være kritisk selv om den er lavt prioritert, for eksempel hvis den ikke er analysert ennå.",
-    "filterTeam": "Filtrer team",
     "settings": "Instillinger",
     "refresh": "Oppdater",
     "fetchNewData": "Hent nye data fra backend",
-    "wait": "Vent"
+    "wait": "Vent",
+    "showAllBuckets": "Vis alle prioritetskategorier"
   },
   "sync": {
     "fetchingInBackground": "Oppdaterer sårbarhetsdata i bakgrunnen..."
@@ -71,23 +71,6 @@
       "fixesMany": "Fikser {count} sårbarheter",
       "openPr": "Åpne PR #{number} ↗",
       "openPrGeneric": "Åpne PR ↗"
-    },
-    "filterModal": {
-      "title": "Filtrer",
-      "teamsLabel": "Team",
-      "teamsDescription": "Velg hvilke team du vil se data for. Tom betyr alle.",
-      "repositoriesLabel": "Repositories",
-      "repositoriesDescription": "Velg hvilke repositories du vil se. Tom betyr alle.",
-      "repositoriesSearchPlaceholder": "Søk etter repositories...",
-      "repositoriesSelected": "{count} repositories valgt",
-      "noRepositories": "Ingen repositories funnet",
-      "noTeams": "Ingen team funnet",
-      "selectAll": "Velg alle",
-      "clearAll": "Fjern alle",
-      "apply": "Bruk",
-      "cancel": "Avbryt",
-      "reset": "Tilbakestill",
-      "lastSyncedAt": "Oppdatert {date}"
     },
     "metadata": {
       "teams": "Teams",
@@ -149,24 +132,22 @@
     "fixableByRebuild": "{count} {count, plural, one {sårbarhet fikses} other {sårbarheter fikses}} ved å bygge base image på nytt",
     "actionsLabel": "{count} {count, plural, one {tiltak} other {tiltak}}"
   },
-  "teamFilter": {
-    "title": "Filter",
+  "workContextFilter": {
+    "title": "Velg team og applikasjoner",
     "buttonLabel": "Filter",
-    "loadingTeams": "Laster data...",
+    "buttonLabelWithCount": "Filter, {count} aktive filtergrupper",
     "teamsLabel": "Team",
-    "description": "Velg hvilke team du vil se data for. Bare valgte team vil vises.",
+    "teamsDescription": "Velg teamene eller subteamene du vil se data for i hele Titt på Ting.",
     "noTeams": "Ingen team funnet",
-    "appsLabel": "Applikasjoner",
-    "appsDescription": "Velg hvilke applikasjoner du vil se data for. Tom betyr alle.",
-    "appsSearchLabel": "Søk i applikasjoner",
-    "appsSearchPlaceholder": "Søk etter appnavn...",
-    "appsSelected": "{count} applikasjoner valgt",
-    "noApps": "Ingen applikasjoner funnet",
+    "applicationsLabel": "Applikasjoner",
+    "applicationsDescription": "Applikasjonene avgrenses av valgte team. Ingen valg betyr alle applikasjoner.",
+    "applicationsSearchLabel": "Søk i applikasjoner",
+    "applicationsSearchPlaceholder": "Søk etter applikasjonsnavn...",
+    "applicationsSelected": "{count} applikasjoner valgt",
+    "noApplications": "Ingen applikasjoner funnet",
     "cancel": "Avbryt",
-    "apply": "Bruk filter",
-    "reset": "Nullstill filter",
-    "showAllBuckets": "Vis alle prioritetskategorier",
-    "showAllBucketsDescription": "Som standard vises kun de tre høyeste prioritetskategoriene for å redusere støy."
+    "apply": "Bruk",
+    "reset": "Nullstill"
   },
   "vulnerabilitiesPage": {
     "title": "Sårbarheter",
@@ -210,7 +191,12 @@
   "filter": {
     "searchPlaceholder": "Søk {filterName}...",
     "noResults": "Ingen resultater",
-    "showingLimited": "Viser {showing} av {total}. Søk for å begrense."
+    "showingLimited": "Viser {showing} av {total}. Søk for å begrense.",
+    "labels": {
+      "environment": "Miljø",
+      "cve": "CVE",
+      "package": "Pakke"
+    }
   },
   "riskFactors": {
     "severity": "Alvorlighetsgrad",

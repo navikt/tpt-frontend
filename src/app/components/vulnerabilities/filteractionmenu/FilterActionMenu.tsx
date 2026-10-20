@@ -24,6 +24,7 @@ const FilterActionMenu = ({
 }: FilterActionMenuProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const t = useTranslations("filter");
+  const filterLabel = t(`labels.${filterName}`);
 
   const { filteredOptions, displayOptions, isLimited } = useMemo(() => {
     let filtered = filterOptions;
@@ -66,7 +67,7 @@ const FilterActionMenu = ({
             data-color="neutral"
             variant="secondary"
             icon={<ChevronDownIcon aria-hidden />}>
-            {filterName}
+            {filterLabel}
           </Button>
         </ActionMenu.Trigger>
         <ActionMenu.Content>
@@ -75,12 +76,12 @@ const FilterActionMenu = ({
               label=""
               hideLabel
               size="small"
-              placeholder={t("searchPlaceholder", { filterName: filterName.toLowerCase() })}
+              placeholder={t("searchPlaceholder", { filterName: filterLabel.toLowerCase() })}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <ActionMenu.Group label={filterName}>
+          <ActionMenu.Group label={filterLabel}>
             {displayOptions.length > 0 ? (
               <>
                 {displayOptions.map((option, i) => (

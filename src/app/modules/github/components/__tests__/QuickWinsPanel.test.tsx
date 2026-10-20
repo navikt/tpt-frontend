@@ -4,9 +4,10 @@ import { QuickWinsPanel } from "../QuickWinsPanel";
 import type { RepositoryMetrics } from "../../hooks/useRepositoryMetrics";
 
 vi.mock("next-intl", () => ({
-  useTranslations: () =>
-    (key: string, values?: Record<string, string | number>) => {
-      if (key === "sortedByRisk") return `Showing ${values?.shown} of ${values?.total}`;
+  useTranslations:
+    () => (key: string, values?: Record<string, string | number>) => {
+      if (key === "sortedByRisk")
+        return `Showing ${values?.shown} of ${values?.total}`;
       if (key === "riskScore") return "Risk score";
       if (key === "fixesOne") return "Fixes 1 vulnerability";
       if (key === "fixesMany") return `Fixes ${values?.count} vulnerabilities`;
@@ -16,9 +17,12 @@ vi.mock("next-intl", () => ({
     },
 }));
 
-function repository(vulnerabilities: RepositoryMetrics["vulnerabilities"]): RepositoryMetrics {
+function repository(
+  vulnerabilities: RepositoryMetrics["vulnerabilities"]
+): RepositoryMetrics {
   return {
     nameWithOwner: "navikt/example",
+    team: "team-a",
     vulnerabilities,
     aggregateRiskScore: 0,
     vulnerabilityCount: vulnerabilities.length,
@@ -74,6 +78,8 @@ describe("QuickWinsPanel", () => {
     expect(screen.getByText("Showing 2 of 2")).toBeInTheDocument();
     expect(screen.getAllByText("Risk score")).toHaveLength(2);
     expect(screen.getByText("80")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Open PR #42" })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: "Open PR #42" })).toHaveLength(
+      1
+    );
   });
 });

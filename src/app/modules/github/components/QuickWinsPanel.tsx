@@ -5,6 +5,7 @@ import { Box, HStack, VStack, BodyShort, Button } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
+import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 
 interface QuickWinsPanelProps {
   repositories: RepositoryMetrics[];
@@ -31,15 +32,13 @@ function RiskScoreBadge({ score }: { score: number }) {
     score >= 75
       ? "var(--ax-color-red-600)"
       : score >= 50
-        ? "var(--ax-color-orange-600)"
-        : score >= 25
-          ? "var(--ax-color-yellow-600)"
-          : "var(--ax-color-gray-600)";
+      ? "var(--ax-color-orange-600)"
+      : score >= 25
+      ? "var(--ax-color-yellow-600)"
+      : "var(--ax-color-gray-600)";
 
   const textColor =
-    score >= 25
-      ? "var(--ax-text-on-inverted)"
-      : "var(--ax-text-on-inverted)";
+    score >= 25 ? "var(--ax-text-on-inverted)" : "var(--ax-text-on-inverted)";
 
   return (
     <div
@@ -73,13 +72,15 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
         const pullRequestUrl = vulnerability.dependabotUpdatePullRequestUrl;
         if (pullRequestUrl == null) continue;
 
-        const pullRequestNumber = pullRequestUrl.match(/\/pull\/(\d+)(?:[/?#]|$)/)?.[1];
+        const pullRequestNumber = pullRequestUrl.match(
+          /\/pull\/(\d+)(?:[/?#]|$)/
+        )?.[1];
         const key = JSON.stringify([
           repo.nameWithOwner,
           pullRequestNumber ?? pullRequestUrl,
         ]);
         const group = groupedByPullRequest.get(key) ?? {
-          repoName: repo.nameWithOwner,
+          repoName: getTeamRepositoryDisplayName(repo),
           pullRequestUrl,
           pullRequestNumber,
           dependencyNames: new Set<string>(),
@@ -87,7 +88,9 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
           riskScore: vulnerability.riskScore,
         };
 
-        group.dependencyNames.add(extractDependencyName(vulnerability.packageName));
+        group.dependencyNames.add(
+          extractDependencyName(vulnerability.packageName)
+        );
         group.vulnerabilityIds.add(vulnerability.identifier);
         group.riskScore = Math.max(group.riskScore, vulnerability.riskScore);
         groupedByPullRequest.set(key, group);
@@ -111,12 +114,25 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
         backgroundColor: "var(--ax-bg-success-soft)",
       }}
     >
-      <HStack justify="space-between" align="center" style={{ marginBottom: "1rem" }}>
-        <BodyShort weight="semibold" style={{ color: "var(--ax-text-success)" }}>
+      <HStack
+        justify="space-between"
+        align="center"
+        style={{ marginBottom: "1rem" }}
+      >
+        <BodyShort
+          weight="semibold"
+          style={{ color: "var(--ax-text-success)" }}
+        >
           {t("title")}
         </BodyShort>
-        <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
-          {t("sortedByRisk", { shown: quickWins.length, total: totalQuickWins })}
+        <BodyShort
+          size="small"
+          style={{ color: "var(--ax-text-neutral-subtle)" }}
+        >
+          {t("sortedByRisk", {
+            shown: quickWins.length,
+            total: totalQuickWins,
+          })}
         </BodyShort>
       </HStack>
 
@@ -158,7 +174,10 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
                   ? t("fixesOne")
                   : t("fixesMany", { count: win.vulnerabilityIds.size })}
               </BodyShort>
-              <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)" }}>
+              <BodyShort
+                size="small"
+                style={{ color: "var(--ax-text-neutral-subtle)" }}
+              >
                 {win.repoName}
               </BodyShort>
             </div>

@@ -6,6 +6,7 @@ import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
 import { useTranslations } from "next-intl";
 import { RiskScoreBreakdownBars } from "./RiskScoreBreakdownBars";
+import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 import styles from "./GitHubRepositoryListItem.module.css";
 
 /** Strip PURL prefix and version — "pkg:npm/axios@1.2.3" → "axios" */
@@ -263,7 +264,7 @@ export function GitHubRepositoryListItem({ repository, rank }: GitHubRepositoryL
               </BodyShort>
 
               <BodyShort weight="semibold" style={{ flexShrink: 0 }}>
-                {repository.nameWithOwner}
+                {getTeamRepositoryDisplayName(repository)}
               </BodyShort>
 
               <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", flexShrink: 0 }}>
