@@ -84,20 +84,20 @@ describe("GoldenPathPage", () => {
 
     render(<GoldenPathPage />);
 
-    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
-    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
+    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
   });
 
   it("filters repository results by severity", () => {
     render(<GoldenPathPage />);
 
-    expect(screen.getByText("navikt/high-repo")).toBeInTheDocument();
-    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
+    expect(screen.getByText("team-a/high-repo")).toBeInTheDocument();
+    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "goldenpath.severity.high" }));
 
-    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
-    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
+    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
   });
 
   it("searches check reasons as well as repository names", () => {
@@ -107,8 +107,8 @@ describe("GoldenPathPage", () => {
       target: { value: "Missing branch protection" },
     });
 
-    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
-    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
+    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
   });
 
   it("shows the check title without repeating its internal check name", () => {
@@ -127,7 +127,7 @@ describe("GoldenPathPage", () => {
     fireEvent.click(sectionToggle);
     expect(sectionToggle).toHaveAttribute("aria-expanded", "true");
 
-    const repositoryToggle = screen.getByRole("button", { name: /example-org\/healthy-demo/ });
+    const repositoryToggle = screen.getByRole("button", { name: /team-a\/healthy-demo/ });
     expect(repositoryToggle).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(repositoryToggle);
 
@@ -138,7 +138,7 @@ describe("GoldenPathPage", () => {
     expect(within(passingSection).getByRole("link")).toHaveAttribute(
       "href", "https://github.com/example-org/healthy-demo",
     );
-    expect(screen.queryByText("example-org/no-results")).not.toBeInTheDocument();
+    expect(screen.queryByText("team-a/no-results")).not.toBeInTheDocument();
     expect(screen.queryByText("good-check description")).not.toBeInTheDocument();
   });
 
@@ -150,8 +150,8 @@ describe("GoldenPathPage", () => {
     const passingSection = screen.getByRole("region", { name: "goldenpath.noChecksNeedWorkSection 1" });
     fireEvent.click(within(passingSection).getByRole("button", { name: "Vis mer" }));
 
-    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
-    expect(screen.queryByText("navikt/medium-repo")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /example-org\/healthy-demo/ })).toBeVisible();
+    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
+    expect(screen.queryByText("team-b/medium-repo")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /team-a\/healthy-demo/ })).toBeVisible();
   });
 });

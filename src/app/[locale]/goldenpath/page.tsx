@@ -19,7 +19,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { useCheckResults } from "@/app/modules/goldenpath/useCheckResults";
 import type { CheckResult } from "@/app/modules/goldenpath/useCheckResults";
-import { filterGoldenPathChecks } from "@/app/modules/goldenpath/filterCheckResults";
+import { filterGoldenPathChecks, getGoldenPathDisplayName } from "@/app/modules/goldenpath/filterCheckResults";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import styles from "./page.module.css";
 
@@ -43,13 +43,14 @@ const severityColors: Record<Severity, "danger" | "warning" | "neutral" | "info"
 export default function GoldenPathPage() {
   const { checkResults: allCheckResults, isLoading, hasError } = useCheckResults();
   const { data, teamFilters, applicationFilters } = useVulnerabilitiesContext();
-  // Scope everything on the page to the global work context filter (navbar).
+  // Scope everything on the page to the global work context filter (navbar),
+  // and show repositories as "team/repo" like the rest of the app.
   const checkResults = useMemo(
     () =>
       filterGoldenPathChecks(allCheckResults, data?.teams ?? [], {
         teamFilters,
         applicationFilters,
-      }),
+      }).map((repo) => ({ ...repo, displayName: getGoldenPathDisplayName(repo) })),
     [allCheckResults, data, teamFilters, applicationFilters],
   );
   const t = useTranslations("goldenpath");
@@ -66,7 +67,7 @@ export default function GoldenPathPage() {
   const repositoriesWithGoodChecks = checkResults.filter((repo) => repo.good.length > 0).length;
   const repositoriesWithoutFailures = checkResults
     .filter((repo) => repo.good.length > 0 && repo.bad.length === 0)
-    .sort((first, second) => first.name.localeCompare(second.name));
+    .sort((first, second) => first.displayName.localeCompare(second.displayName));
   const severityCounts = severities.map((severity) => ({
     severity,
     count: allBadChecks.filter((check) => check.severity === severity).length,
@@ -88,20 +89,21 @@ export default function GoldenPathPage() {
           const searchText = [check.name, check.desc, ...(check.reasons ?? [])]
             .join(" ")
             .toLocaleLowerCase();
-          return repo.name.toLocaleLowerCase().includes(normalizedQuery) ||
+          return repo.displayName.toLocaleLowerCase().includes(normalizedQuery) ||
+            repo.name.toLocaleLowerCase().includes(normalizedQuery) ||
             searchText.includes(normalizedQuery);
         });
         return { ...repo, visibleChecks: matchingChecks };
       })
       .filter((repo) => repo.visibleChecks.length > 0)
       .sort((first, second) => {
-        if (sortOption === "repository") return first.name.localeCompare(second.name);
+        if (sortOption === "repository") return first.displayName.localeCompare(second.displayName);
         if (sortOption === "checks") return second.visibleChecks.length - first.visibleChecks.length;
         const firstSeverity = Math.max(...first.visibleChecks.map((check) => severityRank[check.severity]));
         const secondSeverity = Math.max(...second.visibleChecks.map((check) => severityRank[check.severity]));
         return secondSeverity - firstSeverity ||
           second.visibleChecks.length - first.visibleChecks.length ||
-          first.name.localeCompare(second.name);
+          first.displayName.localeCompare(second.displayName);
       });
   }, [checkResults, query, selectedSeverities, sortOption]);
 
@@ -264,7 +266,7 @@ export default function GoldenPathPage() {
                   >
                     <Accordion.Header>
                       <HStack className={styles.repositoryHeader} gap="space-16" justify="space-between" align="center" wrap>
-                        <BodyShort weight="semibold">{repo.name}</BodyShort>
+                        <BodyShort weight="semibold">{repo.displayName}</BodyShort>
                         <HStack gap="space-8" wrap>
                           {severityCountsFor(repo.visibleChecks).map(({ severity, count }) => (
                             <SeverityTag key={severity} severity={severity} count={count} />
@@ -307,7 +309,7 @@ export default function GoldenPathPage() {
                     <Accordion.Item key={repo.name}>
                       <Accordion.Header>
                         <HStack className={styles.repositoryHeader} gap="space-16" justify="space-between" align="center" wrap>
-                          <BodyShort weight="semibold">{repo.name}</BodyShort>
+                          <BodyShort weight="semibold">{repo.displayName}</BodyShort>
                           <Tag size="small" variant="moderate" data-color="success">
                             {t("passingCheckCount", { count: repo.good.length })}
                           </Tag>

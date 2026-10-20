@@ -112,6 +112,7 @@ export const useVulnerabilities = () => {
   const lastSyncedParamsRef = useRef<string>("");
   const isFirstDataLoadRef = useRef(true);
   const teamPrefsLoadedRef = useRef(false);
+  const persistTeamFiltersRef = useRef(false);
   const previousPathnameRef = useRef(pathname);
 
   // Mark as initialized and set URL sync flag
@@ -301,9 +302,11 @@ export const useVulnerabilities = () => {
     [data]
   );
 
-  // Persist team filters to IndexedDB when they change
+  // Persist team filters to IndexedDB, but only after the user has changed them.
+  // Filters restored from the URL or from saved preferences are not written back,
+  // while every user change — including clearing the filter — is.
   useEffect(() => {
-    if (!teamPrefsLoadedRef.current && Object.keys(teamFilters).length === 0) return;
+    if (!persistTeamFiltersRef.current) return;
     const selectedTeams = Object.keys(teamFilters).filter(team => teamFilters[team] === true);
     setKvItem(KV_KEYS.TEAM_PREFERENCES, selectedTeams);
   }, [teamFilters]);
@@ -558,6 +561,7 @@ export const useVulnerabilities = () => {
   // Wrapped setters that enable URL syncing when filters change
   const wrappedSetTeamFilters = useCallback((filters: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
     shouldSyncToUrlRef.current = true;
+    persistTeamFiltersRef.current = true;
     setTeamFilters(filters);
   }, []);
 

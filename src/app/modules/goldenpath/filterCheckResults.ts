@@ -1,4 +1,5 @@
 import type { Team } from "@/app/shared/types/vulnerabilities";
+import { getRepositoryName } from "@/app/modules/github/utils/filterRepositoriesByWorkContext";
 
 interface WorkContextFilters {
   teamFilters: Record<string, boolean>;
@@ -11,6 +12,16 @@ export interface OwnedRepository {
   name: string;
   /** Teams that own the repository */
   owners: string[];
+}
+
+/**
+ * Display name in the same "team/name" format used elsewhere — "team-a/my-repo".
+ * Each repository has a single owning team (CODEOWNERS); falls back to the
+ * full GitHub name when no owner is known.
+ */
+export function getGoldenPathDisplayName(repository: OwnedRepository): string {
+  const owner = repository.owners[0];
+  return owner ? `${owner}/${getRepositoryName(repository.name)}` : repository.name;
 }
 
 export function filterGoldenPathChecks<T extends OwnedRepository>(

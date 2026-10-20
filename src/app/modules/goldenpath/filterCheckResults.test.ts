@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Team } from "@/app/shared/types/vulnerabilities";
-import { filterGoldenPathChecks } from "./filterCheckResults";
+import { filterGoldenPathChecks, getGoldenPathDisplayName } from "./filterCheckResults";
 import type { RepoWithGroupedChecks } from "./useCheckResults";
 
 const teams: Team[] = [
@@ -80,5 +80,17 @@ describe("filterGoldenPathChecks", () => {
         applicationFilters: { "my-frontend": true },
       })
     ).toEqual([]);
+  });
+});
+
+describe("getGoldenPathDisplayName", () => {
+  it("prefixes the repository name with its owning team", () => {
+    expect(
+      getGoldenPathDisplayName({ name: "navikt/my-frontend", owners: ["product-team"] })
+    ).toBe("product-team/my-frontend");
+  });
+
+  it("falls back to the full GitHub name when no owner is known", () => {
+    expect(getGoldenPathDisplayName({ name: "navikt/orphan", owners: [] })).toBe("navikt/orphan");
   });
 });
