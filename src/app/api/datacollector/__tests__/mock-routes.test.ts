@@ -17,12 +17,16 @@ describe("Golden Path mock routes", () => {
 
     expect(response.status).toBe(200);
     expect(checks.map((repo) => repo.repoName)).toEqual([
-      "example-org/golden-path-demo",
-      "example-org/demo-api",
-      "example-org/healthy-demo",
+      "navikt/tpt-frontend",
+      "navikt/api-gateway",
+      "navikt/payment-service",
+      "navikt/user-service",
+      "navikt/kafka-consumer",
+      "navikt/security-scanner",
+      "navikt/auth-service",
     ]);
-    expect(checks.every((repo) => repo.repoOwners.length > 0)).toBe(true);
-    expect(checks.find((repo) => repo.repoName === "example-org/golden-path-demo")?.results).toEqual(
+    expect(checks.every((repo) => repo.repoOwners.length === 1)).toBe(true);
+    expect(checks.find((repo) => repo.repoName === "navikt/tpt-frontend")?.results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ type: "NeedsWork", severity: "HIGH" }),
         expect.objectContaining({ type: "AllGood" }),

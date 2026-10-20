@@ -1,13 +1,39 @@
 import type { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import type { SlaOverdueData } from "@/app/shared/hooks/useSlaOverdue";
-import type { SecurityStatusResponse } from "@/app/types/securityStatus";
+import type { SecurityStatusResponse, TeamSecurityStatus } from "@/app/types/securityStatus";
 import type { RepoChecks } from "@/app/modules/goldenpath/useCheckResults";
 
-// These synthetic example-org repositories are intentionally fake preview data.
-// Owners reuse team names from mockVulnerabilitiesPayload so the work context filter matches.
+// ---------------------------------------------------------------------------
+// Shared mock universe
+// All mocks below use the same teams, applications and repositories as
+// mockVulnerabilitiesPayload, so the global work context filter (team/app)
+// gives consistent results across every page when MOCKS_ENABLED=true:
+//
+//   frontend-team       tpt-frontend, api-gateway
+//   backend-team        user-service, util-thing, payment-service
+//   security-team       security-scanner
+//   data-platform       kafka-consumer
+//   auth-team           auth-service
+//   notification-team   notification-service
+//   search-team         search-api
+//   ml-platform         ml-inference-api
+//   devtools-team       ci-runner
+//   portal-team         nav-portal
+//   infrastructure-team infra-controller
+//   integration-team    integration-hub
+//   clean-team          clean-service
+//
+// Repositories are always "navikt/<application>", with exactly one owning team.
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// mockGoldenPathChecks
+// Shape: RepoChecks (from useCheckResults.ts)
+// Used by: GET /api/datacollector/checks when MOCKS_ENABLED=true
+// ---------------------------------------------------------------------------
 export const mockGoldenPathChecks: RepoChecks = [
   {
-    repoName: "example-org/golden-path-demo",
+    repoName: "navikt/tpt-frontend",
     repoOwners: ["frontend-team"],
     results: [
       {
@@ -16,15 +42,7 @@ export const mockGoldenPathChecks: RepoChecks = [
         desc: "Critical dependency vulnerabilities",
         severity: "HIGH",
         whenChecked: "2026-10-19T09:12:00Z",
-        reasons: ["2 open critical alerts: demo-library 2.1.0, example-parser 4.1.68"],
-      },
-      {
-        type: "NeedsWork",
-        name: "DeploymentRefresh",
-        desc: "Deployment not refreshed recently",
-        severity: "MEDIUM",
-        whenChecked: "2026-10-19T09:12:00Z",
-        reasons: ["demo-cluster / golden-path-demo last refreshed 94 days ago"],
+        reasons: ["1 open critical alert: next 14.2.3"],
       },
       {
         type: "AllGood",
@@ -43,7 +61,57 @@ export const mockGoldenPathChecks: RepoChecks = [
     ],
   },
   {
-    repoName: "example-org/demo-api",
+    repoName: "navikt/api-gateway",
+    repoOwners: ["frontend-team"],
+    results: [
+      {
+        type: "NeedsWork",
+        name: "DeploymentRefresh",
+        desc: "Deployment not refreshed recently",
+        severity: "MEDIUM",
+        whenChecked: "2026-10-19T09:11:00Z",
+        reasons: ["prod-gcp / api-gateway last refreshed 41 days ago"],
+      },
+      {
+        type: "AllGood",
+        name: "BranchProtection",
+        desc: "Default branch is protected",
+        severity: "HIGH",
+        whenChecked: "2026-10-19T09:11:00Z",
+      },
+    ],
+  },
+  {
+    repoName: "navikt/payment-service",
+    repoOwners: ["backend-team"],
+    results: [
+      {
+        type: "NeedsWork",
+        name: "CriticalDependencyAlerts",
+        desc: "Critical dependency vulnerabilities",
+        severity: "HIGH",
+        whenChecked: "2026-10-19T09:10:00Z",
+        reasons: ["1 open critical alert: jackson-databind 2.15.2"],
+      },
+      {
+        type: "NeedsWork",
+        name: "DeploymentRefresh",
+        desc: "Deployment not refreshed recently",
+        severity: "MEDIUM",
+        whenChecked: "2026-10-19T09:10:00Z",
+        reasons: ["prod-gcp / payment-service last refreshed 94 days ago"],
+      },
+      {
+        type: "AllGood",
+        name: "CodeOwners",
+        desc: "CODEOWNERS file is present",
+        severity: "MEDIUM",
+        whenChecked: "2026-10-19T09:10:00Z",
+      },
+    ],
+  },
+  {
+    repoName: "navikt/user-service",
     repoOwners: ["backend-team"],
     results: [
       {
@@ -51,42 +119,76 @@ export const mockGoldenPathChecks: RepoChecks = [
         name: "RepositoryReadme",
         desc: "Repository is missing a README",
         severity: "LOW",
-        whenChecked: "2026-10-19T09:10:00Z",
+        whenChecked: "2026-10-19T09:09:00Z",
         reasons: ["README.md was not found in the repository"],
-      },
-      {
-        type: "AllGood",
-        name: "CriticalDependencyAlerts",
-        desc: "No critical dependency vulnerabilities",
-        severity: "HIGH",
-        whenChecked: "2026-10-19T09:10:00Z",
       },
       {
         type: "AllGood",
         name: "BranchProtection",
         desc: "Default branch is protected",
         severity: "HIGH",
-        whenChecked: "2026-10-19T09:10:00Z",
+        whenChecked: "2026-10-19T09:09:00Z",
       },
     ],
   },
   {
-    repoName: "example-org/healthy-demo",
-    repoOwners: ["frontend-team", "security-team"],
+    repoName: "navikt/kafka-consumer",
+    repoOwners: ["data-platform"],
+    results: [
+      {
+        type: "NeedsWork",
+        name: "DeploymentRefresh",
+        desc: "Deployment not refreshed recently",
+        severity: "MEDIUM",
+        whenChecked: "2026-10-19T09:08:00Z",
+        reasons: ["prod-gcp / kafka-consumer last refreshed 33 days ago"],
+      },
+      {
+        type: "AllGood",
+        name: "CriticalDependencyAlerts",
+        desc: "No critical dependency vulnerabilities",
+        severity: "HIGH",
+        whenChecked: "2026-10-19T09:08:00Z",
+      },
+    ],
+  },
+  {
+    repoName: "navikt/security-scanner",
+    repoOwners: ["security-team"],
     results: [
       {
         type: "AllGood",
         name: "CriticalDependencyAlerts",
         desc: "No critical dependency vulnerabilities",
         severity: "HIGH",
-        whenChecked: "2026-10-19T09:08:00Z",
+        whenChecked: "2026-10-19T09:07:00Z",
       },
       {
         type: "AllGood",
         name: "BranchProtection",
         desc: "Default branch is protected",
         severity: "HIGH",
-        whenChecked: "2026-10-19T09:08:00Z",
+        whenChecked: "2026-10-19T09:07:00Z",
+      },
+    ],
+  },
+  {
+    repoName: "navikt/auth-service",
+    repoOwners: ["auth-team"],
+    results: [
+      {
+        type: "AllGood",
+        name: "CriticalDependencyAlerts",
+        desc: "No critical dependency vulnerabilities",
+        severity: "HIGH",
+        whenChecked: "2026-10-19T09:06:00Z",
+      },
+      {
+        type: "AllGood",
+        name: "CodeOwners",
+        desc: "CODEOWNERS file is present",
+        severity: "MEDIUM",
+        whenChecked: "2026-10-19T09:06:00Z",
       },
     ],
   },
@@ -911,7 +1013,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
           ],
         },
         {
-          nameWithOwner: "navikt/design-system",
+          nameWithOwner: "navikt/api-gateway",
           usesDistroless: true,
           codeScanningStatus: "OK",
           vulnerabilities: [
@@ -949,7 +1051,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
       workloads: [],
       repositories: [
         {
-          nameWithOwner: "navikt/tpt-backend",
+          nameWithOwner: "navikt/payment-service",
           usesDistroless: true,
           codeScanningStatus: "OK",
           vulnerabilities: [
@@ -967,7 +1069,7 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
               publishedAt: "2025-01-20T00:00:00Z",
               cvssScore: 9.8,
               dependabotUpdatePullRequestUrl:
-                "https://github.com/navikt/tpt-backend/pull/55",
+                "https://github.com/navikt/payment-service/pull/55",
               riskScore: 85,
               riskScoreBreakdown: {
                 factors: [
@@ -982,8 +1084,14 @@ export const mockGithubPayload: VulnerabilitiesResponse = {
             },
           ],
         },
+      ],
+    },
+    {
+      team: "data-platform",
+      workloads: [],
+      repositories: [
         {
-          nameWithOwner: "navikt/data-pipeline",
+          nameWithOwner: "navikt/kafka-consumer",
           usesDistroless: false,
           codeScanningStatus: null,
           vulnerabilities: [
@@ -1185,73 +1293,98 @@ export const mockConfigPayload = {
 // Matches spec in design_handoff_security_status
 // Used by: GET /api/security-status
 // ---------------------------------------------------------------------------
+// Teams with a single, fully up-to-date application and no history of issues.
+function healthyTeam(team: string): TeamSecurityStatus {
+  return {
+    team,
+    applicationCount: 1,
+    level: null,
+    history: ["green", "green", "green", "green", "green", "green"],
+    exposed: {
+      status: "green",
+      appsPastDeadline: [],
+    },
+    trend: {
+      status: "green",
+      direction: "stable",
+      appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
+    },
+    maintenance: {
+      status: "green",
+      upToDate: 1,
+      total: 1,
+      overdueRebuild: [],
+    },
+  };
+}
+
 export const mockSecurityStatusPayload: SecurityStatusResponse = {
   teams: [
+    // Chronic: overdue vulnerabilities for six months (matches mockSlaOverduePayload)
     {
-      team: "team-hav",
-      applicationCount: 14,
+      team: "backend-team",
+      applicationCount: 3,
       level: "chronic",
       history: ["red", "red", "red", "red", "red", "red"],
       exposed: {
         status: "red",
         since: "2026-05-01T00:00:00Z",
         appsPastDeadline: [
-          { app: "soknad-api", workdaysOver: 6 },
-          { app: "vedtak-worker", workdaysOver: 5 },
-          { app: "utbetaling", workdaysOver: 3 },
+          { app: "payment-service", workdaysOver: 44 },
+          { app: "user-service", workdaysOver: 14 },
         ],
       },
       trend: {
         status: "red",
         since: "2026-05-01T00:00:00Z",
         direction: "worse",
-        appsWithOverduePerMonth: [2, 3, 3, 4, 4, 5],
+        appsWithOverduePerMonth: [1, 1, 1, 2, 2, 2],
       },
       maintenance: {
         status: "red",
         since: "2026-05-01T00:00:00Z",
-        upToDate: 9,
-        total: 14,
+        upToDate: 1,
+        total: 3,
         overdueRebuild: [
-          { app: "soknad-api", daysOver: 14 },
-          { app: "vedtak-worker", daysOver: 10 },
-          { app: "gammel-rapport", daysOver: 4 },
+          { app: "payment-service", daysOver: 64 },
+          { app: "util-thing", daysOver: 10 },
         ],
       },
     },
+    // Ongoing: recently turned red (matches mockSlaOverduePayload)
     {
-      team: "team-nordlys",
-      applicationCount: 11,
+      team: "frontend-team",
+      applicationCount: 2,
       level: "ongoing",
       history: ["green", "green", "green", "green", "yellow", "red"],
       exposed: {
         status: "red",
         since: "2026-10-01T00:00:00Z",
         appsPastDeadline: [
-          { app: "soknad-api", workdaysOver: 6 },
-          { app: "vedtak-worker", workdaysOver: 2 },
+          { app: "tpt-frontend", workdaysOver: 33 },
+          { app: "api-gateway", workdaysOver: 9 },
         ],
       },
       trend: {
         status: "red",
         since: "2026-09-01T00:00:00Z",
         direction: "worse",
-        appsWithOverduePerMonth: [1, 1, 2, 2, 3, 4],
+        appsWithOverduePerMonth: [0, 0, 1, 1, 2, 2],
       },
       maintenance: {
         status: "yellow",
         since: "2026-09-01T00:00:00Z",
-        upToDate: 9,
-        total: 11,
+        upToDate: 1,
+        total: 2,
         overdueRebuild: [
-          { app: "gammel-rapport", daysOver: 11 },
-          { app: "soknad-api", daysOver: 4 },
+          { app: "api-gateway", daysOver: 11 },
         ],
       },
     },
+    // Ongoing: trend getting worse, nothing past deadline yet
     {
-      team: "team-skog",
-      applicationCount: 12,
+      team: "security-team",
+      applicationCount: 1,
       level: "ongoing",
       history: ["green", "green", "green", "green", "yellow", "yellow"],
       exposed: {
@@ -1266,21 +1399,22 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       },
       maintenance: {
         status: "green",
-        upToDate: 12,
-        total: 12,
+        upToDate: 1,
+        total: 1,
         overdueRebuild: [],
       },
     },
+    // New: just started slipping
     {
-      team: "team-myr",
-      applicationCount: 13,
+      team: "data-platform",
+      applicationCount: 1,
       level: "new",
       history: ["green", "green", "green", "green", "green", "yellow"],
       exposed: {
         status: "yellow",
         since: "2026-10-10T00:00:00Z",
         appsPastDeadline: [
-          { app: "arbeidsgiver-innsyn", workdaysOver: 1 },
+          { app: "kafka-consumer", workdaysOver: 1 },
         ],
       },
       trend: {
@@ -1291,16 +1425,17 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       maintenance: {
         status: "yellow",
         since: "2026-10-10T00:00:00Z",
-        upToDate: 10,
-        total: 13,
+        upToDate: 0,
+        total: 1,
         overdueRebuild: [
-          { app: "arbeidsgiver-innsyn", daysOver: 3 },
+          { app: "kafka-consumer", daysOver: 3 },
         ],
       },
     },
+    // On track and improving
     {
-      team: "team-fjell",
-      applicationCount: 7,
+      team: "auth-team",
+      applicationCount: 1,
       level: null,
       history: ["green", "green", "green", "green", "green", "green"],
       exposed: {
@@ -1310,78 +1445,23 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       trend: {
         status: "green",
         direction: "improving",
-        appsWithOverduePerMonth: [3, 3, 2, 2, 1, 1],
+        appsWithOverduePerMonth: [1, 1, 1, 0, 0, 0],
       },
       maintenance: {
         status: "green",
-        upToDate: 7,
-        total: 7,
+        upToDate: 1,
+        total: 1,
         overdueRebuild: [],
       },
     },
-    {
-      team: "team-kyst",
-      applicationCount: 13,
-      level: null,
-      history: ["green", "green", "green", "green", "green", "green"],
-      exposed: {
-        status: "green",
-        appsPastDeadline: [],
-      },
-      trend: {
-        status: "green",
-        direction: "stable",
-        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
-      },
-      maintenance: {
-        status: "green",
-        upToDate: 13,
-        total: 13,
-        overdueRebuild: [],
-      },
-    },
-    {
-      team: "team-elv",
-      applicationCount: 13,
-      level: null,
-      history: ["green", "green", "green", "green", "green", "green"],
-      exposed: {
-        status: "green",
-        appsPastDeadline: [],
-      },
-      trend: {
-        status: "green",
-        direction: "stable",
-        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
-      },
-      maintenance: {
-        status: "green",
-        upToDate: 13,
-        total: 13,
-        overdueRebuild: [],
-      },
-    },
-    {
-      team: "team-is",
-      applicationCount: 13,
-      level: null,
-      history: ["green", "green", "green", "green", "green", "green"],
-      exposed: {
-        status: "green",
-        appsPastDeadline: [],
-      },
-      trend: {
-        status: "green",
-        direction: "stable",
-        appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0],
-      },
-      maintenance: {
-        status: "green",
-        upToDate: 13,
-        total: 13,
-        overdueRebuild: [],
-      },
-    },
+    healthyTeam("notification-team"),
+    healthyTeam("search-team"),
+    healthyTeam("ml-platform"),
+    healthyTeam("devtools-team"),
+    healthyTeam("portal-team"),
+    healthyTeam("infrastructure-team"),
+    healthyTeam("integration-team"),
+    healthyTeam("clean-team"),
   ],
   generatedAt: "2026-10-13T10:00:00Z",
 };
