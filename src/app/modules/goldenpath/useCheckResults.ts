@@ -32,10 +32,16 @@ export const useCheckResults = () => {
 }
 
 
+const GITHUB_ORG = "navikt"
+
+/** Ensures the repository name includes the GitHub owner — "my-repo" → "navikt/my-repo" */
+export const withGitHubOwner = (repoName: string): string =>
+    repoName.includes("/") ? repoName : `${GITHUB_ORG}/${repoName}`
+
 const groupedChecks = (backendReply: RepoChecks): RepoWithGroupedChecks[] =>
     backendReply.map(({ repoName, repoOwners, results }) => {
         const repo: RepoWithGroupedChecks = {
-            name: repoName,
+            name: withGitHubOwner(repoName),
             owners: repoOwners ?? [],
             good: [],
             bad: []

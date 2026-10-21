@@ -51,13 +51,32 @@ describe("useCheckResults", () => {
         expect(result.current.isLoading).toBe(true);
         await waitFor(() => expect(result.current.isLoading).toBe(false));
         expect(result.current.checkResults).toEqual([
-            { name: "test-repo", owners: ["team-a", "team-b"], good: [good], bad: [bad, badWithoutReason] },
+            { name: "navikt/test-repo", owners: ["team-a", "team-b"], good: [good], bad: [bad, badWithoutReason] },
         ]);
         expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/datacollector/checks");
         expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/datacollector/collect", { method: "POST" });
 
         rerender();
         expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("prefixes repository names with the navikt GitHub org only when the owner is missing", async () => {
+        fetchMock
+            .mockResolvedValueOnce(new Response(JSON.stringify([
+                { repoName: "repo-without-owner", repoOwners: ["team-a"], results: [] },
+                { repoName: "navikt/repo-with-owner", repoOwners: ["team-a"], results: [] },
+                { repoName: "other-org/external-repo", repoOwners: ["team-a"], results: [] },
+            ])))
+            .mockResolvedValueOnce(new Response(null, { status: 202 }));
+
+        const { result } = renderHook(() => useCheckResults());
+
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+        expect(result.current.checkResults.map((repo) => repo.name)).toEqual([
+            "navikt/repo-without-owner",
+            "navikt/repo-with-owner",
+            "other-org/external-repo",
+        ]);
     });
 
     it("stops loading and logs failed requests without retrying on rerender", async () => {

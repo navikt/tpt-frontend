@@ -6,6 +6,7 @@ import {
   mockSlaOverduePayload,
   mockVulnerabilitiesPayload,
 } from "@/app/mocks/mockPayloads";
+import { withGitHubOwner } from "@/app/modules/goldenpath/useCheckResults";
 
 // mockVulnerabilitiesPayload (/api/applications) drives the global work context
 // filter, so every other mock must use the same teams, applications and repositories.
@@ -36,7 +37,8 @@ describe("mock payloads are consistent with mockVulnerabilitiesPayload", () => {
   it("Golden path repositories have exactly one owner that owns the workload", () => {
     for (const repository of mockGoldenPathChecks) {
       expect(repository.repoOwners, repository.repoName).toHaveLength(1);
-      expect(repositoryOwner.get(repository.repoName), repository.repoName).toBe(repository.repoOwners[0]);
+      const repoName = withGitHubOwner(repository.repoName);
+      expect(repositoryOwner.get(repoName), repoName).toBe(repository.repoOwners[0]);
     }
   });
 

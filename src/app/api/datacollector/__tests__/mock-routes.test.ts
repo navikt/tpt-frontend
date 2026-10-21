@@ -19,7 +19,7 @@ describe("Golden Path mock routes", () => {
     expect(checks.map((repo) => repo.repoName)).toEqual([
       "navikt/tpt-frontend",
       "navikt/api-gateway",
-      "navikt/payment-service",
+      "payment-service",
       "navikt/user-service",
       "navikt/kafka-consumer",
       "navikt/security-scanner",

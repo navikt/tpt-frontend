@@ -82,7 +82,9 @@ export const mockGoldenPathChecks: RepoChecks = [
     ],
   },
   {
-    repoName: "navikt/payment-service",
+    // Intentionally without the "navikt/" owner to verify that the frontend
+    // adds the missing prefix (see withGitHubOwner in useCheckResults).
+    repoName: "payment-service",
     repoOwners: ["backend-team"],
     results: [
       {
