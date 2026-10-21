@@ -533,7 +533,7 @@
     "checksNeedWork": "{count, plural, one {# check needs work} other {# checks need work}} in {repositories, plural, one {# repository} other {# repositories}}",
     "checksPassing": "checks passing",
     "repositoriesWithPassingChecks": "{count, plural, one {# repository has passing checks} other {# repositories have passing checks}}",
-    "countNote": "Counts are checks, not distinct vulnerabilities. One issue can fail several checks.",
+    "countNote": "Counts are checks, not distinct issues. One issue can fail several checks.",
     "needsWork": "Needs work",
     "search": "Search repository or check",
     "filterBySeverity": "Filter by severity",
