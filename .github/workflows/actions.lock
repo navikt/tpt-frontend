@@ -9,8 +9,8 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-node@v7.1.0'
         - 'aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25'
-        - 'github/codeql-action@v4.38.3'
-        - 'nais/deploy@d003bddf74ce5b96fa3056ae60bd4b9b3bbc89ef'
+        - 'github/codeql-action@v4.39.0'
+        - 'nais/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50'
         - 'nais/docker-build-push@v0'
         - 'nais/login@40b72a35a18ddf2ad74b632461139ab838cc2a2f'
         - 'pnpm/action-setup@v6.1.0'
@@ -85,9 +85,9 @@ dependencies:
         commit: 'sha1-4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd'
         owner_id: 5429470
         repo_id: 288485773
-    'github/codeql-action@v4.38.3':
-        ref: 'v4.38.3'
-        commit: 'sha1-24c54180a607b1449ed407dd24f251e4e9147c8d'
+    'github/codeql-action@v4.39.0':
+        ref: 'v4.39.0'
+        commit: 'sha1-6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee'
         owner_id: 9919
         repo_id: 259445878
     'google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093':
@@ -105,9 +105,9 @@ dependencies:
             - 'aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25'
             - 'oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4'
             - 'sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6'
-    'nais/deploy@d003bddf74ce5b96fa3056ae60bd4b9b3bbc89ef':
-        ref: 'deploy-v3'
-        commit: 'sha1-d003bddf74ce5b96fa3056ae60bd4b9b3bbc89ef'
+    'nais/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50':
+        ref: 'v3'
+        commit: 'sha1-6a9dcd6df697ec2d38edc78cadb0b9acd1232f50'
         owner_id: 29488289
         repo_id: 166402203
         uses:
