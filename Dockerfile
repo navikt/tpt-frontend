@@ -1,4 +1,4 @@
-FROM node:24@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS builder
+FROM node:24 AS builder
 WORKDIR /app
 
 ENV PNPM_HOME="/pnpm"
@@ -17,7 +17,7 @@ COPY public/ ./public/
 
 RUN pnpm run build
 
-FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:24-slim
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:26-slim
 WORKDIR /app
 
 ENV NODE_ENV=production \
