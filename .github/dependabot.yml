@@ -12,7 +12,7 @@ updates:
     registries:
       - npm-github
     cooldown:
-      default-days: 7
+      default-days: 3
     groups:
       navikt:
         patterns:
@@ -45,7 +45,7 @@ updates:
     schedule:
       interval: weekly
     cooldown:
-      default-days: 7
+      default-days: 3
     groups:
       github-actions:
         patterns:

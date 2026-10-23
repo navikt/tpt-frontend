@@ -1,9 +1,7 @@
-FROM node:24 AS builder
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/node:26-dev AS builder
 WORKDIR /app
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN npm install pnpm@12
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN --mount=type=secret,id=NODE_AUTH_TOKEN,env=NODE_AUTH_TOKEN \
