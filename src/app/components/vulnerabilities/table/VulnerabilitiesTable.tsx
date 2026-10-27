@@ -49,6 +49,7 @@ const VulnerabilitiesTable = ({
       team: string;
       workload: string;
       workloadId: string;
+      repository?: string;
       vulnerabilityId: string;
       vulnerability: string;
       packageName: string;
@@ -88,6 +89,7 @@ const VulnerabilitiesTable = ({
                   team: team.team,
                   workload: workload.name,
                   workloadId: workload.id,
+                  repository: workload.repository,
                   vulnerabilityId: vulnerability.identifier,
                   vulnerability: vulnerability.identifier,
                   packageName: vulnerability.packageName,
@@ -159,7 +161,19 @@ const VulnerabilitiesTable = ({
                 {row.team}
               </Link>
             </Table.DataCell>
-            <Table.DataCell>{row.workload}</Table.DataCell>
+            <Table.DataCell>
+              {row.repository ? (
+                <Link
+                  href={`https://github.com/${row.repository}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {row.workload}
+                </Link>
+              ) : (
+                row.workload
+              )}
+            </Table.DataCell>
             <Table.DataCell>{row.vulnerability}</Table.DataCell>
             <Table.DataCell>
               {Math.round(row.riskScore)}
