@@ -6,7 +6,7 @@ RUN npm install pnpm@12
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN --mount=type=secret,id=NODE_AUTH_TOKEN,env=NODE_AUTH_TOKEN \
     pnpm config set //npm.pkg.github.com/:_authToken="${NODE_AUTH_TOKEN}" && \
-    pnpm install --prod --frozen-lockfile
+    pnpm install --frozen-lockfile
 
 COPY next.config.ts tsconfig.json ./
 COPY src/ ./src/
