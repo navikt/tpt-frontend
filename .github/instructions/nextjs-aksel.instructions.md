@@ -189,33 +189,30 @@ const formatted = num.toLocaleString(); // Uses browser locale
 
 ## API Routes (App Router)
 
+Authenticated backend routes use `proxyToBackend` from `@/app/shared/server/backendProxy`.
+The shared module owns environment validation, OBO/local-dev authentication, mocks, cancellation,
+and error responses. Keep backend paths and route-specific validation in the route handler.
+Use `mode: "json"` for JSON, `"stream"` for unbuffered bodies, and `"sse"` for event streams.
+Set `forwardQuery: true` only when the backend should receive the incoming query parameters.
+
 ```typescript
-import { NextResponse } from "next/server";
+import { proxyToBackend } from "@/app/shared/server/backendProxy";
 
-// GET endpoint with error handling
-export async function GET() {
-  const { data, error } = await fetchData();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json(data);
-}
-
-// POST endpoint
-export async function POST(request: Request) {
-  const body = await request.json();
-
-  // Validation
-  if (!body.requiredField) {
-    return NextResponse.json({ error: "requiredField is missing" }, { status: 400 });
-  }
-
-  const result = await processData(body);
-  return NextResponse.json(result, { status: 201 });
+export function GET(request: Request) {
+  return proxyToBackend(request, {
+    path: "/vulnerabilities/user",
+    mode: "stream",
+  });
 }
 ```
+
+For route-specific response transformations or local fallbacks, use `fetchFromBackend`
+and normalize non-OK responses and caught exceptions with `backendErrorResponse`.
+Backend Problem Details retain their fields and extensions, with `isReportable` added.
+Other errors use `{ error: <i18n key>, status, details?, isReportable }`; SSE errors are
+framed as `event: error`. Client disconnects return non-reportable status 499.
+Routes without a `mock` option still call the backend when `MOCKS_ENABLED=true`.
+`config`, `health`, `telemetry-config`, and `user` do not use this OBO proxy.
 
 ## Authentication
 
@@ -228,7 +225,9 @@ const { user, isLoading } = useUser();
 // user.email contains the preferred_username from JWT
 ```
 
-API routes that call the backend use `requestOboToken()` from `@navikt/oasis` to obtain scoped tokens.
+Only `shared/server/backendProxy.ts` calls `requestOboToken()` from `@navikt/oasis`
+and reads `TPT_BACKEND_SCOPE`. Route handlers use the proxy module rather than
+implementing token exchange themselves.
 
 ## Testing
 

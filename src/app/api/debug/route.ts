@@ -1,100 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken, requestOboToken } from "@navikt/oasis";
-import { mockVulnerabilitiesPayload, mockSlaOverduePayload } from "@/app/mocks/mockPayloads";
-import { isLocalDev, createLocalDevToken } from "@/app/utils/localDevAuth";
-import { isAbortError } from "@/app/shared/utils/errorHandling";
+import {
+  mockSlaOverduePayload,
+  mockVulnerabilitiesPayload,
+} from "@/app/mocks/mockPayloads";
+import { proxyToBackend } from "@/app/shared/server/backendProxy";
 
-// Environment validation helper
-function getServerEnv() {
-  const tptBackendUrl = process.env.TPT_BACKEND_URL;
-  const tptBackendScope = process.env.TPT_BACKEND_SCOPE;
+export function GET(request: Request) {
+  const endpoint = new URL(request.url).searchParams.get("endpoint");
+  const path = endpoint === "github"
+    ? "/vulnerabilities/github/user"
+    : endpoint === "sla" ? "/sla/overdue" : "/vulnerabilities/user";
 
-  if (!tptBackendUrl) {
-    throw new Error("TPT_BACKEND_URL not configured");
-  }
-
-  if (!isLocalDev() && !tptBackendScope) {
-    throw new Error("TPT_BACKEND_SCOPE not configured");
-  }
-
-  return { tptBackendUrl, tptBackendScope };
-}
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const endpoint = searchParams.get("endpoint") || "vulnerabilities";
-
-  if (process.env.MOCKS_ENABLED === "true") {
-    const mockData = endpoint === "sla" ? mockSlaOverduePayload : mockVulnerabilitiesPayload;
-    return NextResponse.json(mockData);
-  }
-
-  try {
-    const { tptBackendUrl } = getServerEnv();
-
-    let backendToken: string;
-
-    if (isLocalDev()) {
-      const email = process.env.LOCAL_DEV_EMAIL || "lokal.utvikler@nav.no";
-      backendToken = createLocalDevToken(email);
-    } else {
-      const accessToken = getToken(request);
-      if (!accessToken) {
-        return NextResponse.json(
-          { error: "Authentication required" },
-          { status: 401 }
-        );
-      }
-
-      const { tptBackendScope } = getServerEnv();
-      const oboResult = await requestOboToken(accessToken, tptBackendScope!);
-      if (!oboResult.ok) {
-        return NextResponse.json(
-          { error: "Authentication failed" },
-          { status: 401 }
-        );
-      }
-      backendToken = oboResult.token;
-    }
-
-    // Support different endpoints via query parameter
-    const backendUrl =
-      endpoint === "github"
-        ? `${tptBackendUrl}/vulnerabilities/github/user`
-        : endpoint === "sla"
-          ? `${tptBackendUrl}/sla/overdue`
-          : `${tptBackendUrl}/vulnerabilities/user`;
-
-    const response = await fetch(backendUrl, {
-      headers: {
-        Authorization: `Bearer ${backendToken}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch from backend" },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    return NextResponse.json(data);
-
-  } catch (error) {
-    if (isAbortError(error)) {
-      // Client disconnected (e.g. navigated away) before we could respond.
-      return NextResponse.json(
-        { error: "Client aborted request" },
-        { status: 499 }
-      );
-    }
-
-    console.error("Debug endpoint error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
+  return proxyToBackend(request, {
+    path,
+    mode: "json",
+    mock: endpoint === "sla" ? mockSlaOverduePayload : mockVulnerabilitiesPayload,
+  });
 }
