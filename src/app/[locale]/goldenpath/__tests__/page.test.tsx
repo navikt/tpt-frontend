@@ -77,7 +77,22 @@ describe("GoldenPathPage", () => {
 
   it("only shows repositories owned by teams selected in the work context filter", () => {
     useVulnerabilitiesContextMock.mockReturnValue({
-      data: { teams: [] },
+      data: {
+        teams: [
+          {
+            team: "team-b",
+            workloads: [
+              {
+                id: "medium-repo",
+                name: "medium-repo",
+                environment: "prod-gcp",
+                repository: "navikt/medium-repo",
+                vulnerabilities: [],
+              },
+            ],
+          },
+        ],
+      },
       teamFilters: { "team-b": true },
       applicationFilters: {},
     });

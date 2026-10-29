@@ -39,6 +39,7 @@ export function filterGoldenPathChecks<T extends OwnedRepository>(
   );
   const hasTeamFilter = selectedTeams.size > 0;
   const hasApplicationFilter = selectedApplications.size > 0;
+  const hasWorkContextFilter = hasTeamFilter || hasApplicationFilter;
 
   const selectedRepositories = new Set(
     teams
@@ -50,15 +51,12 @@ export function filterGoldenPathChecks<T extends OwnedRepository>(
       )
       .map((workload) => workload.repository)
       .filter((repository): repository is string => Boolean(repository))
+      .map(getRepositoryName)
   );
 
-  return checks.filter((repository) => {
-    const matchesTeam =
-      !hasTeamFilter ||
-      repository.owners.some((owner) => selectedTeams.has(owner));
-    const matchesApplication =
-      !hasApplicationFilter || selectedRepositories.has(repository.name);
-
-    return matchesTeam && matchesApplication;
-  });
+  return checks.filter(
+    (repository) =>
+      !hasWorkContextFilter ||
+      selectedRepositories.has(getRepositoryName(repository.name))
+  );
 }

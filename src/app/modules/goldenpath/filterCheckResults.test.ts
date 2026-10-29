@@ -45,6 +45,28 @@ const checks: RepoWithGroupedChecks[] = [
   },
 ];
 
+const appsecTeams: Team[] = [
+  {
+    team: "appsec",
+    workloads: [
+      {
+        id: "appsec-github-watcher",
+        name: "appsec-github-watcher",
+        environment: "prod-gcp",
+        repository: "navikt/tpt-graph",
+        vulnerabilities: [],
+      },
+    ],
+  },
+];
+
+const appsecCheck: RepoWithGroupedChecks = {
+  name: "tpt-graph",
+  owners: ["appsec"],
+  good: [],
+  bad: [],
+};
+
 describe("filterGoldenPathChecks", () => {
   it("returns all repositories without an active work context", () => {
     expect(
@@ -81,6 +103,33 @@ describe("filterGoldenPathChecks", () => {
       })
     ).toEqual([]);
   });
+
+  it("matches appsec workload filters to short Goldenpath repo names", () => {
+    expect(
+      filterGoldenPathChecks([appsecCheck], appsecTeams, {
+        teamFilters: { appsec: true },
+        applicationFilters: { "appsec-github-watcher": true },
+      })
+    ).toEqual([appsecCheck]);
+  });
+
+  it("matches applications when the workload repository includes an org", () => {
+    expect(
+      filterGoldenPathChecks([appsecCheck], appsecTeams, {
+        teamFilters: {},
+        applicationFilters: { "appsec-github-watcher": true },
+      })
+    ).toEqual([appsecCheck]);
+  });
+
+  it("matches teams using workload membership", () => {
+    expect(
+      filterGoldenPathChecks([appsecCheck], appsecTeams, {
+        teamFilters: { appsec: true },
+        applicationFilters: {},
+      })
+    ).toEqual([appsecCheck]);
+  });
 });
 
 describe("getGoldenPathDisplayName", () => {
@@ -88,6 +137,10 @@ describe("getGoldenPathDisplayName", () => {
     expect(
       getGoldenPathDisplayName({ name: "navikt/my-frontend", owners: ["product-team"] })
     ).toBe("product-team/my-frontend");
+  });
+
+  it("displays short Goldenpath repo names with their owning team", () => {
+    expect(getGoldenPathDisplayName(appsecCheck)).toBe("appsec/tpt-graph");
   });
 
   it("falls back to the full GitHub name when no owner is known", () => {
