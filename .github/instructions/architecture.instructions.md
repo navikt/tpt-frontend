@@ -28,6 +28,7 @@ src/app/
 │   ├── utils/                       # Shared utility functions (risk scoring, severity colors)
 │   ├── hooks/                       # Shared React hooks (useConfig, useUser)
 │   ├── components/                  # Reusable UI components (risk tags, filters)
+│   ├── server/                      # Authenticated backend proxy (JSON, streaming, SSE)
 │   └── navigation.ts                # Module nav registry, role-gated via `allowedRoles`
 │
 ├── modules/                         # Feature modules — each owns its components, hooks, and business logic
@@ -47,7 +48,8 @@ src/app/
 
 To add a new module:
 1. Create `src/app/modules/[name]/` with `components/` and `hooks/`
-2. Add API endpoint `/api/[name]` (proxy to backend)
+2. Add API endpoint `/api/[name]` using `proxyToBackend` from `shared/server/backendProxy.ts`
+   for authenticated backend calls (route owns the path; proxy owns auth, mocks, errors, and streaming)
 3. Create route `[locale]/[name]/page.tsx`
 4. Add an entry to `shared/navigation.ts` (set `allowedRoles` if the module should be role-gated)
 5. Add translation keys `[name].*` to `messages/*.json`
