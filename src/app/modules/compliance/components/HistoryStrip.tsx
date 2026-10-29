@@ -1,20 +1,39 @@
 "use client";
 
-import { BodyShort, Detail, HStack, ReadMore, VStack } from "@navikt/ds-react";
+import { BodyShort, HStack, Tooltip } from "@navikt/ds-react";
+import { CheckmarkIcon, ExclamationmarkIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { useTranslations, useLocale } from "next-intl";
 import type { MonthlySecurityHistory } from "@/app/types/securityStatus";
-import { getOnTrackPercentage } from "../utils/complianceFormatters";
+import { getMonthlyStatus, getOnTrackPercentage } from "../utils/complianceFormatters";
 
 interface HistoryStripProps {
   history: MonthlySecurityHistory[];
 }
+
+const STATUS_APPEARANCE = {
+  green: {
+    backgroundColor: "var(--ax-bg-success-strong)",
+    color: "var(--ax-text-success-contrast)",
+    Icon: CheckmarkIcon,
+  },
+  yellow: {
+    backgroundColor: "var(--ax-bg-warning-strong)",
+    color: "var(--ax-text-warning-contrast)",
+    Icon: ExclamationmarkIcon,
+  },
+  red: {
+    backgroundColor: "var(--ax-bg-danger-strong)",
+    color: "var(--ax-text-danger-contrast)",
+    Icon: XMarkIcon,
+  },
+};
 
 export function HistoryStrip({ history }: HistoryStripProps) {
   const t = useTranslations("complianceHistory");
   const tStatus = useTranslations("complianceStatus");
   const locale = useLocale();
   const monthFormat = new Intl.DateTimeFormat(locale, {
-    month: "short",
+    month: "long",
     year: "numeric",
     timeZone: "Europe/Oslo",
   });
@@ -22,72 +41,71 @@ export function HistoryStrip({ history }: HistoryStripProps) {
     style: "percent",
     maximumFractionDigits: 0,
   });
-  const dateFormat = new Intl.DateTimeFormat(locale, {
-    dateStyle: "long",
-    timeZone: "Europe/Oslo",
-  });
-
   if (history.length === 0) {
     return <BodyShort size="small">{tStatus("noData")}</BodyShort>;
   }
 
   return (
-    <VStack gap="space-8">
-      <Detail textColor="subtle">{t("caption")}</Detail>
-      <HStack gap="space-12" wrap>
-        {history.map((month) => {
-          const percentage = getOnTrackPercentage(month);
-          return (
-            <VStack key={month.month} gap="space-2" align="center">
-              <Detail>{monthFormat.format(new Date(`${month.month}-01T12:00:00Z`))}</Detail>
-              <BodyShort size="small" weight="semibold">
-                {percentage === null ? tStatus("noData") : percentageFormat.format(percentage)}
-                {month.provisional && " *"}
-              </BodyShort>
-            </VStack>
-          );
-        })}
-      </HStack>
-      {history.some((month) => month.provisional) && (
-        <Detail textColor="subtle">{t("monthToDate")}</Detail>
-      )}
-      <ReadMore header={t("details")} size="small">
-        <VStack gap="space-12">
-          {history.map((month) => {
-            const recorded = month.onTrackDays + month.needsAttentionDays + month.actNowDays;
-            const percentage = getOnTrackPercentage(month);
-            return (
-              <VStack key={month.month} gap="space-4">
-                <BodyShort size="small" weight="semibold">
-                  {monthFormat.format(new Date(`${month.month}-01T12:00:00Z`))}
-                </BodyShort>
-                <BodyShort size="small">
-                  {percentage === null
-                    ? tStatus("noData")
-                    : t("summary", {
-                        onTrack: month.onTrackDays,
-                        recorded,
-                        percentage: percentageFormat.format(percentage),
-                      })}
-                </BodyShort>
-                <BodyShort size="small">
-                  {t("breakdown", {
-                    green: month.onTrackDays,
-                    yellow: month.needsAttentionDays,
-                    red: month.actNowDays,
-                  })}
-                </BodyShort>
-                <BodyShort size="small">
-                  {t("coverage", {
-                    through: dateFormat.format(new Date(`${month.throughDate}T12:00:00Z`)),
-                    missing: month.missingDays,
-                  })}
-                </BodyShort>
-              </VStack>
-            );
-          })}
-        </VStack>
-      </ReadMore>
-    </VStack>
+    <HStack gap="space-0" role="group" aria-label={t("label")}>
+      {history.map((month) => {
+        const status = getMonthlyStatus(month);
+        const appearance = status === null ? null : STATUS_APPEARANCE[status];
+        const Icon = appearance?.Icon;
+        const percentage = getOnTrackPercentage(month);
+        const recorded = month.onTrackDays + month.needsAttentionDays + month.actNowDays;
+        const content = [
+          t("monthStatus", {
+            month: monthFormat.format(new Date(`${month.month}-01T12:00:00Z`)),
+            status: status === null ? tStatus("noData") : t(status),
+          }),
+          percentage === null ? null : t("summary", {
+            onTrack: month.onTrackDays,
+            recorded,
+            percentage: percentageFormat.format(percentage),
+          }),
+          t("breakdown", {
+            green: month.onTrackDays,
+            yellow: month.needsAttentionDays,
+            red: month.actNowDays,
+          }),
+        ].filter(Boolean).join(" ");
+
+        return (
+          <Tooltip key={month.month} content={content} maxChar={300}>
+            <button
+              type="button"
+              aria-label={content}
+              style={{
+                display: "grid",
+                placeItems: "center",
+                width: "var(--ax-space-24)",
+                height: "var(--ax-space-24)",
+                padding: 0,
+                border: 0,
+                background: "transparent",
+                cursor: "help",
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  display: "grid",
+                  placeItems: "center",
+                  width: "var(--ax-space-16)",
+                  height: "var(--ax-space-16)",
+                  borderRadius: "var(--ax-radius-2)",
+                  backgroundColor: appearance?.backgroundColor ?? "var(--ax-bg-neutral-moderate)",
+                  color: appearance?.color,
+                  border: "var(--ax-space-1) solid var(--ax-border-neutral)",
+                  boxSizing: "border-box",
+                }}
+              >
+                {Icon && <Icon aria-hidden style={{ width: "100%", height: "100%" }} />}
+              </span>
+            </button>
+          </Tooltip>
+        );
+      })}
+    </HStack>
   );
 }

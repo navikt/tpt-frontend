@@ -1,8 +1,16 @@
-import type { MonthlySecurityHistory, TeamSecurityStatus } from "@/app/types/securityStatus";
+import type { MonthlySecurityHistory, SecurityStatusColor, TeamSecurityStatus } from "@/app/types/securityStatus";
 
 export function getOnTrackPercentage(month: MonthlySecurityHistory): number | null {
   const recordedDays = month.onTrackDays + month.needsAttentionDays + month.actNowDays;
   return recordedDays === 0 ? null : month.onTrackDays / recordedDays;
+}
+
+export function getMonthlyStatus(month: MonthlySecurityHistory): SecurityStatusColor | null {
+  const mostDays = Math.max(month.onTrackDays, month.needsAttentionDays, month.actNowDays);
+  if (mostDays === 0) return null;
+  if (month.actNowDays === mostDays) return "red";
+  if (month.needsAttentionDays === mostDays) return "yellow";
+  return "green";
 }
 
 export function sortTeamsForLeader(teams: TeamSecurityStatus[]): TeamSecurityStatus[] {

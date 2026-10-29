@@ -1,5 +1,5 @@
 import { vi, describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StatusTag } from "../StatusTag";
 import { LevelBadge } from "../LevelBadge";
@@ -49,7 +49,7 @@ describe("Compliance Components", () => {
     expect(screen.getByText("complianceLevel.chronic")).toBeInTheDocument();
   });
 
-  it("shows a dated percentage and exposes day counts and missing coverage without hovering", async () => {
+  it("shows only a compact box and reveals monthly details on hover or keyboard focus", async () => {
     const user = userEvent.setup();
     render(<HistoryStrip history={[{
       month: "2026-10",
@@ -61,16 +61,49 @@ describe("Compliance Components", () => {
       provisional: true,
     }]} />);
 
-    expect(screen.getByText(/^89\s% \*$/)).toBeInTheDocument();
-    expect(screen.getAllByText(/^okt.*2026$/)[0]).toBeInTheDocument();
-    expect(screen.getByText("complianceHistory.monthToDate")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "complianceHistory.details" }));
-    expect(screen.getByText(/complianceHistory.summary onTrack=24 recorded=27/)).toBeVisible();
-    expect(screen.getByText(/complianceHistory.breakdown green=24 yellow=2 red=1/)).toBeVisible();
-    expect(screen.getByText(/complianceHistory.coverage.*missing=1/)).toBeVisible();
+    const box = screen.getByRole("button", { name: /month=oktober 2026 status=complianceHistory.green/ });
+    expect(box.firstElementChild).toHaveStyle({ backgroundColor: "var(--ax-bg-success-strong)" });
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    expect(screen.queryByText(/complianceHistory.summary/)).not.toBeInTheDocument();
+
+    await user.hover(box);
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent(/summary onTrack=24 recorded=27 percentage=89\s%/);
+    expect(tooltip).toHaveTextContent(/breakdown green=24 yellow=2 red=1$/);
+    expect(box).toHaveAccessibleName(/breakdown green=24 yellow=2 red=1$/);
+
+    await user.unhover(box);
+    await user.tab();
+    expect(box).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toBeVisible();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("tooltip")).not.toBeInTheDocument());
   });
 
-  it("does not show a percentage for months without recorded days", () => {
+  it("distinguishes monthly statuses by symbol as well as colour", () => {
+    render(<HistoryStrip history={["2026-08", "2026-09", "2026-10"].map((month, index) => ({
+      month,
+      throughDate: `${month}-28`,
+      onTrackDays: index === 0 ? 28 : 0,
+      needsAttentionDays: index === 1 ? 28 : 0,
+      actNowDays: index === 2 ? 28 : 0,
+      missingDays: 0,
+      provisional: false,
+    }))} />);
+
+    const icons = ["green", "yellow", "red"].map((status) => {
+      const box = screen.getByRole("button", {
+        name: new RegExp(`status=complianceHistory.${status}`),
+      });
+      const icon = box.querySelector("svg");
+      expect(icon).toBeInTheDocument();
+      expect(icon).toHaveAttribute("aria-hidden", "true");
+      return icon?.innerHTML;
+    });
+    expect(new Set(icons).size).toBe(3);
+  });
+
+  it("does not show a percentage or status symbol for months without recorded days", () => {
     render(<HistoryStrip history={[{
       month: "2025-12",
       throughDate: "2025-12-31",
@@ -80,10 +113,10 @@ describe("Compliance Components", () => {
       missingDays: 31,
       provisional: false,
     }]} />);
-    expect(screen.getAllByText(/^des.*2025$/)[0]).toBeInTheDocument();
-    expect(screen.getAllByText("complianceStatus.noData").length).toBeGreaterThan(0);
-    expect(screen.queryByText(/0\s%/)).not.toBeInTheDocument();
-    expect(screen.queryByText("complianceHistory.monthToDate")).not.toBeInTheDocument();
+    const box = screen.getByRole("button", { name: /month=desember 2025 status=complianceStatus.noData/ });
+    expect(box.firstElementChild).toHaveStyle({ backgroundColor: "var(--ax-bg-neutral-moderate)" });
+    expect(box).not.toHaveAccessibleName(/complianceHistory.summary/);
+    expect(box.querySelector("svg")).not.toBeInTheDocument();
   });
 
   it("explains the backend's active thresholds rather than frontend defaults", async () => {
@@ -98,7 +131,11 @@ describe("Compliance Components", () => {
       }}
       generatedAt="2026-10-28T07:00:00Z"
     />);
-    await user.click(screen.getByRole("button", { name: "complianceMeasurement.title" }));
+    const toggle = screen.getByRole("button", { name: "complianceMeasurement.title" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("complianceMeasurement.historyColours")).toBeVisible();
     expect(screen.getByText("complianceMeasurement.maintenanceAge days=45")).toBeVisible();
     expect(screen.getByText("complianceMeasurement.exposureRules workdays=7")).toBeVisible();
     expect(screen.getByText("complianceMeasurement.trendWindow days=20")).toBeVisible();

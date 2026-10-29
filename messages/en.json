@@ -227,21 +227,23 @@
     "loadingData": "Loading security status..."
   },
   "complianceHistory": {
-    "caption": "Days on track (%)",
-    "monthToDate": "* Month to date, including today. Not a completed month.",
-    "details": "Day counts and coverage",
-    "summary": "On track on {onTrack} of {recorded} recorded days ({percentage}).",
-    "breakdown": "{green} days on track, {yellow} days needing attention, {red} days requiring action.",
-    "coverage": "Through {through}. {missing} elapsed days without tracked applications are excluded, not counted as on track."
+    "label": "Monthly history, oldest first",
+    "monthStatus": "{month}: {status}.",
+    "green": "on track most often",
+    "yellow": "needed attention most often",
+    "red": "required action most often",
+    "summary": "On track: {onTrack}/{recorded} days ({percentage}).",
+    "breakdown": "Days: {green} green, {yellow} yellow, {red} red."
   },
   "complianceMeasurement": {
     "title": "How we measure security status",
     "calculatedAt": "Calculated {timestamp} ({timeZone}). This is not the last data collection time.",
-    "intro": "The three metrics describe the latest calculated situation. Monthly history describes how often the team was on track, not whether you need to act now. All application environments are included; deployments of the same application in different environments count separately.",
-    "historyTitle": "Monthly percentage and daily statuses",
-    "historyFormula": "Monthly on-track percentage = days when all three metrics were green ÷ recorded days × 100. Every recorded calendar day has equal weight, including weekends. Percentages are rounded to the nearest whole percentage point. We do not average colour scores or assign a single status to the month.",
+    "intro": "The three metrics describe the latest calculated situation. The monthly boxes summarise historical days, not whether you need to act now. All application environments are included; deployments of the same application in different environments count separately.",
+    "historyTitle": "Monthly colours and daily statuses",
+    "historyColours": "Each box uses the most frequent daily status in that month. A check mark means on track, an exclamation mark means needs attention, and a cross means act now. Ties use the worse colour: red before yellow before green. Most frequent does not necessarily mean more than half of the days. Grey means no recorded days. Hover, focus or tap a box to see the month, day counts and on-track percentage.",
+    "historyFormula": "The on-track percentage in the tooltip = days when all three metrics were green ÷ recorded days × 100. Every recorded calendar day has equal weight, including weekends. Percentages are rounded to the nearest whole percentage point. The box colour uses the most frequent status, not percentage thresholds or an average of colour scores.",
     "dailyStatus": "A day is on track (green) only when all three metrics are green. It needs attention (yellow) if at least one metric is yellow and none is red. It requires action (red) if any metric is red. The day counts show the full distribution, so earlier problems remain visible even after recovery.",
-    "historyCoverage": "We show up to {months} calendar months, oldest first, limited to available history. Recorded days start when we first tracked a team application. Days before tracking began, or with no tracked applications, are excluded from the percentage. A month without recorded days has no percentage. The current month includes only elapsed dates through today, and is marked as month to date.",
+    "historyCoverage": "We show up to {months} calendar months, oldest first, limited to available history. A day counts if a tracked application was present during any part of the evaluated day, outside recorded absences. Days before tracking began, or with no application presence at all, are excluded from both the colour counts and the percentage. A month without recorded days is grey and has no percentage. The current month includes only elapsed dates through today.",
     "dailyTiming": "Dates use {timeZone}. Historical trend and maintenance are evaluated at the end of each day; today uses the calculation time. Exposure includes applications that were overdue at any time during the day, even if fixed later that day. This also applies to today's exposure status, while its application list shows only currently unresolved overdue findings. Today's result can change before the day ends.",
     "exposureTitle": "Exposure and remediation deadlines",
     "deadlines": "Deadlines run from the recorded discovery time: {critical} workdays for CRITICAL vulnerabilities and {nonCritical} calendar months for all other severities, including unknown severity. This uses severity, not the prioritisation risk score or bucket.",

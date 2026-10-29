@@ -11,15 +11,12 @@ In All vulnerabilities, application names link to their deployment source reposi
 The Golden Path view groups repository security and maintenance checks by severity, with search, filtering, and sorting.
 Repositories with passing results and no reported failures appear in a separate collapsed section.
 
-Compliance history shows the percentage of recorded days with all three metrics on track, with monthly
-day counts, missing coverage and month-to-date labels. The tab explains the backend's active measurement
-rules and distinguishes calculation time from data collection time.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (version 24 or newer — the Docker image pins `node:24`; `.mise/config.toml` pins `25` for local tool management)
+- Node.js
 - pnpm
 - A GitHub Personal Access Token (PAT) with `read:packages` scope — required to install `@navikt/*` packages from GitHub Packages. Create one at https://github.com/settings/tokens, then register it once with pnpm:
   ```bash

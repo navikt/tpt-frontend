@@ -227,21 +227,23 @@
     "loadingData": "Laster sikkerhetsstatus..."
   },
   "complianceHistory": {
-    "caption": "Dager på rett spor (%)",
-    "monthToDate": "* Hittil i måneden, inkludert i dag. Måneden er ikke avsluttet.",
-    "details": "Antall dager og datadekning",
-    "summary": "På rett spor {onTrack} av {recorded} registrerte dager ({percentage}).",
-    "breakdown": "{green} dager på rett spor, {yellow} dager som trengte oppmerksomhet, {red} dager som krevde oppfølging.",
-    "coverage": "Til og med {through}. {missing} passerte dager uten registrerte applikasjoner er utelatt, ikke regnet som på rett spor."
+    "label": "Månedshistorikk, eldste først",
+    "monthStatus": "{month}: {status}.",
+    "green": "oftest på rett spor",
+    "yellow": "trengte oftest oppmerksomhet",
+    "red": "krevde oftest oppfølging",
+    "summary": "På rett spor: {onTrack}/{recorded} dager ({percentage}).",
+    "breakdown": "Dager: {green} grønne, {yellow} gule, {red} røde."
   },
   "complianceMeasurement": {
     "title": "Slik måler vi sikkerhetsstatus",
     "calculatedAt": "Beregnet {timestamp} ({timeZone}). Dette er ikke tidspunktet for siste datainnhenting.",
-    "intro": "De tre målene viser den sist beregnede situasjonen. Månedshistorikken viser hvor ofte teamet var på rett spor, ikke om dere må gjøre noe nå. Vi tar med alle applikasjonsmiljøer. Samme applikasjon i ulike miljøer telles hver for seg.",
-    "historyTitle": "Månedsprosent og daglig status",
-    "historyFormula": "Andelen dager på rett spor = dager da alle tre mål var grønne ÷ registrerte dager × 100. Hver registrerte kalenderdag teller like mye, også helgedager. Prosenten avrundes til nærmeste hele prosentpoeng. Vi beregner ikke gjennomsnitt av fargeverdier eller gir måneden én samlet status.",
+    "intro": "De tre målene viser den sist beregnede situasjonen. Månedsrutene oppsummerer tidligere dager, ikke om dere må gjøre noe nå. Vi tar med alle applikasjonsmiljøer. Samme applikasjon i ulike miljøer telles hver for seg.",
+    "historyTitle": "Månedsfarger og daglig status",
+    "historyColours": "Hver rute får den vanligste daglige statusen i måneden. En hake betyr på rett spor, et utropstegn betyr trenger oppmerksomhet, og et kryss betyr følg opp nå. Ved likt antall dager velger vi den dårligste fargen: rød foran gul foran grønn. Vanligst betyr ikke nødvendigvis mer enn halvparten av dagene. Grå betyr at ingen dager er registrert. Hold pekeren over, bruk tastaturfokus eller trykk på en rute for å se måned, antall dager og prosent på rett spor.",
+    "historyFormula": "Andelen dager på rett spor i hjelpeteksten = dager da alle tre mål var grønne ÷ registrerte dager × 100. Hver registrerte kalenderdag teller like mye, også helgedager. Prosenten avrundes til nærmeste hele prosentpoeng. Fargen følger den vanligste statusen, ikke prosentgrenser eller et gjennomsnitt av fargeverdier.",
     "dailyStatus": "En dag er på rett spor (grønn) bare når alle tre mål er grønne. Den trenger oppmerksomhet (gul) hvis minst ett mål er gult og ingen er røde. Den krever oppfølging (rød) hvis minst ett mål er rødt. Antall dager i hver kategori viser også tidligere problemer etter at teamet er på rett spor igjen.",
-    "historyCoverage": "Vi viser opptil {months} kalendermåneder med tilgjengelige data, med den eldste først. Registrerte dager begynner når vi først registrerte en applikasjon for teamet. Dager før registreringen startet, eller uten registrerte applikasjoner, inngår ikke i prosenten. En måned uten registrerte dager får ingen prosent. Inneværende måned dekker bare datoer til og med i dag og merkes med «hittil i måneden».",
+    "historyCoverage": "Vi viser opptil {months} kalendermåneder med tilgjengelige data, med den eldste først. En dag teller hvis en registrert applikasjon var til stede i noen del av dagen vi vurderer, utenom registrerte fravær. Dager før registreringen startet, eller helt uten applikasjoner til stede, inngår verken i antall dager per farge eller i prosenten. En måned uten registrerte dager er grå og får ingen prosent. Inneværende måned dekker bare datoer til og med i dag.",
     "dailyTiming": "Datoene følger {timeZone}. Historisk trend og vedlikehold vurderes ved slutten av hver dag. For i dag bruker vi beregningstidspunktet. Målet for sårbarhet tar med applikasjoner som var over fristen på et hvilket som helst tidspunkt i løpet av dagen, selv om problemet ble rettet senere samme dag. Dette gjelder også dagens status, mens applikasjonslisten bare viser uløste funn som er over fristen nå. Dagens resultat kan endre seg før dagen er over.",
     "exposureTitle": "Sårbarhet og frister for utbedring",
     "deadlines": "Fristen regnes fra det registrerte funntidspunktet: {critical} arbeidsdager for CRITICAL-sårbarheter og {nonCritical} kalendermåneder for alle andre alvorlighetsgrader, også ukjent alvorlighetsgrad. Dette følger alvorlighetsgraden, ikke risikoscoren eller prioriteringsgruppen.",

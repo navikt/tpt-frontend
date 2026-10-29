@@ -24,17 +24,18 @@ export function ComplianceMeasurement({ measurement, generatedAt }: ComplianceMe
 
   return (
     <VStack gap="space-8">
-      <Detail textColor="subtle">
-        {t("calculatedAt", { timestamp: calculatedAt, timeZone: measurement.timeZone })}
-      </Detail>
       <Accordion>
         <Accordion.Item>
           <Accordion.Header>{t("title")}</Accordion.Header>
           <Accordion.Content>
             <VStack gap="space-24">
+              <Detail textColor="subtle">
+                {t("calculatedAt", { timestamp: calculatedAt, timeZone: measurement.timeZone })}
+              </Detail>
               <BodyLong>{t("intro")}</BodyLong>
               <VStack gap="space-8">
                 <Heading size="small" level="3">{t("historyTitle")}</Heading>
+                <BodyLong>{t("historyColours")}</BodyLong>
                 <BodyLong>{t("historyFormula")}</BodyLong>
                 <BodyLong>{t("dailyStatus")}</BodyLong>
                 <BodyLong>{t("historyCoverage", { months: measurement.historyMonths })}</BodyLong>
