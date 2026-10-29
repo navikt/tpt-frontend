@@ -9,8 +9,11 @@ versus which ones can wait.
 - Break work into small tasks; verify one step before moving to the next. If in doubt, ask for clarification and
   do not stray beyond the requested scope (e.g. don't add docs or extend functionality unprompted).
 - Do NOT add code comments unless the logic is genuinely complex.
-- Do NOT add documentation files or explanations unless specifically asked — **except** the root `README.md`,
-  which must be kept concise and updated whenever functionality, packages, or folder structure change.
+- Do NOT add documentation files or explanations unless specifically asked.
+- Keep the root `README.md` limited to a concise project overview and essential setup and operation instructions.
+  Update it only when that information becomes inaccurate, not for every functionality, package, or folder change.
+  Do not add detailed feature descriptions, bug-fix notes, change summaries, or decision rationale to the README.
+  Use Git commit history to track changes and explain why they were made.
 - Keep existing instruction files (`.github/instructions/*.instructions.md`) in sync with the code they describe.
   If a change makes one inaccurate — a renamed pattern, a changed env var or default, a replaced integration —
   update that file in the same commit. This is maintenance of what already exists, not adding new documentation.

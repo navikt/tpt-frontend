@@ -114,6 +114,7 @@ export const useVulnerabilities = () => {
   const teamPrefsLoadedRef = useRef(false);
   const persistTeamFiltersRef = useRef(false);
   const previousPathnameRef = useRef(pathname);
+  const previousCveContextRef = useRef({ teamFilters, applicationFilters, environmentFilters });
 
   // Mark as initialized and set URL sync flag
   // biome-ignore lint/correctness/useExhaustiveDependencies: Read initial URL filters only on mount.
@@ -516,6 +517,14 @@ export const useVulnerabilities = () => {
       if (!isInitializedRef.current) return;
       if (isFirstDataLoadRef.current) return;
 
+      const previousContext = previousCveContextRef.current;
+      previousCveContextRef.current = { teamFilters, applicationFilters, environmentFilters };
+      if (
+        previousContext.teamFilters === teamFilters &&
+        previousContext.applicationFilters === applicationFilters &&
+        previousContext.environmentFilters === environmentFilters
+      ) return;
+
       const validCves = new Set(availableCves);
       const currentCves = Object.keys(cveFilters).filter(
         (cve) => cveFilters[cve] === true
@@ -529,7 +538,7 @@ export const useVulnerabilities = () => {
         startTransition(() => setCveFilters(cleanedFilters));
       }
     },
-    [availableCves, teamFilters, applicationFilters, data, cveFilters]
+    [availableCves, teamFilters, applicationFilters, environmentFilters, data, cveFilters]
   );
 
   useEffect(

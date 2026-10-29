@@ -9,7 +9,6 @@ The GitHub view groups open Dependabot pull requests and shows how many distinct
 In All vulnerabilities, application names link to their deployment source repository on GitHub when available.
 
 The Golden Path view groups repository security and maintenance checks by severity, with search, filtering, and sorting.
-Repositories with passing results and no reported failures appear in a separate collapsed section.
 
 
 ## Getting Started
