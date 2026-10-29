@@ -1,23 +1,8 @@
-import type { TeamSecurityStatus } from "@/app/types/securityStatus";
+import type { MonthlySecurityHistory, TeamSecurityStatus } from "@/app/types/securityStatus";
 
-
-export function getLast6MonthsInfo(locale: string = "nb"): { initial: string; fullName: string }[] {
-  const result: { initial: string; fullName: string }[] = [];
-  const now = new Date();
-
-  // 6 months ending in current month, oldest on the left
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const fullName = d.toLocaleDateString(locale === "nb" ? "nb-NO" : "en-US", { month: "long" });
-    const capitalizedName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
-    const initial = capitalizedName.charAt(0);
-    result.push({
-      initial,
-      fullName: capitalizedName,
-    });
-  }
-
-  return result;
+export function getOnTrackPercentage(month: MonthlySecurityHistory): number | null {
+  const recordedDays = month.onTrackDays + month.needsAttentionDays + month.actNowDays;
+  return recordedDays === 0 ? null : month.onTrackDays / recordedDays;
 }
 
 export function sortTeamsForLeader(teams: TeamSecurityStatus[]): TeamSecurityStatus[] {

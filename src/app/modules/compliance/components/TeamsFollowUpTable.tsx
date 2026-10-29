@@ -138,7 +138,7 @@ export function TeamsFollowUpTable({
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell scope="col">{t("teamHeader")}</Table.HeaderCell>
-                <Table.HeaderCell scope="col">{t("last6MonthsHeader")}</Table.HeaderCell>
+                <Table.HeaderCell scope="col">{t("monthlyHistoryHeader")}</Table.HeaderCell>
                 <Table.HeaderCell scope="col">
                   {tQuestions("areWeExposed")}
                 </Table.HeaderCell>
@@ -184,7 +184,7 @@ export function TeamsFollowUpTable({
                     <Table.Header>
                       <Table.Row>
                         <Table.HeaderCell scope="col">{t("teamHeader")}</Table.HeaderCell>
-                        <Table.HeaderCell scope="col">{t("last6MonthsHeader")}</Table.HeaderCell>
+                        <Table.HeaderCell scope="col">{t("monthlyHistoryHeader")}</Table.HeaderCell>
                         <Table.HeaderCell scope="col">{tQuestions("areWeExposed")}</Table.HeaderCell>
                         <Table.HeaderCell scope="col">{tQuestions("isItGettingBetterOrWorse")}</Table.HeaderCell>
                         <Table.HeaderCell scope="col">{tQuestions("areWeKeepingUpWithMaintenance")}</Table.HeaderCell>

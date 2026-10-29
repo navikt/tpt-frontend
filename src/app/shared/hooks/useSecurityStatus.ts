@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { ApiError, handleApiError } from "@/app/shared/utils/errorHandling";
-import { withSeriesTrend } from "@/app/modules/compliance/utils/complianceEvaluators";
 import type { SecurityStatusResponse } from "@/app/types/securityStatus";
 
 export function useSecurityStatus() {
@@ -15,7 +14,7 @@ export function useSecurityStatus() {
       const response = await fetch("/api/security-status");
       if (response.ok) {
         const json: SecurityStatusResponse = await response.json();
-        setData({ ...json, teams: json.teams.map(withSeriesTrend) });
+        setData(json);
       } else {
         const errorData = await response.json().catch(() => ({}));
         const apiError: ApiError = {

@@ -1,120 +1,93 @@
 "use client";
 
-import { Tooltip, VStack, Detail } from "@navikt/ds-react";
+import { BodyShort, Detail, HStack, ReadMore, VStack } from "@navikt/ds-react";
 import { useTranslations, useLocale } from "next-intl";
-import type { SecurityStatusColor } from "@/app/types/securityStatus";
-import { getLast6MonthsInfo } from "../utils/complianceFormatters";
+import type { MonthlySecurityHistory } from "@/app/types/securityStatus";
+import { getOnTrackPercentage } from "../utils/complianceFormatters";
 
 interface HistoryStripProps {
-  history: SecurityStatusColor[];
-  showInitials?: boolean;
-  showCaption?: boolean;
+  history: MonthlySecurityHistory[];
 }
 
-const STATUS_COLOR_MAP: Record<SecurityStatusColor, string> = {
-  green: "var(--ax-bg-success-strong, #06893A)",
-  yellow: "var(--ax-border-warning-strong, #C77300)",
-  red: "var(--ax-bg-danger-strong, #C30000)",
-};
-
-const NO_DATA_COLOR = "var(--ax-bg-neutral-moderate, #CFD3D8)";
-
-export function HistoryStrip({
-  history,
-  showInitials = false,
-  showCaption = false,
-}: HistoryStripProps) {
+export function HistoryStrip({ history }: HistoryStripProps) {
+  const t = useTranslations("complianceHistory");
   const tStatus = useTranslations("complianceStatus");
-  const tCompliance = useTranslations("compliance");
   const locale = useLocale();
+  const monthFormat = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    year: "numeric",
+    timeZone: "Europe/Oslo",
+  });
+  const percentageFormat = new Intl.NumberFormat("nb-NO", {
+    style: "percent",
+    maximumFractionDigits: 0,
+  });
+  const dateFormat = new Intl.DateTimeFormat(locale, {
+    dateStyle: "long",
+    timeZone: "Europe/Oslo",
+  });
 
-  const months = getLast6MonthsInfo(locale);
-  // Pad or slice history so it's always exactly 6 entries
-  const paddedHistory = [...history];
-  const missing = Math.max(0, 6 - paddedHistory.length);
-  const historySlice: (SecurityStatusColor | null)[] = [
-    ...Array<null>(missing).fill(null),
-    ...paddedHistory,
-  ].slice(-6);
-
-  const getStatusText = (status: SecurityStatusColor | null | undefined) =>
-    status === "green"
-      ? tStatus("onTrack")
-      : status === "yellow"
-        ? tStatus("needsAttention")
-        : status === "red"
-          ? tStatus("actNow")
-          : tStatus("noData");
-
-  const summaryLabel = months
-    .map((m, idx) => {
-      const statusText = getStatusText(historySlice[idx]);
-      return `${m.fullName}: ${statusText}`;
-    })
-    .join(", ");
+  if (history.length === 0) {
+    return <BodyShort size="small">{tStatus("noData")}</BodyShort>;
+  }
 
   return (
-    <VStack
-      gap="space-4"
-      align="center"
-      aria-label={`${tCompliance("last6Months")}: ${summaryLabel}`}
-    >
-      {showInitials && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(6, 14px)",
-            gap: "3px",
-            fontSize: "11px",
-            fontWeight: 600,
-            color: "var(--ax-text-subtle)",
-            textAlign: "center",
-            lineHeight: 1,
-          }}
-        >
-          {months.map((m, idx) => (
-            <span key={`init-${idx}-${m.fullName}`}>{m.initial}</span>
-          ))}
-        </div>
-      )}
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 14px)",
-          gap: "3px",
-        }}
-      >
-        {months.map((m, idx) => {
-          const status = historySlice[idx] ?? null;
-          const statusText = getStatusText(status);
-          const tooltipContent = `${m.fullName}: ${statusText}`;
-
+    <VStack gap="space-8">
+      <Detail textColor="subtle">{t("caption")}</Detail>
+      <HStack gap="space-12" wrap>
+        {history.map((month) => {
+          const percentage = getOnTrackPercentage(month);
           return (
-            <Tooltip key={`square-${idx}-${m.fullName}`} content={tooltipContent}>
-              <span
-                role="img"
-                tabIndex={0}
-                style={{
-                  display: "inline-block",
-                  width: "14px",
-                  height: "14px",
-                  borderRadius: "3px",
-                  backgroundColor: status ? STATUS_COLOR_MAP[status] : NO_DATA_COLOR,
-                  cursor: "default",
-                }}
-                aria-label={tooltipContent}
-              />
-            </Tooltip>
+            <VStack key={month.month} gap="space-2" align="center">
+              <Detail>{monthFormat.format(new Date(`${month.month}-01T12:00:00Z`))}</Detail>
+              <BodyShort size="small" weight="semibold">
+                {percentage === null ? tStatus("noData") : percentageFormat.format(percentage)}
+                {month.provisional && " *"}
+              </BodyShort>
+            </VStack>
           );
         })}
-      </div>
-
-      {showCaption && (
-        <Detail textColor="subtle">
-          {tCompliance("last6Months")}
-        </Detail>
+      </HStack>
+      {history.some((month) => month.provisional) && (
+        <Detail textColor="subtle">{t("monthToDate")}</Detail>
       )}
+      <ReadMore header={t("details")} size="small">
+        <VStack gap="space-12">
+          {history.map((month) => {
+            const recorded = month.onTrackDays + month.needsAttentionDays + month.actNowDays;
+            const percentage = getOnTrackPercentage(month);
+            return (
+              <VStack key={month.month} gap="space-4">
+                <BodyShort size="small" weight="semibold">
+                  {monthFormat.format(new Date(`${month.month}-01T12:00:00Z`))}
+                </BodyShort>
+                <BodyShort size="small">
+                  {percentage === null
+                    ? tStatus("noData")
+                    : t("summary", {
+                        onTrack: month.onTrackDays,
+                        recorded,
+                        percentage: percentageFormat.format(percentage),
+                      })}
+                </BodyShort>
+                <BodyShort size="small">
+                  {t("breakdown", {
+                    green: month.onTrackDays,
+                    yellow: month.needsAttentionDays,
+                    red: month.actNowDays,
+                  })}
+                </BodyShort>
+                <BodyShort size="small">
+                  {t("coverage", {
+                    through: dateFormat.format(new Date(`${month.throughDate}T12:00:00Z`)),
+                    missing: month.missingDays,
+                  })}
+                </BodyShort>
+              </VStack>
+            );
+          })}
+        </VStack>
+      </ReadMore>
     </VStack>
   );
 }

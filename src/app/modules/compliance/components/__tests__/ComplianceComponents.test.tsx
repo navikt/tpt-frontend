@@ -1,5 +1,6 @@
 import { vi, describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { StatusTag } from "../StatusTag";
 import { LevelBadge } from "../LevelBadge";
 import { HistoryStrip } from "../HistoryStrip";
@@ -7,6 +8,8 @@ import { SummarySentence } from "../SummarySentence";
 import { TeamCard } from "../TeamCard";
 import { TeamsFollowUpTable } from "../TeamsFollowUpTable";
 import { FewTeamsLeaderView } from "../FewTeamsLeaderView";
+import { ComplianceMeasurement } from "../ComplianceMeasurement";
+import { mockSecurityStatusPayload } from "@/app/mocks/mockPayloads";
 import type { TeamSecurityStatus } from "@/app/types/securityStatus";
 
 vi.mock("next-intl", () => ({
@@ -46,9 +49,61 @@ describe("Compliance Components", () => {
     expect(screen.getByText("complianceLevel.chronic")).toBeInTheDocument();
   });
 
-  it("renders HistoryStrip with 6 squares", () => {
-    render(<HistoryStrip history={["green", "green", "green", "yellow", "red", "red"]} showInitials showCaption />);
-    expect(screen.getByText("compliance.last6Months")).toBeInTheDocument();
+  it("shows a dated percentage and exposes day counts and missing coverage without hovering", async () => {
+    const user = userEvent.setup();
+    render(<HistoryStrip history={[{
+      month: "2026-10",
+      throughDate: "2026-10-28",
+      onTrackDays: 24,
+      needsAttentionDays: 2,
+      actNowDays: 1,
+      missingDays: 1,
+      provisional: true,
+    }]} />);
+
+    expect(screen.getByText(/^89\s% \*$/)).toBeInTheDocument();
+    expect(screen.getAllByText(/^okt.*2026$/)[0]).toBeInTheDocument();
+    expect(screen.getByText("complianceHistory.monthToDate")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "complianceHistory.details" }));
+    expect(screen.getByText(/complianceHistory.summary onTrack=24 recorded=27/)).toBeVisible();
+    expect(screen.getByText(/complianceHistory.breakdown green=24 yellow=2 red=1/)).toBeVisible();
+    expect(screen.getByText(/complianceHistory.coverage.*missing=1/)).toBeVisible();
+  });
+
+  it("does not show a percentage for months without recorded days", () => {
+    render(<HistoryStrip history={[{
+      month: "2025-12",
+      throughDate: "2025-12-31",
+      onTrackDays: 0,
+      needsAttentionDays: 0,
+      actNowDays: 0,
+      missingDays: 31,
+      provisional: false,
+    }]} />);
+    expect(screen.getAllByText(/^des.*2025$/)[0]).toBeInTheDocument();
+    expect(screen.getAllByText("complianceStatus.noData").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/0\s%/)).not.toBeInTheDocument();
+    expect(screen.queryByText("complianceHistory.monthToDate")).not.toBeInTheDocument();
+  });
+
+  it("explains the backend's active thresholds rather than frontend defaults", async () => {
+    const user = userEvent.setup();
+    render(<ComplianceMeasurement
+      measurement={{
+        ...mockSecurityStatusPayload.measurement,
+        deployMaxAgeDays: 45,
+        exposedRedWorkdays: 7,
+        trendWindowDays: 20,
+        maintenanceYellowRatio: 0.8,
+      }}
+      generatedAt="2026-10-28T07:00:00Z"
+    />);
+    await user.click(screen.getByRole("button", { name: "complianceMeasurement.title" }));
+    expect(screen.getByText("complianceMeasurement.maintenanceAge days=45")).toBeVisible();
+    expect(screen.getByText("complianceMeasurement.exposureRules workdays=7")).toBeVisible();
+    expect(screen.getByText("complianceMeasurement.trendWindow days=20")).toBeVisible();
+    expect(screen.getByText(/complianceMeasurement.maintenanceRules ratio=80\s%/)).toBeVisible();
+    expect(screen.getByText(/complianceMeasurement.calculatedAt.*2026.*Europe\/Oslo/)).toBeVisible();
   });
 
   it("renders SummarySentence for 5a, 5b and 5c", () => {
@@ -57,7 +112,7 @@ describe("Compliance Components", () => {
         team: "team-nordlys",
         applicationCount: 11,
         level: "ongoing",
-        history: ["green", "green", "green", "green", "yellow", "red"],
+        history: [],
         exposed: {
           status: "red",
           appsPastDeadline: [{ app: "soknad-api", workdaysOver: 6 }],
@@ -88,7 +143,7 @@ describe("Compliance Components", () => {
       team: "team-nordlys",
       applicationCount: 11,
       level: "ongoing",
-      history: ["green", "green", "green", "green", "yellow", "red"],
+      history: [],
       exposed: {
         status: "red",
         appsPastDeadline: [{ app: "soknad-api", workdaysOver: 6 }],
@@ -118,7 +173,7 @@ describe("Compliance Components", () => {
         team: "team-fjell",
         applicationCount: 7,
         level: null,
-        history: ["green", "green", "green", "green", "green", "green"],
+        history: [],
         exposed: { status: "green", appsPastDeadline: [] },
         trend: { status: "green", direction: "improving", appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0] },
         maintenance: { status: "green", upToDate: 7, total: 7, overdueRebuild: [] },
@@ -127,7 +182,7 @@ describe("Compliance Components", () => {
         team: "team-myr",
         applicationCount: 13,
         level: "new",
-        history: ["green", "green", "green", "green", "green", "yellow"],
+        history: [],
         exposed: { status: "yellow", appsPastDeadline: [{ app: "myr-app", workdaysOver: 1 }] },
         trend: { status: "green", direction: "stable", appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0] },
         maintenance: { status: "yellow", upToDate: 10, total: 13, overdueRebuild: [] },
@@ -136,7 +191,7 @@ describe("Compliance Components", () => {
         team: "team-hav",
         applicationCount: 14,
         level: "chronic",
-        history: ["red", "red", "red", "red", "red", "red"],
+        history: [],
         exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", workdaysOver: 10 }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [2, 2, 3, 3, 4, 4] },
         maintenance: { status: "red", upToDate: 9, total: 14, overdueRebuild: [] },
@@ -145,7 +200,7 @@ describe("Compliance Components", () => {
         team: "team-nordlys",
         applicationCount: 11,
         level: "ongoing",
-        history: ["green", "green", "green", "green", "yellow", "red"],
+        history: [],
         exposed: { status: "red", appsPastDeadline: [{ app: "soknad-api", workdaysOver: 6 }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [1, 2, 3, 4, 4, 4] },
         maintenance: { status: "yellow", upToDate: 9, total: 11, overdueRebuild: [] },
@@ -168,7 +223,7 @@ describe("Compliance Components", () => {
         team: "team-fjell",
         applicationCount: 7,
         level: null,
-        history: ["green", "green", "green", "green", "green", "green"],
+        history: [],
         exposed: { status: "green", appsPastDeadline: [] },
         trend: { status: "green", direction: "improving", appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0] },
         maintenance: { status: "green", upToDate: 7, total: 7, overdueRebuild: [] },
@@ -177,7 +232,7 @@ describe("Compliance Components", () => {
         team: "team-hav",
         applicationCount: 14,
         level: "chronic",
-        history: ["red", "red", "red", "red", "red", "red"],
+        history: [],
         exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", workdaysOver: 10 }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [2, 2, 3, 3, 4, 4] },
         maintenance: { status: "red", upToDate: 9, total: 14, overdueRebuild: [] },

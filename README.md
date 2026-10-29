@@ -6,8 +6,14 @@ TPT analyzes and ranks vulnerabilities based on multiple factors such as KEV (Kn
 
 The GitHub view groups open Dependabot pull requests and shows how many distinct vulnerabilities each PR fixes.
 
+In All vulnerabilities, application names link to their deployment source repository on GitHub when available.
+
 The Golden Path view groups repository security and maintenance checks by severity, with search, filtering, and sorting.
 Repositories with passing results and no reported failures appear in a separate collapsed section.
+
+Compliance history shows the percentage of recorded days with all three metrics on track, with monthly
+day counts, missing coverage and month-to-date labels. The tab explains the backend's active measurement
+rules and distinguishes calculation time from data collection time.
 
 ## Getting Started
 
