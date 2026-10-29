@@ -1,6 +1,11 @@
 import type { VulnerabilitiesResponse } from "@/app/shared/types/vulnerabilities";
 import type { SlaOverdueData } from "@/app/shared/hooks/useSlaOverdue";
-import type { SecurityStatusResponse, TeamSecurityStatus } from "@/app/types/securityStatus";
+import type {
+  MonthlySecurityHistory,
+  SecurityStatusColor,
+  SecurityStatusResponse,
+  TeamSecurityStatus,
+} from "@/app/types/securityStatus";
 import type { RepoChecks } from "@/app/modules/goldenpath/useCheckResults";
 
 // ---------------------------------------------------------------------------
@@ -1293,13 +1298,30 @@ export const mockConfigPayload = {
 // Matches spec in design_handoff_security_status
 // Used by: GET /api/security-status
 // ---------------------------------------------------------------------------
-// Teams with a single, fully up-to-date application and no history of issues.
+function mockHistory(statuses: SecurityStatusColor[]): MonthlySecurityHistory[] {
+  return statuses.map((status, index) => {
+    const date = new Date(Date.UTC(2026, 5 + index, 0));
+    const provisional = index === 5;
+    const days = provisional ? 13 : date.getUTCDate();
+    const month = date.toISOString().slice(0, 7);
+    return {
+      month,
+      throughDate: `${month}-${days}`,
+      onTrackDays: status === "green" ? days : 0,
+      needsAttentionDays: status === "yellow" ? days : 0,
+      actNowDays: status === "red" ? days : 0,
+      missingDays: 0,
+      provisional,
+    };
+  });
+}
+
 function healthyTeam(team: string): TeamSecurityStatus {
   return {
     team,
     applicationCount: 1,
     level: null,
-    history: ["green", "green", "green", "green", "green", "green"],
+    history: mockHistory(["green", "green", "green", "green", "green", "green"]),
     exposed: {
       status: "green",
       appsPastDeadline: [],
@@ -1325,7 +1347,7 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       team: "backend-team",
       applicationCount: 3,
       level: "chronic",
-      history: ["red", "red", "red", "red", "red", "red"],
+      history: mockHistory(["red", "red", "red", "red", "red", "red"]),
       exposed: {
         status: "red",
         since: "2026-05-01T00:00:00Z",
@@ -1356,7 +1378,7 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       team: "frontend-team",
       applicationCount: 2,
       level: "ongoing",
-      history: ["green", "green", "green", "green", "yellow", "red"],
+      history: mockHistory(["green", "green", "green", "green", "yellow", "red"]),
       exposed: {
         status: "red",
         since: "2026-10-01T00:00:00Z",
@@ -1386,7 +1408,7 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       team: "security-team",
       applicationCount: 1,
       level: "ongoing",
-      history: ["green", "green", "green", "green", "yellow", "yellow"],
+      history: mockHistory(["green", "green", "green", "green", "yellow", "yellow"]),
       exposed: {
         status: "green",
         appsPastDeadline: [],
@@ -1409,7 +1431,7 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       team: "data-platform",
       applicationCount: 1,
       level: "new",
-      history: ["green", "green", "green", "green", "green", "yellow"],
+      history: mockHistory(["green", "green", "green", "green", "green", "yellow"]),
       exposed: {
         status: "yellow",
         since: "2026-10-10T00:00:00Z",
@@ -1437,7 +1459,18 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
       team: "auth-team",
       applicationCount: 1,
       level: null,
-      history: ["green", "green", "green", "green", "green", "green"],
+      history: [
+        ...mockHistory(["green", "green", "green", "green", "green"]),
+        {
+          month: "2026-10",
+          throughDate: "2026-10-13",
+          onTrackDays: 10,
+          needsAttentionDays: 2,
+          actNowDays: 1,
+          missingDays: 0,
+          provisional: true,
+        },
+      ],
       exposed: {
         status: "green",
         appsPastDeadline: [],
@@ -1464,4 +1497,17 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
     healthyTeam("clean-team"),
   ],
   generatedAt: "2026-10-13T10:00:00Z",
+  measurement: {
+    deployMaxAgeDays: 60,
+    exposedRedWorkdays: 5,
+    maintenanceYellowRatio: 0.75,
+    trendWindowDays: 30,
+    trendStableRatio: 0.05,
+    historyMonths: 6,
+    levelNewWorkdays: 5,
+    levelChronicMonths: 3,
+    criticalWorkdays: 1,
+    nonCriticalMonths: 3,
+    timeZone: "Europe/Oslo",
+  },
 };

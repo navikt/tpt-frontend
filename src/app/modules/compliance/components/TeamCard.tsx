@@ -47,6 +47,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
         <HStack
           justify="space-between"
           align="start"
+          wrap
           style={{
             paddingBottom: "16px",
             borderBottom: "1px solid var(--ax-border-subtle, #CFD3D8)",
@@ -66,7 +67,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
 
           <VStack gap="space-4" align="end">
             <Label size="small" textColor="subtle">
-              {tCompliance("last6Months")}
+              {tCompliance("monthlyHistory")}
             </Label>
             <HistoryStrip history={team.history} />
           </VStack>

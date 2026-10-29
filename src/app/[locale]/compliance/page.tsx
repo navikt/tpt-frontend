@@ -6,8 +6,9 @@ import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import { ManyTeamsLeaderView } from "@/app/modules/compliance/components/ManyTeamsLeaderView";
 import { FewTeamsLeaderView } from "@/app/modules/compliance/components/FewTeamsLeaderView";
 import { DeveloperComplianceView } from "@/app/modules/compliance/components/DeveloperComplianceView";
+import { ComplianceMeasurement } from "@/app/modules/compliance/components/ComplianceMeasurement";
 import NoTeamView from "../views/NoTeamView";
-import { Loader, Box } from "@navikt/ds-react";
+import { Loader, Box, VStack } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations } from "next-intl";
 
@@ -40,22 +41,24 @@ export default function CompliancePage() {
     );
   }
 
-  if (teams.length === 0) {
+  if (!statusData || teams.length === 0) {
     return <NoTeamView />;
   }
 
-  if (effectiveRole === "DEVELOPER" || effectiveRole === "TEAM_MEMBER") {
-    return <DeveloperComplianceView teams={teams} />;
-  }
+  const isDeveloper = effectiveRole === "DEVELOPER" || effectiveRole === "TEAM_MEMBER";
+  const isFewTeamsLeader = effectiveRole === "TEAM_LEADER" || teams.length < 4;
 
-  if (effectiveRole === "TEAM_LEADER") {
-    return <FewTeamsLeaderView teams={teams} />;
-  }
-
-  // Leaders with < 4 teams get few-teams view (5b), 4 or more get many-teams view (5a)
-  if (teams.length < 4) {
-    return <FewTeamsLeaderView teams={teams} />;
-  }
-
-  return <ManyTeamsLeaderView teams={teams} />;
+  return (
+    <VStack gap="space-16">
+      {isDeveloper
+        ? <DeveloperComplianceView teams={teams} />
+        : isFewTeamsLeader
+          ? <FewTeamsLeaderView teams={teams} />
+          : <ManyTeamsLeaderView teams={teams} />}
+      <ComplianceMeasurement
+        measurement={statusData.measurement}
+        generatedAt={statusData.generatedAt}
+      />
+    </VStack>
+  );
 }

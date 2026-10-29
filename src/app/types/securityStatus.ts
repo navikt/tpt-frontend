@@ -35,11 +35,35 @@ export interface MaintenanceStatus {
   overdueRebuild: AppOverdueRebuild[];
 }
 
+export interface MonthlySecurityHistory {
+  month: string;
+  throughDate: string;
+  onTrackDays: number;
+  needsAttentionDays: number;
+  actNowDays: number;
+  missingDays: number;
+  provisional: boolean;
+}
+
+export interface SecurityStatusMeasurement {
+  deployMaxAgeDays: number;
+  exposedRedWorkdays: number;
+  maintenanceYellowRatio: number;
+  trendWindowDays: number;
+  trendStableRatio: number;
+  historyMonths: number;
+  levelNewWorkdays: number;
+  levelChronicMonths: number;
+  criticalWorkdays: number;
+  nonCriticalMonths: number;
+  timeZone: string;
+}
+
 export interface TeamSecurityStatus {
   team: string;
   applicationCount: number;
   level: SecurityLevel;
-  history: SecurityStatusColor[]; // 6 entries, oldest first
+  history: MonthlySecurityHistory[];
   historyAvailableFrom?: string;
   exposed: ExposedStatus;
   trend: TrendStatus;
@@ -49,4 +73,5 @@ export interface TeamSecurityStatus {
 export interface SecurityStatusResponse {
   teams: TeamSecurityStatus[];
   generatedAt: string;
+  measurement: SecurityStatusMeasurement;
 }

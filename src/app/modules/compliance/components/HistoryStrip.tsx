@@ -1,120 +1,111 @@
 "use client";
 
-import { Tooltip, VStack, Detail } from "@navikt/ds-react";
+import { BodyShort, HStack, Tooltip } from "@navikt/ds-react";
+import { CheckmarkIcon, ExclamationmarkIcon, XMarkIcon } from "@navikt/aksel-icons";
 import { useTranslations, useLocale } from "next-intl";
-import type { SecurityStatusColor } from "@/app/types/securityStatus";
-import { getLast6MonthsInfo } from "../utils/complianceFormatters";
+import type { MonthlySecurityHistory } from "@/app/types/securityStatus";
+import { getMonthlyStatus, getOnTrackPercentage } from "../utils/complianceFormatters";
 
 interface HistoryStripProps {
-  history: SecurityStatusColor[];
-  showInitials?: boolean;
-  showCaption?: boolean;
+  history: MonthlySecurityHistory[];
 }
 
-const STATUS_COLOR_MAP: Record<SecurityStatusColor, string> = {
-  green: "var(--ax-bg-success-strong, #06893A)",
-  yellow: "var(--ax-border-warning-strong, #C77300)",
-  red: "var(--ax-bg-danger-strong, #C30000)",
+const STATUS_APPEARANCE = {
+  green: {
+    backgroundColor: "var(--ax-bg-success-strong)",
+    color: "var(--ax-text-success-contrast)",
+    Icon: CheckmarkIcon,
+  },
+  yellow: {
+    backgroundColor: "var(--ax-bg-warning-strong)",
+    color: "var(--ax-text-warning-contrast)",
+    Icon: ExclamationmarkIcon,
+  },
+  red: {
+    backgroundColor: "var(--ax-bg-danger-strong)",
+    color: "var(--ax-text-danger-contrast)",
+    Icon: XMarkIcon,
+  },
 };
 
-const NO_DATA_COLOR = "var(--ax-bg-neutral-moderate, #CFD3D8)";
-
-export function HistoryStrip({
-  history,
-  showInitials = false,
-  showCaption = false,
-}: HistoryStripProps) {
+export function HistoryStrip({ history }: HistoryStripProps) {
+  const t = useTranslations("complianceHistory");
   const tStatus = useTranslations("complianceStatus");
-  const tCompliance = useTranslations("compliance");
   const locale = useLocale();
-
-  const months = getLast6MonthsInfo(locale);
-  // Pad or slice history so it's always exactly 6 entries
-  const paddedHistory = [...history];
-  const missing = Math.max(0, 6 - paddedHistory.length);
-  const historySlice: (SecurityStatusColor | null)[] = [
-    ...Array<null>(missing).fill(null),
-    ...paddedHistory,
-  ].slice(-6);
-
-  const getStatusText = (status: SecurityStatusColor | null | undefined) =>
-    status === "green"
-      ? tStatus("onTrack")
-      : status === "yellow"
-        ? tStatus("needsAttention")
-        : status === "red"
-          ? tStatus("actNow")
-          : tStatus("noData");
-
-  const summaryLabel = months
-    .map((m, idx) => {
-      const statusText = getStatusText(historySlice[idx]);
-      return `${m.fullName}: ${statusText}`;
-    })
-    .join(", ");
+  const monthFormat = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/Oslo",
+  });
+  const percentageFormat = new Intl.NumberFormat("nb-NO", {
+    style: "percent",
+    maximumFractionDigits: 0,
+  });
+  if (history.length === 0) {
+    return <BodyShort size="small">{tStatus("noData")}</BodyShort>;
+  }
 
   return (
-    <VStack
-      gap="space-4"
-      align="center"
-      aria-label={`${tCompliance("last6Months")}: ${summaryLabel}`}
-    >
-      {showInitials && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(6, 14px)",
-            gap: "3px",
-            fontSize: "11px",
-            fontWeight: 600,
-            color: "var(--ax-text-subtle)",
-            textAlign: "center",
-            lineHeight: 1,
-          }}
-        >
-          {months.map((m, idx) => (
-            <span key={`init-${idx}-${m.fullName}`}>{m.initial}</span>
-          ))}
-        </div>
-      )}
+    <HStack gap="space-0" role="group" aria-label={t("label")}>
+      {history.map((month) => {
+        const status = getMonthlyStatus(month);
+        const appearance = status === null ? null : STATUS_APPEARANCE[status];
+        const Icon = appearance?.Icon;
+        const percentage = getOnTrackPercentage(month);
+        const recorded = month.onTrackDays + month.needsAttentionDays + month.actNowDays;
+        const content = [
+          t("monthStatus", {
+            month: monthFormat.format(new Date(`${month.month}-01T12:00:00Z`)),
+            status: status === null ? tStatus("noData") : t(status),
+          }),
+          percentage === null ? null : t("summary", {
+            onTrack: month.onTrackDays,
+            recorded,
+            percentage: percentageFormat.format(percentage),
+          }),
+          t("breakdown", {
+            green: month.onTrackDays,
+            yellow: month.needsAttentionDays,
+            red: month.actNowDays,
+          }),
+        ].filter(Boolean).join(" ");
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 14px)",
-          gap: "3px",
-        }}
-      >
-        {months.map((m, idx) => {
-          const status = historySlice[idx] ?? null;
-          const statusText = getStatusText(status);
-          const tooltipContent = `${m.fullName}: ${statusText}`;
-
-          return (
-            <Tooltip key={`square-${idx}-${m.fullName}`} content={tooltipContent}>
+        return (
+          <Tooltip key={month.month} content={content} maxChar={300}>
+            <button
+              type="button"
+              aria-label={content}
+              style={{
+                display: "grid",
+                placeItems: "center",
+                width: "var(--ax-space-24)",
+                height: "var(--ax-space-24)",
+                padding: 0,
+                border: 0,
+                background: "transparent",
+                cursor: "help",
+              }}
+            >
               <span
-                role="img"
-                tabIndex={0}
+                aria-hidden
                 style={{
-                  display: "inline-block",
-                  width: "14px",
-                  height: "14px",
-                  borderRadius: "3px",
-                  backgroundColor: status ? STATUS_COLOR_MAP[status] : NO_DATA_COLOR,
-                  cursor: "default",
+                  display: "grid",
+                  placeItems: "center",
+                  width: "var(--ax-space-16)",
+                  height: "var(--ax-space-16)",
+                  borderRadius: "var(--ax-radius-2)",
+                  backgroundColor: appearance?.backgroundColor ?? "var(--ax-bg-neutral-moderate)",
+                  color: appearance?.color,
+                  border: "var(--ax-space-1) solid var(--ax-border-neutral)",
+                  boxSizing: "border-box",
                 }}
-                aria-label={tooltipContent}
-              />
-            </Tooltip>
-          );
-        })}
-      </div>
-
-      {showCaption && (
-        <Detail textColor="subtle">
-          {tCompliance("last6Months")}
-        </Detail>
-      )}
-    </VStack>
+              >
+                {Icon && <Icon aria-hidden style={{ width: "100%", height: "100%" }} />}
+              </span>
+            </button>
+          </Tooltip>
+        );
+      })}
+    </HStack>
   );
 }

@@ -1,120 +1,120 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": false },
-  "files": {
-    "includes": [
-      "**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}",
-      "!!.next",
-      "!!out",
-      "!!build",
-      "!!coverage",
-      "!!test-results",
-      "!next-env.d.ts"
-    ]
-  },
-  "formatter": { "enabled": false },
-  "assist": { "enabled": false },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "preset": "none",
-      "a11y": {
-        "noAriaUnsupportedElements": "warn",
-        "useAltText": "warn",
-        "useAriaPropsForRole": "warn",
-        "useAriaPropsSupportedByRole": "warn",
-        "useValidAriaProps": "warn",
-        "useValidAriaValues": "warn"
-      },
-      "complexity": {
-        "noArguments": "error",
-        "noBannedTypes": "error",
-        "noUselessThisAlias": "error",
-        "noUselessTypeConstraint": "error"
-      },
-      "correctness": {
-        "noBeforeInteractiveScriptOutsideDocument": "warn",
-        "noChildrenProp": "error",
-        "noNextAsyncClientComponent": "warn",
-        "noUnusedFunctionParameters": "warn",
-        "noUnusedImports": "warn",
-        "noUnusedVariables": "warn",
-        "useExhaustiveDependencies": {
-          "level": "warn",
-          "options": { "reportUnnecessaryDependencies": false }
-        },
-        "useHookAtTopLevel": "error",
-        "useInlineScriptId": "error",
-        "useJsxKeyInIterable": "error"
-      },
-      "performance": {
-        "noImgElement": "warn",
-        "noSyncScripts": "warn",
-        "noUnwantedPolyfillio": "warn",
-        "useGoogleFontPreconnect": "warn"
-      },
-      "security": {
-        "noDangerouslySetInnerHtmlWithChildren": "error"
-      },
-      "style": {
-        "noCommonJs": "error",
-        "noHeadElement": "warn",
-        "noNamespace": "error",
-        "useArrayLiterals": "error",
-        "useAsConstAssertion": "error",
-        "useConst": "error",
-        "useSpreadOverApply": "error"
-      },
-      "suspicious": {
-        "noCommentText": "error",
-        "noDocumentImportInPage": "error",
-        "noDuplicateEnumValues": "error",
-        "noDuplicateJsxProps": "error",
-        "noExplicitAny": "error",
-        "noExtraNonNullAssertion": "error",
-        "noHeadImportInDocument": "error",
-        "noMisleadingInstantiator": "error",
-        "noNonNullAssertedOptionalChain": "error",
-        "noTsIgnore": "error",
-        "noUnsafeDeclarationMerging": "error",
-        "noUnusedExpressions": "warn",
-        "noVar": "error",
-        "useGoogleFontDisplay": "warn",
-        "useNamespaceKeyword": "error"
-      }
-    }
-  },
-  "overrides": [
-    {
-      "includes": ["**/*.{js,jsx,cjs,mjs}"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noConstAssign": "error",
-            "noGlobalObjectCalls": "error",
-            "noInvalidBuiltinInstantiation": "error",
-            "noInvalidConstructorSuper": "error",
-            "noSetterReturn": "error",
-            "noUndeclaredVariables": "error",
-            "noUnreachable": "error",
-            "noUnreachableSuper": "error",
-            "noUnusedVariables": "error"
-          },
-          "suspicious": {
-            "noClassAssign": "error",
-            "noDuplicateClassMembers": "error",
-            "noDuplicateObjectKeys": "error",
-            "noDuplicateParameters": "error",
-            "noFunctionAssign": "error",
-            "noImportAssign": "error",
-            "noRedeclare": "error",
-            "noUnsafeNegation": "error",
-            "noUnusedExpressions": "error",
-            "noWith": "error",
-            "useGetterReturn": "error"
-          }
-        }
-      }
-    }
-  ]
+	"$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": false },
+	"files": {
+		"includes": [
+			"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}",
+			"!!.next",
+			"!!out",
+			"!!build",
+			"!!coverage",
+			"!!test-results",
+			"!next-env.d.ts"
+		]
+	},
+	"formatter": { "enabled": false },
+	"assist": { "enabled": false },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "none",
+			"a11y": {
+				"noAriaUnsupportedElements": "warn",
+				"useAltText": "warn",
+				"useAriaPropsForRole": "warn",
+				"useAriaPropsSupportedByRole": "warn",
+				"useValidAriaProps": "warn",
+				"useValidAriaValues": "warn"
+			},
+			"complexity": {
+				"noArguments": "error",
+				"noBannedTypes": "error",
+				"noUselessThisAlias": "error",
+				"noUselessTypeConstraint": "error"
+			},
+			"correctness": {
+				"noBeforeInteractiveScriptOutsideDocument": "warn",
+				"noChildrenProp": "error",
+				"noNextAsyncClientComponent": "warn",
+				"noUnusedFunctionParameters": "warn",
+				"noUnusedImports": "warn",
+				"noUnusedVariables": "warn",
+				"useExhaustiveDependencies": {
+					"level": "warn",
+					"options": { "reportUnnecessaryDependencies": false }
+				},
+				"useHookAtTopLevel": "error",
+				"useInlineScriptId": "error",
+				"useJsxKeyInIterable": "error"
+			},
+			"performance": {
+				"noImgElement": "warn",
+				"noSyncScripts": "warn",
+				"noUnwantedPolyfillio": "warn",
+				"useGoogleFontPreconnect": "warn"
+			},
+			"security": {
+				"noDangerouslySetInnerHtmlWithChildren": "error"
+			},
+			"style": {
+				"noCommonJs": "error",
+				"noHeadElement": "warn",
+				"noNamespace": "error",
+				"useArrayLiterals": "error",
+				"useAsConstAssertion": "error",
+				"useConst": "error",
+				"useSpreadOverApply": "error"
+			},
+			"suspicious": {
+				"noCommentText": "error",
+				"noDocumentImportInPage": "error",
+				"noDuplicateEnumValues": "error",
+				"noDuplicateJsxProps": "error",
+				"noExplicitAny": "error",
+				"noExtraNonNullAssertion": "error",
+				"noHeadImportInDocument": "error",
+				"noMisleadingInstantiator": "error",
+				"noNonNullAssertedOptionalChain": "error",
+				"noTsIgnore": "error",
+				"noUnsafeDeclarationMerging": "error",
+				"noUnusedExpressions": "warn",
+				"noVar": "error",
+				"useGoogleFontDisplay": "warn",
+				"useNamespaceKeyword": "error"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.{js,jsx,cjs,mjs}"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noConstAssign": "error",
+						"noGlobalObjectCalls": "error",
+						"noInvalidBuiltinInstantiation": "error",
+						"noInvalidConstructorSuper": "error",
+						"noSetterReturn": "error",
+						"noUndeclaredVariables": "error",
+						"noUnreachable": "error",
+						"noUnreachableSuper": "error",
+						"noUnusedVariables": "error"
+					},
+					"suspicious": {
+						"noClassAssign": "error",
+						"noDuplicateClassMembers": "error",
+						"noDuplicateObjectKeys": "error",
+						"noDuplicateParameters": "error",
+						"noFunctionAssign": "error",
+						"noImportAssign": "error",
+						"noRedeclare": "error",
+						"noUnsafeNegation": "error",
+						"noUnusedExpressions": "error",
+						"noWith": "error",
+						"useGetterReturn": "error"
+					}
+				}
+			}
+		}
+	]
 }
