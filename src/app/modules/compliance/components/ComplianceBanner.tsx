@@ -17,12 +17,12 @@ export function ComplianceBanner() {
         <BodyShort size="medium">
           {t("targetsBasedOn")}{" "}
           <Link
-            href="https://sikkerhet.nav.no/docs/etterlevelse/krav/k267"
+            href="https://etterlevelse.ansatt.nav.no/krav/267/2"
             target="_blank"
             rel="noopener noreferrer"
             inlineText
           >
-            K267.1 <ExternalLinkIcon aria-hidden />
+            K267.2 <ExternalLinkIcon aria-hidden />
           </Link>
         </BodyShort>
       </HStack>

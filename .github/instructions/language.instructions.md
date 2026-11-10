@@ -13,6 +13,7 @@ The UI is in Norwegian (Bokmål) by default, with English as a secondary locale.
 | Sårbarhet / Sårbarheter | Vulnerability / Vulnerabilities | Core domain object |
 | Applikasjon / Applikasjoner | Application / Applications | Workload / deployment unit |
 | Risikoscore | Risk score | Calculated priority score |
+| Arbeidskontekst | Work context | Teams and applications chosen in the header that apply on every page. Page filters (environment, CVE, package) only narrow results within it and never change it. |
 
 ## Priority Bucket Labels
 

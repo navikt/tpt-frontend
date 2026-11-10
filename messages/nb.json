@@ -271,6 +271,7 @@
     "noData": "Ingen data"
   },
   "complianceLevel": {
+    "explanationTitle": "Hva betyr dette?",
     "new": "Ny",
     "ongoing": "Pågående",
     "chronic": "Kronisk",

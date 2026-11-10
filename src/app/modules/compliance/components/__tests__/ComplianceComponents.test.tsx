@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StatusTag } from "../StatusTag";
 import { LevelBadge } from "../LevelBadge";
+import { LevelLegend } from "../LevelLegend";
 import { HistoryStrip } from "../HistoryStrip";
 import { SummarySentence } from "../SummarySentence";
 import { TeamCard } from "../TeamCard";
@@ -27,6 +28,24 @@ vi.mock("next-intl", () => ({
 }));
 
 describe("Compliance Components", () => {
+  it("keeps term descriptions collapsed until requested and supports closing them with the keyboard", async () => {
+    const user = userEvent.setup();
+    render(<LevelLegend />);
+
+    const toggle = screen.getByRole("button", { name: "complianceLevel.explanationTitle" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("complianceLevel.exposedExplanation")).toBeVisible();
+    for (const level of ["chronic", "ongoing", "new"]) {
+      expect(screen.getByText(`complianceLevel.${level}Detail`)).toBeVisible();
+    }
+
+    await user.keyboard("{Enter}");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("renders StatusTag for on track, warning, and error", () => {
     const { rerender } = render(<StatusTag status="green" />);
     expect(screen.getByText("complianceStatus.onTrack")).toBeInTheDocument();
