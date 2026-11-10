@@ -357,6 +357,7 @@ function RepositoryChecks({
   formatDate: (date: string) => string;
 }) {
   const t = useTranslations("goldenpath");
+  const repoWithOrg = repository.startsWith("navikt/") ? repository : `navikt/${repository}`
 
   return (
     <VStack gap="space-12" className={styles.checkList}>
@@ -364,7 +365,7 @@ function RepositoryChecks({
         <CheckCard key={check.name} check={check} formatDate={formatDate} />
       ))}
       <Link
-        href={`https://github.com/${repository.split("/").map(encodeURIComponent).join("/")}`}
+        href={`https://github.com/${repoWithOrg.split("/").map(encodeURIComponent).join("/")}`}
         target="_blank"
         rel="noreferrer"
       >
