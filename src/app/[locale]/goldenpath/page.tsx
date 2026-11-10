@@ -357,7 +357,7 @@ function RepositoryChecks({
   formatDate: (date: string) => string;
 }) {
   const t = useTranslations("goldenpath");
-  const repoWithOrg = repository.startsWith("navikt/") ? repository : `navikt/${repository}`
+  const repoWithOrg = repository.includes("/") ? repository : `navikt/${repository}`
 
   return (
     <VStack gap="space-12" className={styles.checkList}>
