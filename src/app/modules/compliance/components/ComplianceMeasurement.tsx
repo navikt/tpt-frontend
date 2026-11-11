@@ -44,11 +44,11 @@ export function ComplianceMeasurement({ measurement, generatedAt }: ComplianceMe
               <VStack gap="space-8">
                 <Heading size="small" level="3">{t("exposureTitle")}</Heading>
                 <BodyLong>{t("deadlines", {
-                  critical: measurement.criticalWorkdays,
-                  nonCritical: measurement.nonCriticalMonths,
+                  critical: measurement.criticalDays,
+                  nonCritical: measurement.nonCriticalDays,
                 })}</BodyLong>
-                <BodyLong>{t("exposureRules", { workdays: measurement.exposedRedWorkdays })}</BodyLong>
-                <BodyLong>{t("workdays")}</BodyLong>
+                <BodyLong>{t("exposureRules", { days: measurement.exposedRedDays })}</BodyLong>
+                <BodyLong>{t("calendarDays")}</BodyLong>
               </VStack>
               <VStack gap="space-8">
                 <Heading size="small" level="3">{t("trendTitle")}</Heading>
