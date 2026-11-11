@@ -595,7 +595,7 @@
     "checked": "Checked {date}",
     "openRepository": "Open {repository} on GitHub",
     "noChecksNeedWork": "No checks need work in the results available.",
-    "noChecksNeedWorkSection": "No checks need work ({count, plural, one {# repository} other {# repositories}})",
+    "noChecksNeedWorkSection": "{count, plural, one {# repository} other {# repositories}} needs no follow-up",
     "availableResultsNote": "These repositories have passing checks and no reported failures. Results may not include every applicable check.",
     "passingCheckCount": "{count, plural, one {# passing check} other {# passing checks}}",
     "passing": "Passing",

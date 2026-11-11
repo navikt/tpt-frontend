@@ -595,7 +595,7 @@
     "checked": "Sjekket {date}",
     "openRepository": "Åpne {repository} på GitHub",
     "noChecksNeedWork": "Ingen av sjekkene i tilgjengelige resultater trenger oppfølging.",
-    "noChecksNeedWorkSection": "Ingen sjekker trenger oppfølging ({count, plural, one {# repo} other {# repoer}})",
+    "noChecksNeedWorkSection": "{count, plural, one {# repo} other {# repoer}} trenger ingen oppfølging",
     "availableResultsNote": "Disse repoene har godkjente sjekker og ingen rapporterte feil. Resultatene dekker ikke nødvendigvis alle relevante sjekker.",
     "passingCheckCount": "{count, plural, one {# godkjent sjekk} other {# godkjente sjekker}}",
     "passing": "Godkjent",
