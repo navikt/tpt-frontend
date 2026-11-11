@@ -9,6 +9,18 @@ import { LevelBadge } from "./LevelBadge";
 import { HistoryStrip } from "./HistoryStrip";
 import { TrendSparkline } from "./TrendSparkline";
 
+const SEVERITY_KEYS = {
+  CRITICAL: "critical",
+  HIGH: "high",
+  MEDIUM: "medium",
+  LOW: "low",
+} as const;
+
+function severityKey(severity: string | null): (typeof SEVERITY_KEYS)[keyof typeof SEVERITY_KEYS] | "unknown" {
+  const upper = severity?.toUpperCase();
+  return upper && upper in SEVERITY_KEYS ? SEVERITY_KEYS[upper as keyof typeof SEVERITY_KEYS] : "unknown";
+}
+
 interface TeamCardProps {
   team: TeamSecurityStatus;
   variant: "5b" | "5c";
@@ -19,6 +31,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
   const tQuestions = useTranslations("complianceQuestions");
   const tTable = useTranslations("complianceTable");
   const tCompliance = useTranslations("compliance");
+  const tSeverity = useTranslations("admin");
 
   const [showAllPastDeadline, setShowAllPastDeadline] = useState(false);
   const [showAllOverdueRebuild, setShowAllOverdueRebuild] = useState(false);
@@ -188,7 +201,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
                           <Detail textColor="subtle">
                             {t("findingDetails", {
                               cveId: finding.cveId,
-                              severity: finding.severity ?? "UNKNOWN",
+                              severity: tSeverity(severityKey(finding.severity)),
                               days: finding.daysOver,
                             })}
                           </Detail>

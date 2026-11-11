@@ -250,6 +250,12 @@ describe("Compliance Components", () => {
                 daysOver: 39,
               },
               { cveId: "CVE-2026-54512", packageName: null, severity: "HIGH", daysOver: 19 },
+              {
+                cveId: "CVE-2026-54513",
+                packageName: "pkg:golang/stdlib@1.23.1",
+                severity: null,
+                daysOver: 5,
+              },
             ],
           },
         ],
@@ -268,10 +274,13 @@ describe("Compliance Components", () => {
     expect(screen.getByText("pkg:golang/golang.org/x/net@0.30.0")).toBeVisible();
     expect(screen.getByText("complianceCard.unknownPackage")).toBeVisible();
     expect(
-      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54518 severity=MEDIUM days=39")
+      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54518 severity=admin.medium days=39")
     ).toBeVisible();
     expect(
-      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54512 severity=HIGH days=19")
+      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54512 severity=admin.high days=19")
+    ).toBeVisible();
+    expect(
+      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54513 severity=admin.unknown days=5")
     ).toBeVisible();
   });
 
