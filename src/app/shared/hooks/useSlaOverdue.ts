@@ -4,6 +4,7 @@ import { ApiError, handleApiError } from "@/app/shared/utils/errorHandling";
 export interface OverdueItem {
   cveId: string;
   applicationName: string;
+  packageName: string | null;
   severity: string;
   daysOverdue: number;
 }

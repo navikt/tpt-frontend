@@ -1204,12 +1204,14 @@ export const mockSlaOverduePayload: SlaOverdueData = {
         {
           cveId: "CVE-2025-0001",
           applicationName: "tpt-frontend",
+          packageName: "pkg:npm/next@15.1.0",
           severity: "CRITICAL",
           daysOverdue: 47,
         },
         {
           cveId: "CVE-2021-44228",
           applicationName: "api-gateway",
+          packageName: "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
           severity: "CRITICAL",
           daysOverdue: 12,
         },
@@ -1218,6 +1220,7 @@ export const mockSlaOverduePayload: SlaOverdueData = {
         {
           cveId: "CVE-2025-0002",
           applicationName: "tpt-frontend",
+          packageName: "pkg:npm/axios@1.7.2",
           severity: "HIGH",
           daysOverdue: 35,
         },
@@ -1236,18 +1239,21 @@ export const mockSlaOverduePayload: SlaOverdueData = {
         {
           cveId: "CVE-2023-44487",
           applicationName: "payment-service",
+          packageName: "pkg:maven/io.netty/netty-codec-http2@4.1.94.Final",
           severity: "CRITICAL",
           daysOverdue: 62,
         },
         {
           cveId: "CVE-2024-32002",
           applicationName: "payment-service",
+          packageName: "pkg:deb/debian/git@2.39.2",
           severity: "CRITICAL",
           daysOverdue: 30,
         },
         {
           cveId: "CVE-2024-56406",
           applicationName: "payment-service",
+          packageName: "pkg:deb/debian/perl@5.36.0",
           severity: "CRITICAL",
           daysOverdue: 8,
         },
@@ -1256,6 +1262,7 @@ export const mockSlaOverduePayload: SlaOverdueData = {
         {
           cveId: "CVE-2025-0004",
           applicationName: "user-service",
+          packageName: "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.15.2",
           severity: "HIGH",
           daysOverdue: 20,
         },
@@ -1345,8 +1352,22 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
         status: "red",
         since: "2026-05-01T00:00:00Z",
         appsPastDeadline: [
-          { app: "payment-service", daysOver: 62 },
-          { app: "user-service", daysOver: 20 },
+          {
+            app: "payment-service",
+            daysOver: 62,
+            findings: [
+              { cveId: "CVE-2023-44487", packageName: "pkg:maven/io.netty/netty-codec-http2@4.1.94.Final", severity: "CRITICAL", daysOver: 62 },
+              { cveId: "CVE-2024-32002", packageName: "pkg:deb/debian/git@2.39.2", severity: "CRITICAL", daysOver: 30 },
+              { cveId: "CVE-2024-56406", packageName: "pkg:deb/debian/perl@5.36.0", severity: "CRITICAL", daysOver: 8 },
+            ],
+          },
+          {
+            app: "user-service",
+            daysOver: 20,
+            findings: [
+              { cveId: "CVE-2025-0004", packageName: "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.15.2", severity: "HIGH", daysOver: 20 },
+            ],
+          },
         ],
       },
       trend: {
@@ -1376,8 +1397,21 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
         status: "red",
         since: "2026-10-01T00:00:00Z",
         appsPastDeadline: [
-          { app: "tpt-frontend", daysOver: 47 },
-          { app: "api-gateway", daysOver: 12 },
+          {
+            app: "tpt-frontend",
+            daysOver: 47,
+            findings: [
+              { cveId: "CVE-2025-0001", packageName: "pkg:npm/next@15.1.0", severity: "CRITICAL", daysOver: 47 },
+              { cveId: "CVE-2025-0002", packageName: "pkg:npm/axios@1.7.2", severity: "HIGH", daysOver: 35 },
+            ],
+          },
+          {
+            app: "api-gateway",
+            daysOver: 12,
+            findings: [
+              { cveId: "CVE-2021-44228", packageName: "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1", severity: "CRITICAL", daysOver: 12 },
+            ],
+          },
         ],
       },
       trend: {
@@ -1429,7 +1463,13 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
         status: "yellow",
         since: "2026-10-10T00:00:00Z",
         appsPastDeadline: [
-          { app: "kafka-consumer", daysOver: 1 },
+          {
+            app: "kafka-consumer",
+            daysOver: 1,
+            findings: [
+              { cveId: "CVE-2025-0005", packageName: null, severity: "CRITICAL", daysOver: 1 },
+            ],
+          },
         ],
       },
       trend: {

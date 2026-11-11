@@ -323,6 +323,8 @@
     "pastDeadlineSubheading": "Over tidsfristen",
     "overdueRebuildSubheading": "Applikasjoner over aldersgrensen for deployment",
     "daysOver": "{days} kalenderdager over fristen",
+    "unknownPackage": "Ukjent pakke",
+    "findingDetails": "{cveId} · {severity} · {days} kalenderdager over fristen",
     "showAll": "Vis alle",
     "showFewer": "Vis færre"
   },

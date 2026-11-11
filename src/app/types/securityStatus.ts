@@ -4,9 +4,17 @@ export type SecurityLevel = "new" | "ongoing" | "chronic" | null;
 
 export type TrendDirection = "worse" | "stable" | "improving";
 
+export interface OverdueFinding {
+  cveId: string;
+  packageName: string | null;
+  severity: string | null;
+  daysOver: number;
+}
+
 export interface AppPastDeadline {
   app: string;
   daysOver: number;
+  findings: OverdueFinding[];
 }
 
 export interface AppOverdueRebuild {
