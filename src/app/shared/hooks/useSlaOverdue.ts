@@ -6,7 +6,6 @@ export interface OverdueItem {
   applicationName: string;
   severity: string;
   daysOverdue: number;
-  workdaysOverdue: number;
 }
 
 export interface TeamSla {

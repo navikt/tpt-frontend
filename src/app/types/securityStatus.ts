@@ -6,7 +6,7 @@ export type TrendDirection = "worse" | "stable" | "improving";
 
 export interface AppPastDeadline {
   app: string;
-  workdaysOver: number;
+  daysOver: number;
 }
 
 export interface AppOverdueRebuild {
@@ -47,15 +47,15 @@ export interface MonthlySecurityHistory {
 
 export interface SecurityStatusMeasurement {
   deployMaxAgeDays: number;
-  exposedRedWorkdays: number;
+  exposedRedDays: number;
   maintenanceYellowRatio: number;
   trendWindowDays: number;
   trendStableRatio: number;
   historyMonths: number;
   levelNewWorkdays: number;
   levelChronicMonths: number;
-  criticalWorkdays: number;
-  nonCriticalMonths: number;
+  criticalDays: number;
+  nonCriticalDays: number;
   timeZone: string;
 }
 

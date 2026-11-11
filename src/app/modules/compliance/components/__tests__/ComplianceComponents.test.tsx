@@ -144,7 +144,9 @@ describe("Compliance Components", () => {
       measurement={{
         ...mockSecurityStatusPayload.measurement,
         deployMaxAgeDays: 45,
-        exposedRedWorkdays: 7,
+        exposedRedDays: 7,
+        criticalDays: 10,
+        nonCriticalDays: 50,
         trendWindowDays: 20,
         maintenanceYellowRatio: 0.8,
       }}
@@ -156,7 +158,9 @@ describe("Compliance Components", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText("complianceMeasurement.historyColours")).toBeVisible();
     expect(screen.getByText("complianceMeasurement.maintenanceAge days=45")).toBeVisible();
-    expect(screen.getByText("complianceMeasurement.exposureRules workdays=7")).toBeVisible();
+    expect(screen.getByText("complianceMeasurement.deadlines critical=10 nonCritical=50")).toBeVisible();
+    expect(screen.getByText("complianceMeasurement.exposureRules days=7")).toBeVisible();
+    expect(screen.getByText("complianceMeasurement.calendarDays")).toBeVisible();
     expect(screen.getByText("complianceMeasurement.trendWindow days=20")).toBeVisible();
     expect(screen.getByText(/complianceMeasurement.maintenanceRules ratio=80\s%/)).toBeVisible();
     expect(screen.getByText(/complianceMeasurement.calculatedAt.*2026.*Europe\/Oslo/)).toBeVisible();
@@ -171,7 +175,7 @@ describe("Compliance Components", () => {
         history: [],
         exposed: {
           status: "red",
-          appsPastDeadline: [{ app: "soknad-api", workdaysOver: 6 }],
+          appsPastDeadline: [{ app: "soknad-api", daysOver: 6 }],
         },
         trend: {
           status: "red",
@@ -202,7 +206,7 @@ describe("Compliance Components", () => {
       history: [],
       exposed: {
         status: "red",
-        appsPastDeadline: [{ app: "soknad-api", workdaysOver: 6 }],
+        appsPastDeadline: [{ app: "soknad-api", daysOver: 39 }],
       },
       trend: {
         status: "red",
@@ -221,6 +225,8 @@ describe("Compliance Components", () => {
     expect(screen.getByText("team-nordlys")).toBeInTheDocument();
     expect(screen.getByText("soknad-api")).toBeInTheDocument();
     expect(screen.getByText("gammel-rapport")).toBeInTheDocument();
+    expect(screen.getByText("complianceCard.daysOver days=39")).toBeInTheDocument();
+    expect(screen.queryByText(/complianceCard.workdaysOver/)).not.toBeInTheDocument();
   });
 
   it("renders TeamsFollowUpTable with each team on its own line and sorted chronic > ongoing > new > on-track", () => {
@@ -239,7 +245,7 @@ describe("Compliance Components", () => {
         applicationCount: 13,
         level: "new",
         history: [],
-        exposed: { status: "yellow", appsPastDeadline: [{ app: "myr-app", workdaysOver: 1 }] },
+        exposed: { status: "yellow", appsPastDeadline: [{ app: "myr-app", daysOver: 1 }] },
         trend: { status: "green", direction: "stable", appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0] },
         maintenance: { status: "yellow", upToDate: 10, total: 13, overdueRebuild: [] },
       },
@@ -248,7 +254,7 @@ describe("Compliance Components", () => {
         applicationCount: 14,
         level: "chronic",
         history: [],
-        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", workdaysOver: 10 }] },
+        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", daysOver: 10 }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [2, 2, 3, 3, 4, 4] },
         maintenance: { status: "red", upToDate: 9, total: 14, overdueRebuild: [] },
       },
@@ -257,7 +263,7 @@ describe("Compliance Components", () => {
         applicationCount: 11,
         level: "ongoing",
         history: [],
-        exposed: { status: "red", appsPastDeadline: [{ app: "soknad-api", workdaysOver: 6 }] },
+        exposed: { status: "red", appsPastDeadline: [{ app: "soknad-api", daysOver: 6 }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [1, 2, 3, 4, 4, 4] },
         maintenance: { status: "yellow", upToDate: 9, total: 11, overdueRebuild: [] },
       },
@@ -289,7 +295,7 @@ describe("Compliance Components", () => {
         applicationCount: 14,
         level: "chronic",
         history: [],
-        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", workdaysOver: 10 }] },
+        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", daysOver: 10 }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [2, 2, 3, 3, 4, 4] },
         maintenance: { status: "red", upToDate: 9, total: 14, overdueRebuild: [] },
       },

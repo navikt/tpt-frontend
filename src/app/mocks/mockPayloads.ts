@@ -1206,14 +1206,12 @@ export const mockSlaOverduePayload: SlaOverdueData = {
           applicationName: "tpt-frontend",
           severity: "CRITICAL",
           daysOverdue: 47,
-          workdaysOverdue: 33,
         },
         {
           cveId: "CVE-2021-44228",
           applicationName: "api-gateway",
           severity: "CRITICAL",
           daysOverdue: 12,
-          workdaysOverdue: 9,
         },
       ],
       nonCriticalOverdueItems: [
@@ -1222,7 +1220,6 @@ export const mockSlaOverduePayload: SlaOverdueData = {
           applicationName: "tpt-frontend",
           severity: "HIGH",
           daysOverdue: 35,
-          workdaysOverdue: 25,
         },
       ],
     },
@@ -1241,21 +1238,18 @@ export const mockSlaOverduePayload: SlaOverdueData = {
           applicationName: "payment-service",
           severity: "CRITICAL",
           daysOverdue: 62,
-          workdaysOverdue: 44,
         },
         {
           cveId: "CVE-2024-32002",
           applicationName: "payment-service",
           severity: "CRITICAL",
           daysOverdue: 30,
-          workdaysOverdue: 21,
         },
         {
           cveId: "CVE-2024-56406",
           applicationName: "payment-service",
           severity: "CRITICAL",
           daysOverdue: 8,
-          workdaysOverdue: 6,
         },
       ],
       nonCriticalOverdueItems: [
@@ -1264,7 +1258,6 @@ export const mockSlaOverduePayload: SlaOverdueData = {
           applicationName: "user-service",
           severity: "HIGH",
           daysOverdue: 20,
-          workdaysOverdue: 14,
         },
       ],
     },
@@ -1352,8 +1345,8 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
         status: "red",
         since: "2026-05-01T00:00:00Z",
         appsPastDeadline: [
-          { app: "payment-service", workdaysOver: 44 },
-          { app: "user-service", workdaysOver: 14 },
+          { app: "payment-service", daysOver: 62 },
+          { app: "user-service", daysOver: 20 },
         ],
       },
       trend: {
@@ -1383,8 +1376,8 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
         status: "red",
         since: "2026-10-01T00:00:00Z",
         appsPastDeadline: [
-          { app: "tpt-frontend", workdaysOver: 33 },
-          { app: "api-gateway", workdaysOver: 9 },
+          { app: "tpt-frontend", daysOver: 47 },
+          { app: "api-gateway", daysOver: 12 },
         ],
       },
       trend: {
@@ -1436,7 +1429,7 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
         status: "yellow",
         since: "2026-10-10T00:00:00Z",
         appsPastDeadline: [
-          { app: "kafka-consumer", workdaysOver: 1 },
+          { app: "kafka-consumer", daysOver: 1 },
         ],
       },
       trend: {
@@ -1499,15 +1492,15 @@ export const mockSecurityStatusPayload: SecurityStatusResponse = {
   generatedAt: "2026-10-13T10:00:00Z",
   measurement: {
     deployMaxAgeDays: 60,
-    exposedRedWorkdays: 5,
+    exposedRedDays: 5,
     maintenanceYellowRatio: 0.75,
     trendWindowDays: 30,
     trendStableRatio: 0.05,
     historyMonths: 6,
     levelNewWorkdays: 5,
     levelChronicMonths: 3,
-    criticalWorkdays: 1,
-    nonCriticalMonths: 3,
+    criticalDays: 7,
+    nonCriticalDays: 60,
     timeZone: "Europe/Oslo",
   },
 };

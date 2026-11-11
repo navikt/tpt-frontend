@@ -166,7 +166,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
                   weight="semibold"
                   style={{ color: "var(--ax-text-danger, #C30000)" }}
                 >
-                  {t("workdaysOver", { days: item.workdaysOver })}
+                  {t("daysOver", { days: item.daysOver })}
                 </BodyShort>
               </HStack>
             ))}
