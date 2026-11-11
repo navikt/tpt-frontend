@@ -323,6 +323,8 @@
     "pastDeadlineSubheading": "Past deadline",
     "overdueRebuildSubheading": "Applications past the deployment-age limit",
     "daysOver": "{days} calendar days past deadline",
+    "unknownPackage": "Unknown package",
+    "findingDetails": "{cveId} · {severity} · {days} calendar days past deadline",
     "showAll": "Show all",
     "showFewer": "Show fewer"
   },

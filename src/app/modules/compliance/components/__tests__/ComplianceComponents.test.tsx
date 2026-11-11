@@ -175,7 +175,7 @@ describe("Compliance Components", () => {
         history: [],
         exposed: {
           status: "red",
-          appsPastDeadline: [{ app: "soknad-api", daysOver: 6 }],
+          appsPastDeadline: [{ app: "soknad-api", daysOver: 6, findings: [] }],
         },
         trend: {
           status: "red",
@@ -206,7 +206,7 @@ describe("Compliance Components", () => {
       history: [],
       exposed: {
         status: "red",
-        appsPastDeadline: [{ app: "soknad-api", daysOver: 39 }],
+        appsPastDeadline: [{ app: "soknad-api", daysOver: 39, findings: [] }],
       },
       trend: {
         status: "red",
@@ -229,6 +229,61 @@ describe("Compliance Components", () => {
     expect(screen.queryByText(/complianceCard.workdaysOver/)).not.toBeInTheDocument();
   });
 
+  it("reveals the overdue packages for an application past deadline on demand", async () => {
+    const user = userEvent.setup();
+    const mockTeam: TeamSecurityStatus = {
+      team: "team-nordlys",
+      applicationCount: 1,
+      level: "new",
+      history: [],
+      exposed: {
+        status: "red",
+        appsPastDeadline: [
+          {
+            app: "soknad-api",
+            daysOver: 39,
+            findings: [
+              {
+                cveId: "CVE-2026-54518",
+                packageName: "pkg:golang/golang.org/x/net@0.30.0",
+                severity: "MEDIUM",
+                daysOver: 39,
+              },
+              { cveId: "CVE-2026-54512", packageName: null, severity: "HIGH", daysOver: 19 },
+              {
+                cveId: "CVE-2026-54513",
+                packageName: "pkg:golang/stdlib@1.23.1",
+                severity: null,
+                daysOver: 5,
+              },
+            ],
+          },
+        ],
+      },
+      trend: { status: "green", direction: "stable", appsWithOverduePerMonth: [] },
+      maintenance: { status: "green", upToDate: 1, total: 1, overdueRebuild: [] },
+    };
+
+    render(<TeamCard team={mockTeam} variant="5c" />);
+    const toggle = screen.getByRole("button", { name: /soknad-api/ });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(toggle);
+
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("pkg:golang/golang.org/x/net@0.30.0")).toBeVisible();
+    expect(screen.getByText("complianceCard.unknownPackage")).toBeVisible();
+    expect(
+      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54518 severity=admin.medium days=39")
+    ).toBeVisible();
+    expect(
+      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54512 severity=admin.high days=19")
+    ).toBeVisible();
+    expect(
+      screen.getByText("complianceCard.findingDetails cveId=CVE-2026-54513 severity=admin.unknown days=5")
+    ).toBeVisible();
+  });
+
   it("renders TeamsFollowUpTable with each team on its own line and sorted chronic > ongoing > new > on-track", () => {
     const mockTeams: TeamSecurityStatus[] = [
       {
@@ -245,7 +300,7 @@ describe("Compliance Components", () => {
         applicationCount: 13,
         level: "new",
         history: [],
-        exposed: { status: "yellow", appsPastDeadline: [{ app: "myr-app", daysOver: 1 }] },
+        exposed: { status: "yellow", appsPastDeadline: [{ app: "myr-app", daysOver: 1, findings: [] }] },
         trend: { status: "green", direction: "stable", appsWithOverduePerMonth: [0, 0, 0, 0, 0, 0] },
         maintenance: { status: "yellow", upToDate: 10, total: 13, overdueRebuild: [] },
       },
@@ -254,7 +309,7 @@ describe("Compliance Components", () => {
         applicationCount: 14,
         level: "chronic",
         history: [],
-        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", daysOver: 10 }] },
+        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", daysOver: 10, findings: [] }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [2, 2, 3, 3, 4, 4] },
         maintenance: { status: "red", upToDate: 9, total: 14, overdueRebuild: [] },
       },
@@ -263,7 +318,7 @@ describe("Compliance Components", () => {
         applicationCount: 11,
         level: "ongoing",
         history: [],
-        exposed: { status: "red", appsPastDeadline: [{ app: "soknad-api", daysOver: 6 }] },
+        exposed: { status: "red", appsPastDeadline: [{ app: "soknad-api", daysOver: 6, findings: [] }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [1, 2, 3, 4, 4, 4] },
         maintenance: { status: "yellow", upToDate: 9, total: 11, overdueRebuild: [] },
       },
@@ -295,7 +350,7 @@ describe("Compliance Components", () => {
         applicationCount: 14,
         level: "chronic",
         history: [],
-        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", daysOver: 10 }] },
+        exposed: { status: "red", appsPastDeadline: [{ app: "hav-app", daysOver: 10, findings: [] }] },
         trend: { status: "red", direction: "worse", appsWithOverduePerMonth: [2, 2, 3, 3, 4, 4] },
         maintenance: { status: "red", upToDate: 9, total: 14, overdueRebuild: [] },
       },

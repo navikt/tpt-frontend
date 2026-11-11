@@ -1,13 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Heading, Button, HStack, VStack, BodyShort, Label, HGrid } from "@navikt/ds-react";
+import { Accordion, Box, Heading, Button, HStack, VStack, BodyShort, Detail, Label, HGrid } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import type { TeamSecurityStatus } from "@/app/types/securityStatus";
 import { StatusTag } from "./StatusTag";
 import { LevelBadge } from "./LevelBadge";
 import { HistoryStrip } from "./HistoryStrip";
 import { TrendSparkline } from "./TrendSparkline";
+
+const SEVERITY_KEYS = {
+  CRITICAL: "critical",
+  HIGH: "high",
+  MEDIUM: "medium",
+  LOW: "low",
+} as const;
+
+function severityKey(severity: string | null): (typeof SEVERITY_KEYS)[keyof typeof SEVERITY_KEYS] | "unknown" {
+  const upper = severity?.toUpperCase();
+  return upper && upper in SEVERITY_KEYS ? SEVERITY_KEYS[upper as keyof typeof SEVERITY_KEYS] : "unknown";
+}
 
 interface TeamCardProps {
   team: TeamSecurityStatus;
@@ -19,6 +31,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
   const tQuestions = useTranslations("complianceQuestions");
   const tTable = useTranslations("complianceTable");
   const tCompliance = useTranslations("compliance");
+  const tSeverity = useTranslations("admin");
 
   const [showAllPastDeadline, setShowAllPastDeadline] = useState(false);
   const [showAllOverdueRebuild, setShowAllOverdueRebuild] = useState(false);
@@ -150,26 +163,55 @@ export function TeamCard({ team, variant }: TeamCardProps) {
             <Label size="small" textColor="subtle">
               {t("pastDeadlineSubheading")}
             </Label>
-            {displayedPastDeadline.map((item) => (
-              <HStack
-                key={item.app}
-                justify="space-between"
-                align="center"
-                gap="space-16"
-                paddingBlock="space-8"
-                style={{
-                  borderTop: "1px solid var(--ax-border-subtle, #E6E8EB)",
-                }}
-              >
-                <BodyShort weight="semibold">{item.app}</BodyShort>
-                <BodyShort
-                  weight="semibold"
-                  style={{ color: "var(--ax-text-danger, #C30000)" }}
-                >
-                  {t("daysOver", { days: item.daysOver })}
-                </BodyShort>
-              </HStack>
-            ))}
+            <Accordion size="small">
+              {displayedPastDeadline.map((item) => (
+                <Accordion.Item key={item.app}>
+                  <Accordion.Header>
+                    <HStack
+                      justify="space-between"
+                      align="center"
+                      gap="space-16"
+                      style={{ width: "100%" }}
+                    >
+                      <span>{item.app}</span>
+                      <span style={{ color: "var(--ax-text-danger, #C30000)" }}>
+                        {t("daysOver", { days: item.daysOver })}
+                      </span>
+                    </HStack>
+                  </Accordion.Header>
+                  <Accordion.Content>
+                    <VStack
+                      as="ul"
+                      gap="space-12"
+                      style={{ listStyle: "none", margin: 0, padding: 0 }}
+                    >
+                      {(item.findings ?? []).map((finding) => (
+                        <VStack
+                          as="li"
+                          key={`${finding.cveId}:${finding.packageName ?? ""}`}
+                          gap="space-2"
+                        >
+                          <BodyShort
+                            size="small"
+                            weight="semibold"
+                            style={{ overflowWrap: "anywhere" }}
+                          >
+                            {finding.packageName ?? t("unknownPackage")}
+                          </BodyShort>
+                          <Detail textColor="subtle">
+                            {t("findingDetails", {
+                              cveId: finding.cveId,
+                              severity: tSeverity(severityKey(finding.severity)),
+                              days: finding.daysOver,
+                            })}
+                          </Detail>
+                        </VStack>
+                      ))}
+                    </VStack>
+                  </Accordion.Content>
+                </Accordion.Item>
+              ))}
+            </Accordion>
 
             {pastDeadlineApps.length > 5 && (
               <Button
