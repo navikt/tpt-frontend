@@ -36,15 +36,16 @@ export const useGitHubVulnerabilities = () => {
 
   const [isLoading, setIsLoading] = useState(() => !hasCacheSeed());
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState(false);
 
   const hasFetchedRef = useRef(false);
+  const hasAutoRefreshedRef = useRef(false);
+  const refreshInFlightRef = useRef(false);
 
   const fetchData = useCallback(
-    async (isRefresh = false, showLoading = true) => {
+    async (showLoading = true) => {
       try {
-        if (isRefresh) {
-          setIsRefreshing(true);
-        } else if (showLoading) {
+        if (showLoading) {
           setIsLoading(true);
         }
 
@@ -58,9 +59,11 @@ export const useGitHubVulnerabilities = () => {
         setCachedItem(CACHE_KEYS.GITHUB, responseData);
       } catch (error) {
         console.error("Error fetching GitHub vulnerabilities data:", error);
+        if (refreshInFlightRef.current) {
+          setRefreshError(true);
+        }
       } finally {
         setIsLoading(false);
-        setIsRefreshing(false);
       }
     },
     []
@@ -73,43 +76,65 @@ export const useGitHubVulnerabilities = () => {
 
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const completeRefresh = useCallback(async () => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = null;
+    }
+    await fetchDataRef.current(false);
+    refreshInFlightRef.current = false;
+    setIsRefreshing(false);
+  }, []);
+
   const { isGitHubSyncing: isSyncing } = useSyncEvents({
     onSyncComplete: useCallback(() => {}, []),
-    onGitHubSyncComplete: useCallback(() => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-        refreshTimeoutRef.current = null;
-      }
-      fetchDataRef.current(false, false);
-    }, []),
+    onGitHubSyncComplete: completeRefresh,
     onGitHubSyncError: useCallback(() => {
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
         refreshTimeoutRef.current = null;
       }
+      if (refreshInFlightRef.current) {
+        console.error("GitHub sync event connection was interrupted");
+        setRefreshError(true);
+      }
+      refreshInFlightRef.current = false;
       setIsRefreshing(false);
     }, []),
   });
 
   const refresh = useCallback(async () => {
+    if (refreshInFlightRef.current) return;
+    refreshInFlightRef.current = true;
     setIsRefreshing(true);
+    setRefreshError(false);
     if (refreshTimeoutRef.current) {
       clearTimeout(refreshTimeoutRef.current);
     }
-    refreshTimeoutRef.current = setTimeout(() => {
-      refreshTimeoutRef.current = null;
-      fetchDataRef.current(false, false);
-    }, REFRESH_TIMEOUT_MS);
+    refreshTimeoutRef.current = setTimeout(completeRefresh, REFRESH_TIMEOUT_MS);
     try {
-      await fetch("/api/github/refresh");
+      const response = await fetch("/api/github/refresh");
+      if (!response.ok) {
+        throw new Error(`GitHub refresh failed: ${response.status}`);
+      }
     } catch (error) {
       console.error("Error triggering GitHub refresh:", error);
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
         refreshTimeoutRef.current = null;
       }
+      refreshInFlightRef.current = false;
+      setRefreshError(true);
       setIsRefreshing(false);
     }
+  }, [completeRefresh]);
+
+  useEffect(() => {
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Initialize from IndexedDB and conditionally revalidate
@@ -126,9 +151,6 @@ export const useGitHubVulnerabilities = () => {
           CACHE_KEYS.GITHUB
         );
 
-        // Use the swappable revalidation guard to decide if we need fresh data.
-        // Matches old behaviour: stale cache is treated like no-cache for UX —
-        // isLoading stays true and a loading spinner is shown.
         const shouldRevalidate = await needsRevalidation(
           cached?.meta ?? null,
           CACHE_MAX_AGE_MS
@@ -141,13 +163,13 @@ export const useGitHubVulnerabilities = () => {
         }
 
         if (shouldRevalidate) {
-          fetchData(false, !cached);
+          fetchData(!cached);
         } else {
           setIsLoading(false);
         }
       } catch {
         // IndexedDB unavailable or read error — fall through to network fetch
-        fetchData(false, true);
+        fetchData(true);
       }
     })();
   }, []);
@@ -168,11 +190,20 @@ export const useGitHubVulnerabilities = () => {
     !oldestSyncedAt ||
     now - new Date(oldestSyncedAt).getTime() > 24 * 60 * 60 * 1000;
 
+  useEffect(() => {
+    if (!data || isLoading || hasAutoRefreshedRef.current) return;
+    hasAutoRefreshedRef.current = true;
+    if (isDataStale && !isRefreshing && !isSyncing) {
+      void refresh();
+    }
+  }, [data, isLoading, isDataStale, isRefreshing, isSyncing, refresh]);
+
   return {
     data,
     isLoading,
     isRefreshing,
     isSyncing,
+    refreshError,
     refresh,
     isDataStale,
     oldestSyncedAt,

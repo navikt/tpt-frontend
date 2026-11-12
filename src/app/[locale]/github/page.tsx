@@ -21,14 +21,13 @@ export default function GitHubPage() {
 
 function GitHubPageContent() {
   const t = useTranslations("github");
-  const tHome = useTranslations("home");
 
   const {
     data,
     refresh,
     isRefreshing,
     isSyncing,
-    isDataStale,
+    refreshError,
     isLoading: isGitHubLoading,
   } = useGitHubVulnerabilities();
   const {
@@ -79,7 +78,7 @@ function GitHubPageContent() {
           background="neutral-soft"
           style={{ textAlign: "center" }}
         >
-          <Loader size="large" title={tHome("loadingVulnerabilities")} />
+          <Loader size="large" title={t("fetchingFromGitHub")} />
         </Box>
       </div>
     );
@@ -112,7 +111,7 @@ function GitHubPageContent() {
           onRefresh={refresh}
           isRefreshing={isRefreshing}
           isSyncing={isSyncing}
-          isDataStale={isDataStale}
+          refreshError={refreshError}
         />
       </VStack>
     </div>

@@ -20,15 +20,11 @@ const baseProps = {
   onRefresh: vi.fn(),
   isRefreshing: false,
   isSyncing: false,
-  isDataStale: false,
+  refreshError: false,
 };
 
-// The refresh button is always the first button in the toolbar.
-// When fresh it is icon-only (no accessible name); when stale the Tag text becomes its name.
 function getRefreshButton() {
-  const buttons = screen.getAllByRole("button");
-  // buttons[0] = refresh (icon-only or stale), buttons[1] = quickWinsOnly
-  return buttons[0];
+  return screen.getByRole("button", { name: "refresh" });
 }
 
 describe("GitHubRepositoryList — toolbar", () => {
@@ -39,24 +35,29 @@ describe("GitHubRepositoryList — toolbar", () => {
 });
 
 describe("GitHubRepositoryList — update button", () => {
-  it("renders with secondary variant when data is fresh", () => {
-    render(<GitHubRepositoryList {...baseProps} isDataStale={false} />);
+  it("renders an accessible secondary refresh button", () => {
+    render(<GitHubRepositoryList {...baseProps} />);
     expect(getRefreshButton()).toHaveAttribute("data-variant", "secondary");
   });
 
-  it("renders with primary variant when data is stale", () => {
-    render(<GitHubRepositoryList {...baseProps} isDataStale={true} />);
-    expect(getRefreshButton()).toHaveAttribute("data-variant", "primary");
+  it.each(["isRefreshing", "isSyncing"] as const)(
+    "announces progress while %s",
+    (state) => {
+      render(<GitHubRepositoryList {...baseProps} {...{ [state]: true }} />);
+      expect(screen.getByRole("status")).toHaveTextContent("fetchingFromGitHub");
+      expect(getRefreshButton()).toBeDisabled();
+    }
+  );
+
+  it("shows a refresh failure", () => {
+    render(<GitHubRepositoryList {...baseProps} refreshError />);
+    expect(screen.getByRole("alert")).toHaveTextContent("refreshError");
+    expect(getRefreshButton()).toBeEnabled();
   });
 
-  it("shows the dataStale warning tag when data is stale", () => {
-    render(<GitHubRepositoryList {...baseProps} isDataStale={true} />);
-    expect(screen.getByText("dataStale")).toBeInTheDocument();
-  });
-
-  it("does not show the dataStale warning tag when data is fresh", () => {
-    render(<GitHubRepositoryList {...baseProps} isDataStale={false} />);
-    expect(screen.queryByText("dataStale")).not.toBeInTheDocument();
+  it("does not show progress when idle", () => {
+    render(<GitHubRepositoryList {...baseProps} />);
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("is disabled while refreshing", () => {

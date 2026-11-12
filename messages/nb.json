@@ -55,7 +55,8 @@
     "pageSubtitle": "Repositories rangert etter risikoscore — et beregnet signal som kombinerer alvorlighetsgrad, utnyttelsesbevis og handlingsevne. Fixes med en åpen pull request er fremhevet separat slik at du kan lukke dem raskt.",
     "pageDescription": "Denne siden viser sårbarheter oppdaget av GitHub i dine repositories. GitHub analyserer avhengighetene dine for kjente sikkerhetshull og rapporterer dem her. Dataene er hentet fra GitHub's avhengighetstjekk.",
     "sortedByRiskHighToLow": "Sortert etter risikoscore, høy til lav",
-    "dataStale": "Utdatert",
+    "fetchingFromGitHub": "Henter informasjon fra GitHub...",
+    "refreshError": "Kunne ikke oppdatere informasjon fra GitHub. Prøv å oppdatere på nytt.",
     "stats": {
       "repositories": "REPOSITORIES",
       "totalVulnerabilities": "TOTALT SÅRBARHETER",
@@ -69,8 +70,8 @@
       "pullRequest": "Pull request",
       "fixesOne": "Fikser 1 sårbarhet",
       "fixesMany": "Fikser {count} sårbarheter",
-      "openPr": "Åpne PR #{number} ↗",
-      "openPrGeneric": "Åpne PR ↗"
+      "openPr": "PR #{number}",
+      "openPrGeneric": "PR"
     },
     "metadata": {
       "teams": "Teams",

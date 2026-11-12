@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { VStack, Box, BodyShort, HStack, TextField, Button, Tag } from "@navikt/ds-react";
+import { VStack, Box, BodyShort, HStack, TextField, Button, Loader } from "@navikt/ds-react";
 import { MagnifyingGlassIcon, ArrowsCirclepathIcon } from "@navikt/aksel-icons";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { GitHubRepositoryListItem } from "./GitHubRepositoryListItem";
@@ -14,7 +14,7 @@ interface GitHubRepositoryListProps {
   onRefresh: () => void;
   isRefreshing: boolean;
   isSyncing: boolean;
-  isDataStale: boolean;
+  refreshError: boolean;
 }
 
 const INITIAL_DISPLAY_COUNT = 10;
@@ -24,10 +24,11 @@ export function GitHubRepositoryList({
   onRefresh,
   isRefreshing,
   isSyncing,
-  isDataStale,
+  refreshError,
 }: GitHubRepositoryListProps) {
   const t = useTranslations("github");
   const tRepo = useTranslations("github.repository");
+  const tSummary = useTranslations("summary");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
@@ -65,6 +66,15 @@ export function GitHubRepositoryList({
 
   return (
     <VStack gap="space-24">
+      {(isRefreshing || isSyncing) && (
+        <HStack gap="space-8" align="center" role="status">
+          <Loader size="small" aria-hidden />
+          <BodyShort size="small">{t("fetchingFromGitHub")}</BodyShort>
+        </HStack>
+      )}
+      {refreshError && (
+        <BodyShort role="alert">{t("refreshError")}</BodyShort>
+      )}
       {/* Quick wins panel — always shown when there are fixes ready */}
       <QuickWinsPanel repositories={sortedRepositories} />
 
@@ -96,18 +106,13 @@ export function GitHubRepositoryList({
           />
         </div>
         <Button
-          variant={isDataStale ? "primary" : "secondary"}
+          variant="secondary"
           icon={<ArrowsCirclepathIcon />}
+          aria-label={tSummary("refresh")}
           onClick={onRefresh}
           disabled={isRefreshing || isSyncing}
           loading={isRefreshing || isSyncing}
-        >
-          {isDataStale && (
-            <Tag variant="warning" size="xsmall" style={{ marginInlineStart: "0.4rem" }}>
-              {t("dataStale")}
-            </Tag>
-          )}
-        </Button>
+        />
         <Button
           variant={quickWinsOnly ? "primary" : "secondary"}
           onClick={() => {

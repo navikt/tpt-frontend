@@ -11,8 +11,8 @@ vi.mock("next-intl", () => ({
       if (key === "riskScore") return "Risk score";
       if (key === "fixesOne") return "Fixes 1 vulnerability";
       if (key === "fixesMany") return `Fixes ${values?.count} vulnerabilities`;
-      if (key === "openPr") return `Open PR #${values?.number}`;
-      if (key === "openPrGeneric") return "Open PR";
+      if (key === "openPr") return `PR #${values?.number}`;
+      if (key === "openPrGeneric") return "PR";
       return key;
     },
 }));
@@ -78,7 +78,7 @@ describe("QuickWinsPanel", () => {
     expect(screen.getByText("Showing 2 of 2")).toBeInTheDocument();
     expect(screen.getAllByText("Risk score")).toHaveLength(2);
     expect(screen.getByText("80")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Open PR #42" })).toHaveLength(
+    expect(screen.getAllByRole("button", { name: "PR #42" })).toHaveLength(
       1
     );
   });
