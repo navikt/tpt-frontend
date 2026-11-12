@@ -181,6 +181,26 @@
     "descriptionShowMore": "See the rest of the description...",
     "noRiskFactors": "No risk factors are identified for this vulnerability."
   },
+  "copilot": {
+    "fixButton": "Fix with Copilot",
+    "taskStarted": "Copilot is working on it",
+    "taskStarting": "Copilot task is starting …",
+    "startAgain": "Start again",
+    "alertTitle": "Fix with Copilot",
+    "outcome": {
+      "started": "Copilot has started a task and is creating a pull request. You will be asked to review it on GitHub when it is ready.",
+      "alreadyStarted": "Copilot is already working on this vulnerability. No new task was started.",
+      "cancelled": "You cancelled the GitHub sign-in, so Copilot was not started."
+    },
+    "errors": {
+      "authorizationFailed": "GitHub sign-in failed or took too long. Please try again.",
+      "forbidden": "GitHub denied the request. You need a Copilot Business or Enterprise seat, and Copilot must be enabled for the repository.",
+      "notFound": "The vulnerability or repository was not found. Check that the TPT GitHub App is installed on the repository.",
+      "conflict": "Copilot cannot start here. A Dependabot PR may already exist, or GitHub rejected the task.",
+      "unavailable": "Fix with Copilot is not available right now. Please try again later.",
+      "generic": "Could not start Copilot. Please try again later."
+    }
+  },
   "vulnerabilitiesTable": {
     "team": "Team",
     "application": "Application",

@@ -75,6 +75,7 @@ The application uses the following environment variables (configured in `.env.lo
 | `TPT_BACKEND_SCOPE` | OBO token scope requested for calls to the backend | - | Yes |
 | `BACKEND_CACHE_SECONDS` | Cache duration for backend data in seconds | `300` (5 minutes) | No |
 | `TELEMETRY_URL` | URL for Faro telemetry (fetched at runtime) | - | No |
+| `COPILOT_COMPLETE_URL` | Internal URL the public GitHub OAuth callback (`https://tpt.nav.no/api/github/copilot/callback`) forwards to | `/api/github/copilot/complete` | No |
 | `NEXT_PUBLIC_VERSION` | App version reported to Faro telemetry | `unknown` | No |
 
 **Important about telemetry:** `TELEMETRY_URL` is read at runtime (not build-time) and sent to the client via `/api/telemetry-config`. This allows the same Docker image to be used across environments with different telemetry endpoints.

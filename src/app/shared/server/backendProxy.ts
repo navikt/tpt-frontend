@@ -19,6 +19,7 @@ interface BackendFetchOptions {
   forwardQuery?: boolean;
   mode?: BackendMode;
   mock?: unknown;
+  body?: unknown;
 }
 
 interface BackendProxyOptions extends BackendFetchOptions {
@@ -130,10 +131,12 @@ export async function fetchFromBackend(
     Accept: options.mode === "sse" ? "text/event-stream" : "application/json",
   });
   if (options.mode === "sse") headers.set("Cache-Control", "no-cache");
+  if (options.body !== undefined) headers.set("Content-Type", "application/json");
 
   return fetch(url.toString(), {
     method: options.method ?? "GET",
     headers,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
     cache: "no-store",
     signal: request.signal,
   });

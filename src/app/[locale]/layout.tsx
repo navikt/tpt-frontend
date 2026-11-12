@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { Page, GlobalAlert, Alert } from "@navikt/ds-react";
 import { RoleContextProvider } from "../shared/hooks/useRoleContext";
 import { FeedbackButton } from "../components/FeedbackButton";
@@ -7,6 +8,7 @@ import { Providers } from "../contexts/Providers";
 import { usePathname } from "next/navigation";
 import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
 import { AppHeader } from "../components/AppHeader";
+import { CopilotRemediationAlert } from "../shared/components/CopilotRemediation";
 import styles from "./layout.module.css";
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
@@ -36,6 +38,9 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
         width={pathname.includes("/compliance") ? "xl" : "lg"}
         gutters
       >
+        <Suspense fallback={null}>
+          <CopilotRemediationAlert />
+        </Suspense>
         {children}
       </Page.Block>
       <FeedbackButton />

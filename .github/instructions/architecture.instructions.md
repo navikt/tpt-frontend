@@ -43,7 +43,9 @@ src/app/
 │                                     # LanguageSwitcher.tsx, RoleContextSwitcher.tsx, FaroInitializer.tsx, etc.
 │
 └── api/                             # Backend proxy endpoints: applications/, github/, config/, admin/,
-                                      # sla/overdue/, events/, datacollector/
+                                      # sla/overdue/, events/, datacollector/, remediations/copilot/
+                                      # (github/copilot/callback/ is the only path exposed on tpt.nav.no, excluded
+                                      # from autoLogin; it forwards to github/copilot/complete/ on tpt.ansatt.nav.no)
 ```
 
 To add a new module:

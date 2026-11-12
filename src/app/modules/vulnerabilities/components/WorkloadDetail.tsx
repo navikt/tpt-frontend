@@ -34,6 +34,7 @@ import { useTranslations } from "next-intl";
 import { useConfigContext } from "@/app/contexts/ConfigContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
+import { CopilotFixButton, CopilotRemediationsProvider } from "@/app/shared/components/CopilotRemediation";
 
 function getIconForFactor(iconName: string): React.ReactNode {
     switch (iconName) {
@@ -181,6 +182,9 @@ export function WorkloadDetail({ workloadId, vulnId }: WorkloadDetailProps) {
                             </DSLink>
                         )}
                     </HStack>
+                    <CopilotRemediationsProvider repository={workloadData.repository}>
+                        <CopilotFixButton vulnerability={vulnerabilityData} workloadId={workloadData.id} />
+                    </CopilotRemediationsProvider>
                 </VStack>
             </Box>
             {/* Workload Context */}

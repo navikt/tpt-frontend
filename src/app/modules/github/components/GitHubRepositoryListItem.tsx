@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { RiskScoreBreakdownBars } from "./RiskScoreBreakdownBars";
 import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 import styles from "./GitHubRepositoryListItem.module.css";
+import { CopilotFixButton, CopilotRemediationsProvider } from "@/app/shared/components/CopilotRemediation";
 
 /** Strip PURL prefix and version — "pkg:npm/axios@1.2.3" → "axios" */
 function extractPackageName(raw: string): string {
@@ -148,6 +149,8 @@ function VulnerabilityRow({
             )}
           </HStack>
 
+          <CopilotFixButton vulnerability={vuln} />
+
           {showBreakdown && vuln.riskScoreBreakdown && (
             <Box paddingBlock="space-8">
               <RiskScoreBreakdownBars breakdown={vuln.riskScoreBreakdown} />
@@ -213,6 +216,7 @@ export function GitHubRepositoryListItem({ repository, rank }: GitHubRepositoryL
   const t = useTranslations("github");
   const tRepo = useTranslations("github.repository");
   const riskColor = getRiskColor(repository.riskLevel);
+  const [isOpen, setIsOpen] = useState(false);
 
   const packageGroups: PackageGroup[] = useMemo(() => {
     const groups = new Map<string, PackageGroup>();
@@ -252,7 +256,7 @@ export function GitHubRepositoryListItem({ repository, rank }: GitHubRepositoryL
       style={{ borderLeft: `6px solid ${riskColor}` }}
     >
       <Accordion className={styles.packageAccordion}>
-        <Accordion.Item>
+        <Accordion.Item open={isOpen} onOpenChange={setIsOpen}>
           <Accordion.Header>
             {/* Single-line header: rank · name (N vulns) · GitHub link · [fix badge] · LEVEL score */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: "100%", minWidth: 0 }}>
@@ -312,11 +316,13 @@ export function GitHubRepositoryListItem({ repository, rank }: GitHubRepositoryL
           </Accordion.Header>
 
           <Accordion.Content>
-            <Box paddingBlock="space-8">
-              {packageGroups.map((group) => (
-                <PackageGroupAccordion key={group.key} group={group} />
-              ))}
-            </Box>
+            <CopilotRemediationsProvider repository={repository.nameWithOwner} active={isOpen}>
+              <Box paddingBlock="space-8">
+                {packageGroups.map((group) => (
+                  <PackageGroupAccordion key={group.key} group={group} />
+                ))}
+              </Box>
+            </CopilotRemediationsProvider>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>
