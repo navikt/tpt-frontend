@@ -48,13 +48,15 @@ export default function CompliancePage() {
   const isDeveloper = effectiveRole === "DEVELOPER" || effectiveRole === "TEAM_MEMBER";
   const isFewTeamsLeader = effectiveRole === "TEAM_LEADER" || teams.length < 4;
 
+  const historyMonths = statusData.measurement.historyMonths;
+
   return (
     <VStack gap="space-16">
       {isDeveloper
-        ? <DeveloperComplianceView teams={teams} />
+        ? <DeveloperComplianceView teams={teams} historyMonths={historyMonths} />
         : isFewTeamsLeader
-          ? <FewTeamsLeaderView teams={teams} />
-          : <ManyTeamsLeaderView teams={teams} />}
+          ? <FewTeamsLeaderView teams={teams} historyMonths={historyMonths} />
+          : <ManyTeamsLeaderView teams={teams} historyMonths={historyMonths} />}
       <ComplianceMeasurement
         measurement={statusData.measurement}
         generatedAt={statusData.generatedAt}

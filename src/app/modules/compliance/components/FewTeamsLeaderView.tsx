@@ -11,9 +11,10 @@ import { sortTeamsForLeader } from "../utils/complianceFormatters";
 
 interface FewTeamsLeaderViewProps {
   teams: TeamSecurityStatus[];
+  historyMonths: number;
 }
 
-export function FewTeamsLeaderView({ teams }: FewTeamsLeaderViewProps) {
+export function FewTeamsLeaderView({ teams, historyMonths }: FewTeamsLeaderViewProps) {
   const t = useTranslations("compliance");
 
   const totalTeams = teams.length;
@@ -45,7 +46,7 @@ export function FewTeamsLeaderView({ teams }: FewTeamsLeaderViewProps) {
         <LevelLegend />
         <VStack gap="space-16">
           {sortedTeams.map((team) => (
-            <TeamCard key={team.team} team={team} variant="5b" />
+            <TeamCard key={team.team} team={team} variant="5b" historyMonths={historyMonths} />
           ))}
         </VStack>
       </VStack>

@@ -70,7 +70,7 @@ describe("Compliance Components", () => {
 
   it("shows only a compact box and reveals monthly details on hover or keyboard focus", async () => {
     const user = userEvent.setup();
-    render(<HistoryStrip history={[{
+    render(<HistoryStrip historyMonths={6} history={[{
       month: "2026-10",
       throughDate: "2026-10-28",
       onTrackDays: 24,
@@ -92,7 +92,7 @@ describe("Compliance Components", () => {
     expect(box).toHaveAccessibleName(/breakdown green=24 yellow=2 red=1$/);
 
     await user.unhover(box);
-    await user.tab();
+    for (let i = 0; i < 6 && document.activeElement !== box; i++) await user.tab();
     expect(box).toHaveFocus();
     expect(await screen.findByRole("tooltip")).toBeVisible();
     await user.keyboard("{Escape}");
@@ -100,7 +100,7 @@ describe("Compliance Components", () => {
   });
 
   it("distinguishes monthly statuses by symbol as well as colour", () => {
-    render(<HistoryStrip history={["2026-08", "2026-09", "2026-10"].map((month, index) => ({
+    render(<HistoryStrip historyMonths={6} history={["2026-08", "2026-09", "2026-10"].map((month, index) => ({
       month,
       throughDate: `${month}-28`,
       onTrackDays: index === 0 ? 28 : 0,
@@ -123,7 +123,7 @@ describe("Compliance Components", () => {
   });
 
   it("does not show a percentage or status symbol for months without recorded days", () => {
-    render(<HistoryStrip history={[{
+    render(<HistoryStrip historyMonths={6} history={[{
       month: "2025-12",
       throughDate: "2025-12-31",
       onTrackDays: 0,
@@ -136,6 +136,24 @@ describe("Compliance Components", () => {
     expect(box.firstElementChild).toHaveStyle({ backgroundColor: "var(--ax-bg-neutral-moderate)" });
     expect(box).not.toHaveAccessibleName(/complianceHistory.summary/);
     expect(box.querySelector("svg")).not.toBeInTheDocument();
+  });
+
+  it("pads with no-data months before the first recorded month so there are always six boxes", () => {
+    render(<HistoryStrip historyMonths={6} history={[{
+      month: "2026-02",
+      throughDate: "2026-02-10",
+      onTrackDays: 10,
+      needsAttentionDays: 0,
+      actNowDays: 0,
+      missingDays: 0,
+      provisional: true,
+    }]} />);
+
+    const boxes = screen.getAllByRole("button");
+    expect(boxes).toHaveLength(6);
+    expect(boxes[0]).toHaveAccessibleName(/month=september 2025 status=complianceStatus.noData/);
+    expect(boxes[4]).toHaveAccessibleName(/month=januar 2026 status=complianceStatus.noData/);
+    expect(boxes[5]).toHaveAccessibleName(/month=februar 2026 status=complianceHistory.green/);
   });
 
   it("explains the backend's active thresholds rather than frontend defaults", async () => {
@@ -221,7 +239,7 @@ describe("Compliance Components", () => {
       },
     };
 
-    render(<TeamCard team={mockTeam} variant="5c" />);
+    render(<TeamCard team={mockTeam} variant="5c" historyMonths={6} />);
     expect(screen.getByText("team-nordlys")).toBeInTheDocument();
     expect(screen.getByText("soknad-api")).toBeInTheDocument();
     expect(screen.getByText("gammel-rapport")).toBeInTheDocument();
@@ -264,7 +282,7 @@ describe("Compliance Components", () => {
       maintenance: { status: "green", upToDate: 1, total: 1, overdueRebuild: [] },
     };
 
-    render(<TeamCard team={mockTeam} variant="5c" />);
+    render(<TeamCard team={mockTeam} variant="5c" historyMonths={6} />);
     const toggle = screen.getByRole("button", { name: /soknad-api/ });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
@@ -324,7 +342,7 @@ describe("Compliance Components", () => {
       },
     ];
 
-    render(<TeamsFollowUpTable teams={mockTeams} collapseOnTrack={false} />);
+    render(<TeamsFollowUpTable teams={mockTeams} historyMonths={6} collapseOnTrack={false} />);
 
     const teamNames = screen.getAllByRole("rowheader").map((el) => el.textContent);
     // Ordered: team-hav (chronic), team-nordlys (ongoing), team-myr (new), team-fjell (on track)

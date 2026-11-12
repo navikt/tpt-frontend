@@ -8,9 +8,10 @@ import { TeamCard } from "./TeamCard";
 
 interface DeveloperComplianceViewProps {
   teams: TeamSecurityStatus[];
+  historyMonths: number;
 }
 
-export function DeveloperComplianceView({ teams }: DeveloperComplianceViewProps) {
+export function DeveloperComplianceView({ teams, historyMonths }: DeveloperComplianceViewProps) {
   const t = useTranslations("compliance");
 
   const totalTeams = teams.length;
@@ -42,7 +43,7 @@ export function DeveloperComplianceView({ teams }: DeveloperComplianceViewProps)
         {/* Team cards */}
         <VStack gap="space-16">
           {teams.map((team) => (
-            <TeamCard key={team.team} team={team} variant="5c" />
+            <TeamCard key={team.team} team={team} variant="5c" historyMonths={historyMonths} />
           ))}
         </VStack>
       </VStack>

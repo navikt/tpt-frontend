@@ -24,9 +24,10 @@ function severityKey(severity: string | null): (typeof SEVERITY_KEYS)[keyof type
 interface TeamCardProps {
   team: TeamSecurityStatus;
   variant: "5b" | "5c";
+  historyMonths: number;
 }
 
-export function TeamCard({ team, variant }: TeamCardProps) {
+export function TeamCard({ team, variant, historyMonths }: TeamCardProps) {
   const t = useTranslations("complianceCard");
   const tQuestions = useTranslations("complianceQuestions");
   const tTable = useTranslations("complianceTable");
@@ -82,7 +83,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
             <Label size="small" textColor="subtle">
               {tCompliance("monthlyHistory")}
             </Label>
-            <HistoryStrip history={team.history} />
+            <HistoryStrip history={team.history} historyMonths={historyMonths} />
           </VStack>
         </HStack>
 

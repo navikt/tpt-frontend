@@ -10,9 +10,10 @@ import { TeamsFollowUpTable } from "./TeamsFollowUpTable";
 
 interface ManyTeamsLeaderViewProps {
   teams: TeamSecurityStatus[];
+  historyMonths: number;
 }
 
-export function ManyTeamsLeaderView({ teams }: ManyTeamsLeaderViewProps) {
+export function ManyTeamsLeaderView({ teams, historyMonths }: ManyTeamsLeaderViewProps) {
   const t = useTranslations("compliance");
 
   const totalTeams = teams.length;
@@ -39,7 +40,7 @@ export function ManyTeamsLeaderView({ teams }: ManyTeamsLeaderViewProps) {
         {/* 5a Overview */}
         <QuestionCards teams={teams} />
         <LevelLegend />
-        <TeamsFollowUpTable teams={teams} />
+        <TeamsFollowUpTable teams={teams} historyMonths={historyMonths} />
       </VStack>
     </Box>
   );

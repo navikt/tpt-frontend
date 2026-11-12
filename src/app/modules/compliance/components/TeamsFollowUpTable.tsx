@@ -19,11 +19,13 @@ import { sortTeamsForLeader } from "../utils/complianceFormatters";
 
 interface TeamsFollowUpTableProps {
   teams: TeamSecurityStatus[];
+  historyMonths: number;
   collapseOnTrack?: boolean;
 }
 
 export function TeamsFollowUpTable({
   teams,
+  historyMonths,
   collapseOnTrack = true,
 }: TeamsFollowUpTableProps) {
   const t = useTranslations("complianceTable");
@@ -84,7 +86,7 @@ export function TeamsFollowUpTable({
         </Table.HeaderCell>
 
         <Table.DataCell>
-          <HistoryStrip history={team.history} />
+          <HistoryStrip history={team.history} historyMonths={historyMonths} />
         </Table.DataCell>
 
         <Table.DataCell>

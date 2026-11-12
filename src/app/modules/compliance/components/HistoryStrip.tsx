@@ -8,6 +8,30 @@ import { getMonthlyStatus, getOnTrackPercentage } from "../utils/complianceForma
 
 interface HistoryStripProps {
   history: MonthlySecurityHistory[];
+  historyMonths: number;
+}
+
+function emptyMonth(year: number, monthIndex: number): MonthlySecurityHistory {
+  const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0));
+  const month = lastDay.toISOString().slice(0, 7);
+  return {
+    month,
+    throughDate: lastDay.toISOString().slice(0, 10),
+    onTrackDays: 0,
+    needsAttentionDays: 0,
+    actNowDays: 0,
+    missingDays: lastDay.getUTCDate(),
+    provisional: false,
+  };
+}
+
+function padHistory(history: MonthlySecurityHistory[], monthCount: number): MonthlySecurityHistory[] {
+  const first = history[0];
+  if (!first) return history;
+  const [year = 0, month = 1] = first.month.split("-").map(Number);
+  const missing = Math.max(0, monthCount - history.length);
+  const padding = Array.from({ length: missing }, (_, i) => emptyMonth(year, month - 1 - (missing - i)));
+  return [...padding, ...history];
 }
 
 const STATUS_APPEARANCE = {
@@ -28,7 +52,7 @@ const STATUS_APPEARANCE = {
   },
 };
 
-export function HistoryStrip({ history }: HistoryStripProps) {
+export function HistoryStrip({ history, historyMonths }: HistoryStripProps) {
   const t = useTranslations("complianceHistory");
   const tStatus = useTranslations("complianceStatus");
   const locale = useLocale();
@@ -47,7 +71,7 @@ export function HistoryStrip({ history }: HistoryStripProps) {
 
   return (
     <HStack gap="space-0" role="group" aria-label={t("label")}>
-      {history.map((month) => {
+      {padHistory(history, historyMonths).map((month) => {
         const status = getMonthlyStatus(month);
         const appearance = status === null ? null : STATUS_APPEARANCE[status];
         const Icon = appearance?.Icon;
