@@ -18,7 +18,7 @@ export default function CompliancePage() {
   const t = useTranslations("errors");
   const tCompliance = useTranslations("compliance");
 
-  const teams = useMemo(() => statusData?.teams ?? [], [statusData]);
+  const teams = useMemo(() => statusData?.teams.filter((team) => team.applicationCount > 0) ?? [], [statusData]);
 
   // Wait for role and status data to be ready
   if (isRoleLoading || !isInitialized || isStatusLoading) {
