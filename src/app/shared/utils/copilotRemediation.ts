@@ -16,6 +16,7 @@ export function isSafeReturnPath(value: unknown): value is string {
 
 export function withCopilotOutcome(path: string, outcome: CopilotOutcome, status?: number): string {
   const url = new URL(isSafeReturnPath(path) ? path : "/", "http://localhost");
+  if (url.pathname.startsWith("//")) url.pathname = "/";
   url.searchParams.set(COPILOT_OUTCOME_PARAM, outcome);
   if (status !== undefined) url.searchParams.set(COPILOT_STATUS_PARAM, String(status));
   return `${url.pathname}${url.search}${url.hash}`;
