@@ -46,6 +46,11 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     indexedDB.deleteDatabase("tpt-cache");
   });
+  await page.route("**/api/applications", (route) =>
+    route.fulfill({ json: freshFixture() })
+  );
+  // Keep the event connection pending so backend errors cannot end a refresh.
+  await page.route("**/api/events", () => {});
 });
 
 test.describe("GitHub page — update button", () => {
@@ -64,6 +69,7 @@ test.describe("GitHub page — update button", () => {
     // Repositories are listed as team/repo, not owner/repo
     await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
     await expect(page.getByText("navikt/test-repo")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Oppdater", exact: true })).toBeVisible();
   });
 
   test("fresh data: update button uses secondary (muted) variant", async ({ page }) => {
@@ -77,13 +83,12 @@ test.describe("GitHub page — update button", () => {
     await page.goto("/nb/github");
     await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
 
-    // When fresh the refresh button is icon-only (no accessible text) — it is the first toolbar button
-    const toolbar = page.locator(".aksel-hstack").first();
-    const refreshButton = toolbar.getByRole("button").nth(0);
+    const refreshButton = page.getByRole("button", { name: "Oppdater", exact: true });
     await expect(refreshButton).toHaveAttribute("data-variant", "secondary");
+    await expect(refreshButton).toBeEnabled();
   });
 
-  test("stale data: update button uses primary (highlighted) variant and shows warning tag", async ({
+  test("stale data: automatically refreshes and disables the update button", async ({
     page,
   }) => {
     await page.route("**/api/github", (route) =>
@@ -92,14 +97,16 @@ test.describe("GitHub page — update button", () => {
     await page.route("**/api/config", (route) =>
       route.fulfill({ json: { thresholds: { critical: 75, high: 50, medium: 25 } } })
     );
+    await page.route("**/api/github/refresh", () => {});
+    const refreshRequest = page.waitForRequest("**/api/github/refresh");
 
     await page.goto("/nb/github");
+    await refreshRequest;
     await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
 
-    // When stale, the Tag text ("Utdatert" in nb locale) becomes the button's accessible name
-    const refreshButton = page.getByRole("button", { name: "Utdatert" });
-    await expect(refreshButton).toHaveAttribute("data-variant", "primary");
-    await expect(refreshButton).toBeVisible();
+    const refreshButton = page.getByRole("button", { name: "Oppdater", exact: true });
+    await expect(refreshButton).toBeDisabled();
+    await expect(page.getByRole("status")).toContainText("Henter informasjon fra GitHub...");
   });
 
   test("click refresh: button enters loading/disabled state", async ({ page }) => {
@@ -115,10 +122,12 @@ test.describe("GitHub page — update button", () => {
     await page.goto("/nb/github");
     await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
 
-    const toolbar = page.locator(".aksel-hstack").first();
-    const refreshButton = toolbar.getByRole("button").nth(0);
+    const refreshButton = page.getByRole("button", { name: "Oppdater", exact: true });
+    const refreshRequest = page.waitForRequest("**/api/github/refresh");
     await refreshButton.click();
+    await refreshRequest;
 
     await expect(refreshButton).toBeDisabled();
+    await expect(page.getByRole("status")).toContainText("Henter informasjon fra GitHub...");
   });
 });
