@@ -6,7 +6,6 @@ import { MagnifyingGlassIcon, ArrowsCirclepathIcon } from "@navikt/aksel-icons";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { GitHubRepositoryListItem } from "./GitHubRepositoryListItem";
 import { QuickWinsPanel } from "./QuickWinsPanel";
-import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 import { useTranslations } from "next-intl";
 
 interface GitHubRepositoryListProps {
@@ -45,9 +44,7 @@ export function GitHubRepositoryList({
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
-        (repo) =>
-          getTeamRepositoryDisplayName(repo).toLowerCase().includes(query) ||
-          repo.nameWithOwner.toLowerCase().includes(query)
+        (repo) => repo.nameWithOwner.toLowerCase().includes(query)
       );
     }
 

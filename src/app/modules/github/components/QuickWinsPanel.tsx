@@ -5,7 +5,6 @@ import { Box, HStack, VStack, BodyShort, Button } from "@navikt/ds-react";
 import { useTranslations } from "next-intl";
 import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
-import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 
 interface QuickWinsPanelProps {
   repositories: RepositoryMetrics[];
@@ -80,7 +79,7 @@ export function QuickWinsPanel({ repositories }: QuickWinsPanelProps) {
           pullRequestNumber ?? pullRequestUrl,
         ]);
         const group = groupedByPullRequest.get(key) ?? {
-          repoName: getTeamRepositoryDisplayName(repo),
+          repoName: repo.nameWithOwner,
           pullRequestUrl,
           pullRequestNumber,
           dependencyNames: new Set<string>(),

@@ -6,7 +6,6 @@ import { RepositoryMetrics } from "../hooks/useRepositoryMetrics";
 import { formatNumber } from "@/lib/format";
 import { useTranslations } from "next-intl";
 import { RiskScoreBreakdownBars } from "./RiskScoreBreakdownBars";
-import { getTeamRepositoryDisplayName } from "../utils/filterRepositoriesByWorkContext";
 import styles from "./GitHubRepositoryListItem.module.css";
 import { CopilotFixButton, CopilotRemediationsProvider } from "@/app/shared/components/CopilotRemediation";
 
@@ -268,7 +267,7 @@ export function GitHubRepositoryListItem({ repository, rank }: GitHubRepositoryL
               </BodyShort>
 
               <BodyShort weight="semibold" style={{ flexShrink: 0 }}>
-                {getTeamRepositoryDisplayName(repository)}
+                {repository.nameWithOwner}
               </BodyShort>
 
               <BodyShort size="small" style={{ color: "var(--ax-text-neutral-subtle)", flexShrink: 0 }}>

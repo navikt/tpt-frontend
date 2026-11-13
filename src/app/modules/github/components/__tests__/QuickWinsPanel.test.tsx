@@ -76,6 +76,8 @@ describe("QuickWinsPanel", () => {
     expect(screen.getByText("Fixes 2 vulnerabilities")).toBeInTheDocument();
     expect(screen.getByText("Fixes 1 vulnerability")).toBeInTheDocument();
     expect(screen.getByText("Showing 2 of 2")).toBeInTheDocument();
+    expect(screen.getAllByText("navikt/example")).toHaveLength(2);
+    expect(screen.queryByText("team-a/example")).not.toBeInTheDocument();
     expect(screen.getAllByText("Risk score")).toHaveLength(2);
     expect(screen.getByText("80")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "PR #42" })).toHaveLength(

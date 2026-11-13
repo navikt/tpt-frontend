@@ -84,20 +84,20 @@ describe("GoldenPathPage", () => {
 
     render(<GoldenPathPage />);
 
-    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
-    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
+    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
   });
 
   it("filters repository results by severity", () => {
     render(<GoldenPathPage />);
 
-    expect(screen.getByText("team-a/high-repo")).toBeInTheDocument();
-    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
+    expect(screen.getByText("navikt/high-repo")).toBeInTheDocument();
+    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "goldenpath.severity.high" }));
 
-    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
-    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
+    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
   });
 
   it("searches check reasons as well as repository names", () => {
@@ -107,8 +107,8 @@ describe("GoldenPathPage", () => {
       target: { value: "Missing branch protection" },
     });
 
-    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
-    expect(screen.getByText("team-b/medium-repo")).toBeInTheDocument();
+    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
+    expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
   });
 
   it("shows the check title without repeating its internal check name", () => {
@@ -116,6 +116,59 @@ describe("GoldenPathPage", () => {
 
     expect(screen.getByText("high-check description")).toBeInTheDocument();
     expect(screen.queryByText("high-check", { exact: true })).not.toBeInTheDocument();
+  });
+
+  it("searches repositories by their GitHub owner and name", () => {
+    render(<GoldenPathPage />);
+
+    fireEvent.change(screen.getByPlaceholderText("goldenpath.search"), {
+      target: { value: "NAVIKT/high-repo" },
+    });
+
+    expect(screen.getByText("navikt/high-repo")).toBeInTheDocument();
+    expect(screen.queryByText("navikt/medium-repo")).not.toBeInTheDocument();
+  });
+
+  it("sorts repositories by their GitHub name instead of their owning team", () => {
+    useCheckResultsMock.mockReturnValue({
+      isLoading: false,
+      hasError: false,
+      checkResults: [
+        { name: "z-org/repo", owners: ["a-team"], good: [], bad: [check("NeedsWork", "z-check", "HIGH")] },
+        { name: "a-org/repo", owners: ["z-team"], good: [], bad: [check("NeedsWork", "a-check", "HIGH")] },
+      ],
+    });
+    render(<GoldenPathPage />);
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "repository" },
+    });
+
+    const headings = screen.getAllByRole("button", { name: /-org\/repo/ });
+    expect(headings[0]).toHaveTextContent("a-org/repo");
+    expect(headings[1]).toHaveTextContent("z-org/repo");
+  });
+
+  it.each([
+    ["high-repo", "navikt/high-repo"],
+    ["example-org/high-repo", "example-org/high-repo"],
+  ])("uses the same qualified name for the heading and link for %s", (name, qualifiedName) => {
+    useCheckResultsMock.mockReturnValue({
+      isLoading: false,
+      hasError: false,
+      checkResults: [
+        { name, owners: ["team-a"], good: [], bad: [check("NeedsWork", "high-check", "HIGH")] },
+      ],
+    });
+    render(<GoldenPathPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(qualifiedName) }));
+
+    expect(screen.getByText(qualifiedName)).toBeVisible();
+    expect(screen.getByRole("link", {
+      name: `goldenpath.openRepository ${qualifiedName}`,
+    })).toHaveAttribute("href", `https://github.com/${qualifiedName}`);
+    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
   });
 
   it("expands passing-only repositories and shows passing checks without severity warnings", () => {
@@ -127,7 +180,7 @@ describe("GoldenPathPage", () => {
     fireEvent.click(sectionToggle);
     expect(sectionToggle).toHaveAttribute("aria-expanded", "true");
 
-    const repositoryToggle = screen.getByRole("button", { name: /team-a\/healthy-demo/ });
+    const repositoryToggle = screen.getByRole("button", { name: /example-org\/healthy-demo/ });
     expect(repositoryToggle).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(repositoryToggle);
 
@@ -135,10 +188,12 @@ describe("GoldenPathPage", () => {
     expect(screen.getByText("goldenpath.passing")).toBeVisible();
     expect(within(passingSection).queryByText("goldenpath.severity.high")).not.toBeInTheDocument();
     expect(within(passingSection).getByText(/goldenpath.checked/)).toBeVisible();
-    expect(within(passingSection).getByRole("link")).toHaveAttribute(
+    expect(within(passingSection).getByRole("link", {
+      name: "goldenpath.openRepository example-org/healthy-demo",
+    })).toHaveAttribute(
       "href", "https://github.com/example-org/healthy-demo",
     );
-    expect(screen.queryByText("team-a/no-results")).not.toBeInTheDocument();
+    expect(screen.queryByText("example-org/no-results")).not.toBeInTheDocument();
     expect(screen.queryByText("good-check description")).not.toBeInTheDocument();
   });
 
@@ -150,8 +205,8 @@ describe("GoldenPathPage", () => {
     const passingSection = screen.getByRole("region", { name: "goldenpath.noChecksNeedWorkSection 1" });
     fireEvent.click(within(passingSection).getByRole("button", { name: "Vis mer" }));
 
-    expect(screen.queryByText("team-a/high-repo")).not.toBeInTheDocument();
-    expect(screen.queryByText("team-b/medium-repo")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /team-a\/healthy-demo/ })).toBeVisible();
+    expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
+    expect(screen.queryByText("navikt/medium-repo")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /example-org\/healthy-demo/ })).toBeVisible();
   });
 });

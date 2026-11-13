@@ -43,8 +43,6 @@ const severityColors: Record<Severity, "danger" | "warning" | "neutral" | "info"
 export default function GoldenPathPage() {
   const { checkResults: allCheckResults, isLoading, hasError } = useCheckResults();
   const { data, teamFilters, applicationFilters } = useVulnerabilitiesContext();
-  // Scope everything on the page to the global work context filter (navbar),
-  // and show repositories as "team/repo" like the rest of the app.
   const checkResults = useMemo(
     () =>
       filterGoldenPathChecks(allCheckResults, data?.teams ?? [], {
@@ -275,7 +273,7 @@ export default function GoldenPathPage() {
                       </HStack>
                     </Accordion.Header>
                     <Accordion.Content>
-                      <RepositoryChecks repository={repo.name} checks={repo.visibleChecks} formatDate={formatDate} />
+                      <RepositoryChecks repository={repo.displayName} checks={repo.visibleChecks} formatDate={formatDate} />
                     </Accordion.Content>
                   </Accordion.Item>
                 ))}
@@ -316,7 +314,7 @@ export default function GoldenPathPage() {
                         </HStack>
                       </Accordion.Header>
                       <Accordion.Content>
-                        <RepositoryChecks repository={repo.name} checks={repo.good} formatDate={formatDate} />
+                        <RepositoryChecks repository={repo.displayName} checks={repo.good} formatDate={formatDate} />
                       </Accordion.Content>
                     </Accordion.Item>
                   ))}
@@ -357,7 +355,6 @@ function RepositoryChecks({
   formatDate: (date: string) => string;
 }) {
   const t = useTranslations("goldenpath");
-  const repoWithOrg = repository.includes("/") ? repository : `navikt/${repository}`
 
   return (
     <VStack gap="space-12" className={styles.checkList}>
@@ -365,7 +362,7 @@ function RepositoryChecks({
         <CheckCard key={check.name} check={check} formatDate={formatDate} />
       ))}
       <Link
-        href={`https://github.com/${repoWithOrg.split("/").map(encodeURIComponent).join("/")}`}
+        href={`https://github.com/${repository.split("/").map(encodeURIComponent).join("/")}`}
         target="_blank"
         rel="noreferrer"
       >

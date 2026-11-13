@@ -84,13 +84,25 @@ describe("filterGoldenPathChecks", () => {
 });
 
 describe("getGoldenPathDisplayName", () => {
-  it("prefixes the repository name with its owning team", () => {
+  it("preserves the GitHub owner instead of using the owning team", () => {
     expect(
       getGoldenPathDisplayName({ name: "navikt/my-frontend", owners: ["product-team"] })
-    ).toBe("product-team/my-frontend");
+    ).toBe("navikt/my-frontend");
   });
 
-  it("falls back to the full GitHub name when no owner is known", () => {
+  it("preserves owners other than navikt", () => {
+    expect(
+      getGoldenPathDisplayName({ name: "example-org/my-frontend", owners: ["product-team"] })
+    ).toBe("example-org/my-frontend");
+  });
+
+  it("preserves the full GitHub name when no owning team is known", () => {
     expect(getGoldenPathDisplayName({ name: "navikt/orphan", owners: [] })).toBe("navikt/orphan");
+  });
+
+  it("uses the existing navikt default for unqualified repository names", () => {
+    expect(
+      getGoldenPathDisplayName({ name: "my-frontend", owners: ["product-team"] })
+    ).toBe("navikt/my-frontend");
   });
 });

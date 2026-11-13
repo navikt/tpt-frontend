@@ -10,17 +10,6 @@ export interface TeamRepository extends Repository {
   team: string;
 }
 
-/** Repository name without the GitHub owner — "navikt/repo-a" → "repo-a" */
-export function getRepositoryName(nameWithOwner: string): string {
-  const slashIdx = nameWithOwner.indexOf("/");
-  return slashIdx === -1 ? nameWithOwner : nameWithOwner.slice(slashIdx + 1);
-}
-
-/** Display name in the same "team/name" format used for workloads — "team-a/repo-a" */
-export function getTeamRepositoryDisplayName(repository: TeamRepository): string {
-  return `${repository.team}/${getRepositoryName(repository.nameWithOwner)}`;
-}
-
 export function filterRepositoriesByWorkContext(
   githubTeams: Team[],
   applicationTeams: Team[],
