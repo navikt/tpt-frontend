@@ -66,9 +66,8 @@ test.describe("GitHub page — update button", () => {
 
     // The repository-level filter is gone — the global navbar filter is used instead
     await expect(page.getByRole("button", { name: "Filtrer repositories" })).toHaveCount(0);
-    // Repositories are listed as team/repo, not owner/repo
-    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
-    await expect(page.getByText("navikt/test-repo")).toHaveCount(0);
+    await expect(page.getByText("navikt/test-repo", { exact: true })).toBeVisible();
+    await expect(page.getByText("test-team/test-repo", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Oppdater", exact: true })).toBeVisible();
   });
 
@@ -81,7 +80,7 @@ test.describe("GitHub page — update button", () => {
     );
 
     await page.goto("/nb/github");
-    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
+    await expect(page.getByText("navikt/test-repo", { exact: true })).toBeVisible();
 
     const refreshButton = page.getByRole("button", { name: "Oppdater", exact: true });
     await expect(refreshButton).toHaveAttribute("data-variant", "secondary");
@@ -102,7 +101,7 @@ test.describe("GitHub page — update button", () => {
 
     await page.goto("/nb/github");
     await refreshRequest;
-    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
+    await expect(page.getByText("navikt/test-repo", { exact: true })).toBeVisible();
 
     const refreshButton = page.getByRole("button", { name: "Oppdater", exact: true });
     await expect(refreshButton).toBeDisabled();
@@ -120,7 +119,7 @@ test.describe("GitHub page — update button", () => {
     await page.route("**/api/github/refresh", () => {});
 
     await page.goto("/nb/github");
-    await expect(page.getByText("test-team/test-repo").first()).toBeVisible();
+    await expect(page.getByText("navikt/test-repo", { exact: true })).toBeVisible();
 
     const refreshButton = page.getByRole("button", { name: "Oppdater", exact: true });
     const refreshRequest = page.waitForRequest("**/api/github/refresh");
