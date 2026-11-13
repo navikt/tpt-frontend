@@ -45,3 +45,29 @@ export function copilotErrorKey(status?: number): string {
       return "errors.generic";
   }
 }
+
+function decodeSegment(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+/** Mirrors the backend's version-independent package identity used to deduplicate remediations. */
+export function packageIdentity(packageName?: string | null): string {
+  const value = packageName?.trim() ?? "";
+  if (!value.startsWith("pkg:")) return value.toLowerCase();
+
+  const path = value.slice(4).replace(/^\/+/, "").split(/[?#]/, 1)[0] ?? "";
+  const [type, ...rest] = path.split("/").filter((segment) => segment.length > 0);
+  const last = rest.pop();
+  if (!type || last === undefined) return value.toLowerCase();
+
+  const namespace = rest.map(decodeSegment);
+  const at = last.lastIndexOf("@");
+  const name = decodeSegment(at >= 0 ? last.slice(0, at) : last);
+  const identity =
+    type.toLowerCase() === "maven" && namespace.length > 0 ? `${namespace.join(".")}:${name}` : [...namespace, name].join("/");
+  return identity.toLowerCase();
+}

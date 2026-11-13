@@ -17,6 +17,7 @@ import {
   COPILOT_OUTCOME_PARAM,
   COPILOT_STATUS_PARAM,
   copilotErrorKey,
+  packageIdentity,
   withoutCopilotOutcome,
 } from "@/app/shared/utils/copilotRemediation";
 
@@ -66,7 +67,7 @@ export function CopilotFixButton({
   const remediation = context.remediations.find(
     (item) =>
       item.vulnerabilityIdentifier === vulnerability.identifier &&
-      (item.packageName ?? "") === (vulnerability.packageName ?? ""),
+      packageIdentity(item.packageName) === packageIdentity(vulnerability.packageName),
   );
 
   const start = async (force: boolean) => {
