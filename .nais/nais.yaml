@@ -8,6 +8,7 @@ metadata:
 spec:
   ingresses:
     - https://tpt.ansatt.nav.no
+    - https://tpt.nav.no/api/github/copilot/callback
   azure:
     application:
       enabled: true
@@ -15,6 +16,8 @@ spec:
     sidecar:
       enabled: true
       autoLogin: true
+      autoLoginIgnorePaths:
+        - /api/github/copilot/callback
   accessPolicy:
     outbound:
       rules:
@@ -47,5 +50,7 @@ spec:
     # Telemetry URL accessed at runtime via server-side API
     - name: TELEMETRY_URL
       value: https://telemetry.nav.no/collect
+    - name: COPILOT_COMPLETE_URL
+      value: https://tpt.ansatt.nav.no/api/github/copilot/complete
   envFrom:
     - secret: tpt-frontend

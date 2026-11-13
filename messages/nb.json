@@ -181,6 +181,26 @@
     "descriptionShowMore": "Se resten av beskrivelsen...",
     "noRiskFactors": "Ingen risikofaktorer er identifisert for denne sårbarheten."
   },
+  "copilot": {
+    "fixButton": "Fiks med Copilot",
+    "taskStarted": "Copilot jobber med saken",
+    "taskStarting": "Copilot-oppgaven startes …",
+    "startAgain": "Start på nytt",
+    "alertTitle": "Fiks med Copilot",
+    "outcome": {
+      "started": "Copilot har startet en oppgave og lager en pull request. Du blir bedt om review på GitHub når den er klar.",
+      "alreadyStarted": "Copilot jobber allerede med denne sårbarheten. Det ble ikke startet en ny oppgave.",
+      "cancelled": "Du avbrøt innloggingen på GitHub, så Copilot ble ikke startet."
+    },
+    "errors": {
+      "authorizationFailed": "Innloggingen på GitHub feilet eller tok for lang tid. Prøv igjen.",
+      "forbidden": "GitHub avviste forespørselen. Du trenger en Copilot Business- eller Enterprise-lisens, og Copilot må være slått på for repoet.",
+      "notFound": "Fant ikke sårbarheten eller repoet. Sjekk at GitHub-appen til TPT er installert på repoet.",
+      "conflict": "Copilot kan ikke starte her. Det kan finnes en Dependabot-PR allerede, eller GitHub avviste oppgaven.",
+      "unavailable": "Fiks med Copilot er ikke tilgjengelig akkurat nå. Prøv igjen senere.",
+      "generic": "Kunne ikke starte Copilot. Prøv igjen senere."
+    }
+  },
   "vulnerabilitiesTable": {
     "team": "Team",
     "application": "Applikasjon",
