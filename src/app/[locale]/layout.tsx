@@ -5,7 +5,7 @@ import { RoleContextProvider } from "../shared/hooks/useRoleContext";
 import { FeedbackButton } from "../components/FeedbackButton";
 import { useTranslations } from "next-intl";
 import { Providers } from "../contexts/Providers";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
 import { AppHeader } from "../components/AppHeader";
 import { CopilotRemediationAlert } from "../shared/components/CopilotRemediation";
@@ -15,11 +15,12 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { isSyncing } = useVulnerabilitiesContext();
   const t = useTranslations();
   const pathname = usePathname();
+  const { vulnId } = useParams();
 
   return (
     <Page>
       <AppHeader />
-      {!pathname.includes("/prioritization") && (
+      {!pathname.includes("/prioritization") && !vulnId && (
         <GlobalAlert status="announcement" className={styles.devBanner}>
           <GlobalAlert.Header>
             <GlobalAlert.Title>
