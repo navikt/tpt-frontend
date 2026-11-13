@@ -2,16 +2,21 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CopilotRemediationsResponse } from "@/app/shared/types/copilotRemediation";
-import { CopilotFixButton, CopilotRemediationsProvider } from "../CopilotRemediation";
+import { CopilotFixButton, CopilotRemediationAlert, CopilotRemediationsProvider } from "../CopilotRemediation";
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
+const navigation = vi.hoisted(() => ({
+  searchParams: new URLSearchParams(),
+  router: { replace: () => {} },
+}));
+
 vi.mock("next/navigation", () => ({
   usePathname: () => "/nb",
-  useRouter: () => ({ replace: vi.fn() }),
-  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => navigation.router,
+  useSearchParams: () => navigation.searchParams,
 }));
 
 const fetchMock = vi.fn<typeof fetch>();
@@ -93,5 +98,26 @@ describe("CopilotFixButton", () => {
       packageName: "lib-a",
       force: false,
     });
+  });
+});
+
+describe("CopilotRemediationAlert", () => {
+  afterEach(() => {
+    navigation.searchParams = new URLSearchParams();
+    navigation.router = { replace: () => {} };
+  });
+
+  it("stays visible after the outcome is removed from the URL", () => {
+    const replace = vi.fn();
+    navigation.router = { replace };
+    navigation.searchParams = new URLSearchParams("copilot=started&cve=CVE-2026-0001");
+    const { rerender } = render(<CopilotRemediationAlert />);
+
+    expect(replace).toHaveBeenCalledWith("/nb?cve=CVE-2026-0001", { scroll: false });
+
+    navigation.searchParams = new URLSearchParams("cve=CVE-2026-0001");
+    rerender(<CopilotRemediationAlert />);
+
+    expect(screen.getByText("outcome.started")).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BodyShort, Box, Button, HStack, InlineMessage, Link as AkselLink, LocalAlert } from "@navikt/ds-react";
 import { RobotIcon } from "@navikt/aksel-icons";
@@ -158,17 +158,21 @@ export function CopilotRemediationAlert() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const outcome = searchParams.get(COPILOT_OUTCOME_PARAM);
+  const [shown, setShown] = useState<{ outcome: CopilotOutcome; status?: number; pathname: string } | null>(null);
 
-  if (!isCopilotOutcome(outcome)) return null;
-
-  const status = Number(searchParams.get(COPILOT_STATUS_PARAM)) || undefined;
-  const message = outcome === "error" ? t(copilotErrorKey(status)) : t(`outcome.${outcome}`);
-
-  const close = () => {
+  useEffect(() => {
+    const outcome = searchParams.get(COPILOT_OUTCOME_PARAM);
+    if (!isCopilotOutcome(outcome)) return;
+    setShown({ outcome, status: Number(searchParams.get(COPILOT_STATUS_PARAM)) || undefined, pathname });
     const query = searchParams.toString();
     router.replace(withoutCopilotOutcome(query ? `${pathname}?${query}` : pathname), { scroll: false });
-  };
+  }, [searchParams, pathname, router]);
+
+  if (!shown || shown.pathname !== pathname) return null;
+
+  const { outcome, status } = shown;
+  const message = outcome === "error" ? t(copilotErrorKey(status)) : t(`outcome.${outcome}`);
+  const close = () => setShown(null);
 
   return (
     <Box paddingBlock="space-16 space-0">
