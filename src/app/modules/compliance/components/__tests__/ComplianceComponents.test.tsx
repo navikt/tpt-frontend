@@ -81,7 +81,10 @@ describe("Compliance Components", () => {
     }]} />);
 
     const box = screen.getByRole("button", { name: /month=oktober 2026 status=complianceHistory.green/ });
-    expect(box.firstElementChild).toHaveStyle({ backgroundColor: "var(--ax-bg-success-strong)" });
+    expect(box.firstElementChild).toHaveAttribute(
+      "style",
+      expect.stringContaining("background-color: var(--ax-bg-success-strong)"),
+    );
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     expect(screen.queryByText(/complianceHistory.summary/)).not.toBeInTheDocument();
 
@@ -133,7 +136,10 @@ describe("Compliance Components", () => {
       provisional: false,
     }]} />);
     const box = screen.getByRole("button", { name: /month=desember 2025 status=complianceStatus.noData/ });
-    expect(box.firstElementChild).toHaveStyle({ backgroundColor: "var(--ax-bg-neutral-moderate)" });
+    expect(box.firstElementChild).toHaveAttribute(
+      "style",
+      expect.stringContaining("background-color: var(--ax-bg-neutral-moderate)"),
+    );
     expect(box).not.toHaveAccessibleName(/complianceHistory.summary/);
     expect(box.querySelector("svg")).not.toBeInTheDocument();
   });
