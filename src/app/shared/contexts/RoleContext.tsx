@@ -19,6 +19,7 @@ interface RoleContextType {
   setSelectedRole: (role: string | null) => void;
   actualRole: string | undefined;
   effectiveRole: string | undefined;
+  isAdmin: boolean;
   availableRoles: AppRole[];
   hasSelectedRole: boolean;
   isInitialized: boolean;
@@ -29,7 +30,8 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleContextProvider({ children }: { children: ReactNode }) {
   const { data: vulnData, isLoading, error: vulnError } = useVulnerabilitiesContext();
-  const actualRole = vulnData?.userRole;
+  const isAdmin = vulnData?.userRole === "ADMIN";
+  const actualRole = isAdmin ? undefined : vulnData?.userRole;
 
   const [selectedRole, setSelectedRoleState] = useState<string | null>(null);
   const [hasSelectedRole, setHasSelectedRole] = useState(false);
@@ -72,6 +74,7 @@ export function RoleContextProvider({ children }: { children: ReactNode }) {
     setSelectedRole,
     actualRole,
     effectiveRole,
+    isAdmin,
     availableRoles,
     hasSelectedRole,
     isInitialized,

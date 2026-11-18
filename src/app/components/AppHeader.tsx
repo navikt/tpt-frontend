@@ -39,11 +39,9 @@ function useIsClient() {
 
 function filterByRole(
   allowedRoles: string[] | undefined,
-  effectiveRole: string | null,
-  actualRole: string | null
+  effectiveRole: string | null
 ): boolean {
   if (!allowedRoles || allowedRoles.length === 0) return true;
-  if (actualRole === "ADMIN") return true;
   if (!effectiveRole) return false;
   return allowedRoles.includes(effectiveRole);
 }
@@ -54,7 +52,6 @@ export function AppHeader() {
   const pathname = usePathname();
   const {
     effectiveRole,
-    actualRole,
     isLoading: isRoleLoading,
     setSelectedRole,
   } = useRoleContext();
@@ -83,8 +80,7 @@ export function AppHeader() {
           .filter((s) =>
             filterByRole(
               s.allowedRoles,
-              effectiveRole ?? null,
-              actualRole ?? null
+              effectiveRole ?? null
             )
           )
           .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
@@ -106,8 +102,7 @@ export function AppHeader() {
         .filter((sub) =>
           filterByRole(
             sub.allowedRoles,
-            effectiveRole ?? null,
-            actualRole ?? null
+            effectiveRole ?? null
           )
         )
         .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));

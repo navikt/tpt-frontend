@@ -26,9 +26,7 @@ export function AvatarMenu({ email }: AvatarMenuProps) {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const { actualRole } = useRoleContext();
-
-  const isAdmin = actualRole === "ADMIN";
+  const { isAdmin } = useRoleContext();
   const initials = getInitials(email);
 
   return (

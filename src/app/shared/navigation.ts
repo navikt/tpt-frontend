@@ -4,7 +4,6 @@
  * Top-level sections appear in the primary (dark) header row.
  * Each section may have sub-links that appear in the secondary nav row.
  * Sections and sub-links with allowedRoles are filtered by the user's effective role.
- * ADMIN bypasses all allowedRoles checks.
  */
 
 export interface SubNavLink {
@@ -79,7 +78,6 @@ export const navSections: NavSection[] = [
 export const adminNavLink: SubNavLink = {
   labelKey: "admin.navTitle",
   path: "/admin",
-  allowedRoles: ["ADMIN"],
 };
 
 /**
