@@ -148,11 +148,11 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                             }
                         }}
                     >
-                        <Tooltip content={t("list.viewByCve")}>
-                            <ToggleGroup.Item value="cve" label={t("list.viewByCve")} />
-                        </Tooltip>
                         <Tooltip content={t("list.viewByPackage")}>
                             <ToggleGroup.Item value="package" label={t("list.viewByPackage")} />
+                        </Tooltip>
+                        <Tooltip content={t("list.viewByCve")}>
+                            <ToggleGroup.Item value="cve" label={t("list.viewByCve")} />
                         </Tooltip>
                     </ToggleGroup>
                     <Button

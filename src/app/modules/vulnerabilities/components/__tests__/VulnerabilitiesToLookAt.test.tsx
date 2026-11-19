@@ -68,6 +68,7 @@ it("always groups by action and defaults to packages", async () => {
   renderList();
 
   expect(screen.queryByText("Group by action")).not.toBeInTheDocument();
+  expect(screen.getAllByRole("radio")[0]).toHaveAccessibleName("Group by package");
   expect(screen.getByRole("radio", { name: "Group by package" })).toBeChecked();
   await user.click(screen.getByRole("button", { name: "Open all" }));
 
