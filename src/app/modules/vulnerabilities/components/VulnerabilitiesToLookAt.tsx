@@ -11,7 +11,7 @@ import {
   getPackageDisplayName,
   RemediationGroup,
 } from "@/app/shared/utils/packageClassification";
-import { useUserPreferences } from "@/app/shared/hooks/useUserPreferences";
+import { useUserPreferences, type UserPreferences } from "@/app/shared/hooks/useUserPreferences";
 
 interface WorkloadWithVulns {
     workload: Workload;
@@ -35,7 +35,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
     const { data, isLoading, applicationFilters } = useVulnerabilitiesContext();
     const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
     const { preferences, updatePreferences } = useUserPreferences();
-    const grouping = preferences.vulnerabilityGrouping ?? "action";
+    const grouping = preferences.vulnerabilityGrouping;
 
     const hasAppFilters = Object.values(applicationFilters).some((v) => v === true);
 
@@ -84,7 +84,7 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                         existing.environments.push(workload.environment);
                     }
                     filteredVulns.forEach(vuln => {
-                        if (!existing.vulnerabilities.some(v => v.identifier === vuln.identifier)) {
+                        if (!existing.vulnerabilities.some(v => v.identifier === vuln.identifier && v.packageName === vuln.packageName)) {
                             existing.vulnerabilities.push(vuln);
                         }
                     });
@@ -142,13 +142,17 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                     <ToggleGroup
                         size="small"
                         value={grouping}
-                        onChange={(val) => updatePreferences({ vulnerabilityGrouping: val as "action" | "package" })}
+                        onChange={(val) => {
+                            if (val === "cve" || val === "package") {
+                                updatePreferences({ vulnerabilityGrouping: val });
+                            }
+                        }}
                     >
-                        <Tooltip content={t("list.viewByAction")}>
-                            <ToggleGroup.Item value="action">{t("list.viewByAction")}</ToggleGroup.Item>
+                        <Tooltip content={t("list.viewByCve")}>
+                            <ToggleGroup.Item value="cve" label={t("list.viewByCve")} />
                         </Tooltip>
                         <Tooltip content={t("list.viewByPackage")}>
-                            <ToggleGroup.Item value="package">{t("list.viewByPackage")}</ToggleGroup.Item>
+                            <ToggleGroup.Item value="package" label={t("list.viewByPackage")} />
                         </Tooltip>
                     </ToggleGroup>
                     <Button
@@ -199,10 +203,12 @@ const VulnerabilitiesToLookAt = ({ bucketName, minThreshold, maxThreshold, selec
                                     </HStack>
                                 </Accordion.Header>
                                 <Accordion.Content>
-                                    {grouping === "action"
-                                        ? <ActionGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} basePath={basePath} />
-                                        : <PackageGroupedContent vulnerabilities={workloadGroup.vulnerabilities} workload={workloadGroup.workload} basePath={basePath} />
-                                    }
+                                    <ActionGroupedContent
+                                        vulnerabilities={workloadGroup.vulnerabilities}
+                                        workload={workloadGroup.workload}
+                                        basePath={basePath}
+                                        grouping={grouping}
+                                    />
                                 </Accordion.Content>
                             </Accordion.Item>
                         </Accordion>
@@ -219,9 +225,10 @@ interface ContentProps {
     vulnerabilities: Vulnerability[];
     workload: Workload;
     basePath: string;
+    grouping: UserPreferences["vulnerabilityGrouping"];
 }
 
-const ActionGroupedContent = ({ vulnerabilities, workload, basePath }: ContentProps) => {
+const ActionGroupedContent = ({ vulnerabilities, workload, basePath, grouping }: ContentProps) => {
     const groups = groupByRemediationAction(vulnerabilities);
 
     return (
@@ -232,6 +239,7 @@ const ActionGroupedContent = ({ vulnerabilities, workload, basePath }: ContentPr
                     group={group}
                     workload={workload}
                     basePath={basePath}
+                    grouping={grouping}
                 />
             ))}
         </div>
@@ -242,9 +250,10 @@ interface RemediationGroupSectionProps {
     group: RemediationGroup;
     workload: Workload;
     basePath: string;
+    grouping: UserPreferences["vulnerabilityGrouping"];
 }
 
-const RemediationGroupSection = ({ group, workload, basePath }: RemediationGroupSectionProps) => {
+const RemediationGroupSection = ({ group, workload, basePath, grouping }: RemediationGroupSectionProps) => {
     const t = useTranslations();
     const [expanded, setExpanded] = useState(group.category === "app-dependency");
 
@@ -292,10 +301,11 @@ const RemediationGroupSection = ({ group, workload, basePath }: RemediationGroup
                         <p>{description}</p>
                         <p>{clickForDetails}</p>
                     </BodyShort>
-                    <PackageGroupedContent
+                    <GroupedVulnerabilityContent
                         vulnerabilities={group.vulnerabilities}
                         workload={workload}
                         basePath={basePath}
+                        grouping={grouping}
                     />
                 </div>
             )}
@@ -303,14 +313,12 @@ const RemediationGroupSection = ({ group, workload, basePath }: RemediationGroup
     );
 };
 
-// ── Package-grouped view (existing behaviour) ────────────────────────────────
-
-const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentProps) => {
+const GroupedVulnerabilityContent = ({ vulnerabilities, workload, basePath, grouping }: ContentProps) => {
     const t = useTranslations();
 
-    const byPackage = Object.entries(
+    const groups = Object.entries(
         vulnerabilities.reduce((acc, vuln) => {
-            const key = getPackageDisplayName(vuln.packageName);
+            const key = grouping === "cve" ? vuln.identifier : getPackageDisplayName(vuln.packageName);
             if (!acc[key]) acc[key] = [];
             acc[key].push(vuln);
             return acc;
@@ -319,13 +327,13 @@ const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentP
 
     return (
         <div>
-            {byPackage.map(([packageName, vulns]) => (
-                <div key={packageName} style={{ marginBottom: "1rem" }}>
+            {groups.map(([groupName, vulns]) => (
+                <div key={groupName} style={{ marginBottom: "1rem" }}>
                     <BodyShort
                         weight="semibold"
                         style={{ marginBottom: "0.5rem", color: "var(--ax-text-neutral-subtle)" }}
                     >
-                        {packageName} {t("list.vulnerabilitiesInPackage", { count: vulns.length })}
+                        {groupName} {t(grouping === "cve" ? "list.packagesInCve" : "list.vulnerabilitiesInPackage", { count: vulns.length })}
                     </BodyShort>
                     {vulns.map((vuln, vulnIndex) => {
                         const maxDescriptionLength = 200;
@@ -347,7 +355,9 @@ const PackageGroupedContent = ({ vulnerabilities, workload, basePath }: ContentP
                                 <LinkCard.Title>
                                     <LinkCard.Anchor asChild>
                                         <Link href={`${basePath}/${workload.id}/${vuln.identifier}?pkg=${encodeURIComponent(vuln.packageName)}`}>
-                                            <BodyShort size="small">{vuln.identifier}</BodyShort>
+                                            <BodyShort size="small">
+                                                {grouping === "cve" ? `${vuln.identifier} (${getPackageDisplayName(vuln.packageName)})` : vuln.identifier}
+                                            </BodyShort>
                                         </Link>
                                     </LinkCard.Anchor>
                                 </LinkCard.Title>

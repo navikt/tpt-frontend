@@ -7,12 +7,12 @@ import {
 
 export interface UserPreferences {
   showAllBuckets: boolean;
-  vulnerabilityGrouping: "action" | "package";
+  vulnerabilityGrouping: "cve" | "package";
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   showAllBuckets: false,
-  vulnerabilityGrouping: "action",
+  vulnerabilityGrouping: "package",
 };
 
 export const useUserPreferences = () => {
@@ -23,7 +23,11 @@ export const useUserPreferences = () => {
     (async () => {
       const stored = await getKvItem<UserPreferences>(KV_KEYS.USER_PREFERENCES);
       if (stored) {
-        setPreferences({ ...DEFAULT_PREFERENCES, ...stored });
+        setPreferences({
+          ...DEFAULT_PREFERENCES,
+          ...stored,
+          vulnerabilityGrouping: stored.vulnerabilityGrouping === "cve" ? "cve" : "package",
+        });
       }
       loadedRef.current = true;
     })();
