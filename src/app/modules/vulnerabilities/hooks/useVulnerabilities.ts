@@ -232,7 +232,7 @@ export const useVulnerabilities = () => {
     fetchDataRef.current = fetchData;
   });
 
-  const { isSyncing } = useSyncEvents({
+  const { isSyncing, failedSyncTeams } = useSyncEvents({
     onSyncComplete: useCallback(() => {
       // Silent background re-fetch: no spinner, no filter reset, no cooldown
       fetchDataRef.current(false, false);
@@ -599,6 +599,7 @@ export const useVulnerabilities = () => {
     isLoading,
     isRefreshing,
     isSyncing,
+    failedSyncTeams,
     error,
     refresh,
     teamFilters,

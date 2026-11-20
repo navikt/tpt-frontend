@@ -144,6 +144,7 @@ export function AdminTeamVulnerabilitiesProvider({
     isLoading,
     isRefreshing: false,
     isSyncing: false,
+    failedSyncTeams: [],
     error,
     refresh: () => {},
     teamFilters,

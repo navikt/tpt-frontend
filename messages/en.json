@@ -44,7 +44,8 @@
     "showAllBuckets": "Show all priority buckets"
   },
   "sync": {
-    "fetchingInBackground": "Updating vulnerability data in the background..."
+    "fetchingInBackground": "Updating vulnerability data in the background...",
+    "failed": "Could not update vulnerability data for {teams}. You are seeing data from the last successful update."
   },
   "github": {
     "tab": "GitHub",

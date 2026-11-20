@@ -33,7 +33,7 @@ vi.mock("@/app/shared/utils/cacheRevalidation", () => ({
 }));
 
 vi.mock("@/app/shared/hooks/useSyncEvents", () => ({
-  useSyncEvents: () => ({ isSyncing: false }),
+  useSyncEvents: () => ({ isSyncing: false, failedSyncTeams: [] }),
 }));
 
 const data: VulnerabilitiesResponse = {

@@ -130,7 +130,11 @@ export async function fetchFromBackend(
     Authorization: `Bearer ${token}`,
     Accept: options.mode === "sse" ? "text/event-stream" : "application/json",
   });
-  if (options.mode === "sse") headers.set("Cache-Control", "no-cache");
+  if (options.mode === "sse") {
+    headers.set("Cache-Control", "no-cache");
+    const lastEventId = request.headers.get("last-event-id");
+    if (lastEventId) headers.set("Last-Event-ID", lastEventId);
+  }
   if (options.body !== undefined) headers.set("Content-Type", "application/json");
 
   return fetch(url.toString(), {

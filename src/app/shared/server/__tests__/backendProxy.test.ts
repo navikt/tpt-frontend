@@ -295,6 +295,15 @@ describe("backend proxy", () => {
     expect(await response.text()).toBe(event);
   });
 
+  it("forwards the SSE replay cursor to the backend", async () => {
+    fetchMock.mockResolvedValue(new Response(""));
+    const sseRequest = new Request("http://localhost/api/events", { headers: { "Last-Event-ID": "42" } });
+
+    await proxyToBackend(sseRequest, { path: "/events", mode: "sse" });
+
+    expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).get("last-event-id")).toBe("42");
+  });
+
   it("frames authentication failures as SSE error events", async () => {
     vi.mocked(getToken).mockReturnValue(null);
     const response = await proxyToBackend(request(), { path: "/events", mode: "sse" });
