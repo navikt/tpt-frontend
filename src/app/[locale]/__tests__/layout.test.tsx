@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import LocaleLayout from "../layout";
 
-const { useParamsMock, usePathnameMock } = vi.hoisted(() => ({
+const { useParamsMock, usePathnameMock, vulnerabilitiesContext } = vi.hoisted(() => ({
   useParamsMock: vi.fn(),
   usePathnameMock: vi.fn(),
+  vulnerabilitiesContext: { isSyncing: false, failedSyncTeams: [] as string[] },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -26,7 +27,7 @@ vi.mock("@/app/shared/hooks/useRoleContext", () => ({
 }));
 
 vi.mock("@/app/contexts/VulnerabilitiesContext", () => ({
-  useVulnerabilitiesContext: () => ({ isSyncing: false, failedSyncTeams: [] }),
+  useVulnerabilitiesContext: () => vulnerabilitiesContext,
 }));
 
 vi.mock("@/app/components/AppHeader", () => ({
@@ -76,5 +77,33 @@ describe("LocaleLayout development banner", () => {
     render(<LocaleLayout>Page content</LocaleLayout>);
 
     expect(screen.queryByText("banner.underDevelopment")).not.toBeInTheDocument();
+  });
+});
+
+describe("LocaleLayout sync failure warning", () => {
+  beforeEach(() => {
+    useParamsMock.mockReturnValue({ locale: "en" });
+    vulnerabilitiesContext.failedSyncTeams = ["team-a"];
+  });
+
+  afterEach(() => {
+    vulnerabilitiesContext.failedSyncTeams = [];
+  });
+
+  it("shows the warning for the user's failed teams", () => {
+    usePathnameMock.mockReturnValue("/en/vulnerabilities");
+
+    render(<LocaleLayout>Page content</LocaleLayout>);
+
+    expect(screen.getByText("sync.failed")).toBeInTheDocument();
+  });
+
+  it("hides the warning on admin team pages", () => {
+    usePathnameMock.mockReturnValue("/en/admin/team/other-team");
+    useParamsMock.mockReturnValue({ teamSlug: "other-team" });
+
+    render(<LocaleLayout>Page content</LocaleLayout>);
+
+    expect(screen.queryByText("sync.failed")).not.toBeInTheDocument();
   });
 });

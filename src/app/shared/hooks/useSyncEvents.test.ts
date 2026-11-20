@@ -61,4 +61,32 @@ describe("useSyncEvents team sync failures", () => {
 
     expect(result.current.failedSyncTeams).toEqual(["team-b"]);
   });
+
+  it("keeps syncing while another team is still running when one team fails", () => {
+    const { result } = renderHook(() => useSyncEvents({ onSyncComplete: vi.fn() }));
+
+    emit("team_sync_started", { teamSlug: "team-a" });
+    emit("team_sync_started", { teamSlug: "team-b" });
+    emit("team_sync_failed", { teamSlug: "team-a" });
+
+    expect(result.current.isSyncing).toBe(true);
+
+    emit("team_sync_failed", { teamSlug: "team-b" });
+
+    expect(result.current.isSyncing).toBe(false);
+  });
+
+  it("refreshes for an earlier successful sync when a later sync fails", () => {
+    const onSyncComplete = vi.fn();
+    const { result } = renderHook(() => useSyncEvents({ onSyncComplete }));
+
+    emit("team_sync_started", { teamSlug: "team-a" });
+    emit("team_sync_complete", { teamSlug: "team-a" });
+    emit("team_sync_started", { teamSlug: "team-b" });
+    emit("team_sync_failed", { teamSlug: "team-b" });
+    act(() => vi.advanceTimersByTime(1000));
+
+    expect(onSyncComplete).toHaveBeenCalledOnce();
+    expect(result.current.isSyncing).toBe(false);
+  });
 });

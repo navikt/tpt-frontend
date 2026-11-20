@@ -34,7 +34,7 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
           {t("sync.fetchingInBackground")}
         </Alert>
       )}
-      {failedSyncTeams.length > 0 && (
+      {failedSyncTeams.length > 0 && !pathname.includes("/admin/team/") && (
         <Alert variant="warning" size="small" style={{ borderRadius: 0 }}>
           {t("sync.failed", { teams: failedSyncTeams.join(", ") })}
         </Alert>

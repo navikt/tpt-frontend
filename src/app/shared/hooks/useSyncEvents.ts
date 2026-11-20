@@ -44,6 +44,8 @@ export function useSyncEvents({
   const onGitHubSyncErrorRef = useRef(onGitHubSyncError);
 
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeSyncTeamsRef = useRef(new Set<string>());
+  const refreshPendingRef = useRef(false);
   const githubDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -67,7 +69,24 @@ export function useSyncEvents({
 
     const eventSource = new EventSource("/api/events");
 
-    eventSource.addEventListener("team_sync_started", () => {
+    const scheduleSyncSettled = () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      debounceTimerRef.current = setTimeout(() => {
+        debounceTimerRef.current = null;
+        if (refreshPendingRef.current) {
+          refreshPendingRef.current = false;
+          onSyncCompleteRef.current();
+        }
+        if (activeSyncTeamsRef.current.size === 0) {
+          setIsSyncing(false);
+        }
+      }, DEBOUNCE_MS);
+    };
+
+    eventSource.addEventListener("team_sync_started", (event) => {
+      activeSyncTeamsRef.current.add(parseTeamSlug(event) ?? "");
       setIsSyncing(true);
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
@@ -77,25 +96,23 @@ export function useSyncEvents({
 
     eventSource.addEventListener("team_sync_complete", (event) => {
       const teamSlug = parseTeamSlug(event);
+      activeSyncTeamsRef.current.delete(teamSlug ?? "");
       if (teamSlug) {
         setFailedSyncTeams((prev) => prev.filter((team) => team !== teamSlug));
       }
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-      debounceTimerRef.current = setTimeout(() => {
-        onSyncCompleteRef.current();
-        setIsSyncing(false);
-        debounceTimerRef.current = null;
-      }, DEBOUNCE_MS);
+      refreshPendingRef.current = true;
+      scheduleSyncSettled();
     });
 
     eventSource.addEventListener("team_sync_failed", (event) => {
       const teamSlug = parseTeamSlug(event);
+      activeSyncTeamsRef.current.delete(teamSlug ?? "");
       if (teamSlug) {
         setFailedSyncTeams((prev) => (prev.includes(teamSlug) ? prev : [...prev, teamSlug]));
       }
-      if (!debounceTimerRef.current) {
+      if (refreshPendingRef.current) {
+        scheduleSyncSettled();
+      } else if (activeSyncTeamsRef.current.size === 0) {
         setIsSyncing(false);
       }
     });
@@ -129,6 +146,7 @@ export function useSyncEvents({
         clearTimeout(githubDebounceTimerRef.current);
         githubDebounceTimerRef.current = null;
       }
+      activeSyncTeamsRef.current.clear();
       setIsSyncing(false);
       setIsGitHubSyncing(false);
       onGitHubSyncErrorRef.current?.();
