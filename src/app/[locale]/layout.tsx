@@ -12,7 +12,7 @@ import { CopilotRemediationAlert } from "../shared/components/CopilotRemediation
 import styles from "./layout.module.css";
 
 function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isSyncing } = useVulnerabilitiesContext();
+  const { isSyncing, failedSyncTeams } = useVulnerabilitiesContext();
   const t = useTranslations();
   const pathname = usePathname();
   const { vulnId } = useParams();
@@ -32,6 +32,11 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
       {isSyncing && (
         <Alert variant="info" size="small" style={{ borderRadius: 0 }}>
           {t("sync.fetchingInBackground")}
+        </Alert>
+      )}
+      {failedSyncTeams.length > 0 && (
+        <Alert variant="warning" size="small" style={{ borderRadius: 0 }}>
+          {t("sync.failed", { teams: failedSyncTeams.join(", ") })}
         </Alert>
       )}
       <Page.Block

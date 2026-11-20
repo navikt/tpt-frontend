@@ -44,7 +44,8 @@
     "showAllBuckets": "Vis alle prioritetskategorier"
   },
   "sync": {
-    "fetchingInBackground": "Oppdaterer sårbarhetsdata i bakgrunnen..."
+    "fetchingInBackground": "Oppdaterer sårbarhetsdata i bakgrunnen...",
+    "failed": "Klarte ikke å oppdatere sårbarhetsdata for {teams}. Du ser data fra siste vellykkede oppdatering."
   },
   "github": {
     "tab": "GitHub",

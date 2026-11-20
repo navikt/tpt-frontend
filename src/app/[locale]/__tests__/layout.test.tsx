@@ -26,7 +26,7 @@ vi.mock("@/app/shared/hooks/useRoleContext", () => ({
 }));
 
 vi.mock("@/app/contexts/VulnerabilitiesContext", () => ({
-  useVulnerabilitiesContext: () => ({ isSyncing: false }),
+  useVulnerabilitiesContext: () => ({ isSyncing: false, failedSyncTeams: [] }),
 }));
 
 vi.mock("@/app/components/AppHeader", () => ({

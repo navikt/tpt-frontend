@@ -45,6 +45,7 @@ describe("useGitHubVulnerabilities sync", () => {
     vi.mocked(useSyncEvents).mockReturnValue({
       isSyncing: false,
       isGitHubSyncing: false,
+      failedSyncTeams: [],
     });
     fetchMock.mockImplementation(async (url) =>
       url === "/api/github/refresh"
@@ -124,6 +125,7 @@ describe("useGitHubVulnerabilities sync", () => {
     vi.mocked(useSyncEvents).mockReturnValue({
       isSyncing: false,
       isGitHubSyncing: true,
+      failedSyncTeams: [],
     });
     const { result } = renderHook(() => useGitHubVulnerabilities());
 

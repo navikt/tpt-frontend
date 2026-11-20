@@ -11,6 +11,19 @@ interface UseSyncEventsOptions {
   onGitHubSyncError?: () => void;
 }
 
+function parseTeamSlug(event: Event): string | null {
+  if (!(event instanceof MessageEvent) || typeof event.data !== "string") return null;
+  try {
+    const parsed: unknown = JSON.parse(event.data);
+    if (typeof parsed === "object" && parsed !== null && "teamSlug" in parsed) {
+      return typeof parsed.teamSlug === "string" ? parsed.teamSlug : null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 export function useSyncEvents({
   onSyncComplete,
   onGitHubSyncComplete,
@@ -19,8 +32,10 @@ export function useSyncEvents({
 }: UseSyncEventsOptions): {
   isSyncing: boolean;
   isGitHubSyncing: boolean;
+  failedSyncTeams: string[];
 } {
   const [isSyncing, setIsSyncing] = useState(false);
+  const [failedSyncTeams, setFailedSyncTeams] = useState<string[]>([]);
   const [isGitHubSyncing, setIsGitHubSyncing] = useState(false);
 
   const onSyncCompleteRef = useRef(onSyncComplete);
@@ -60,7 +75,11 @@ export function useSyncEvents({
       }
     });
 
-    eventSource.addEventListener("team_sync_complete", () => {
+    eventSource.addEventListener("team_sync_complete", (event) => {
+      const teamSlug = parseTeamSlug(event);
+      if (teamSlug) {
+        setFailedSyncTeams((prev) => prev.filter((team) => team !== teamSlug));
+      }
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
@@ -69,6 +88,16 @@ export function useSyncEvents({
         setIsSyncing(false);
         debounceTimerRef.current = null;
       }, DEBOUNCE_MS);
+    });
+
+    eventSource.addEventListener("team_sync_failed", (event) => {
+      const teamSlug = parseTeamSlug(event);
+      if (teamSlug) {
+        setFailedSyncTeams((prev) => (prev.includes(teamSlug) ? prev : [...prev, teamSlug]));
+      }
+      if (!debounceTimerRef.current) {
+        setIsSyncing(false);
+      }
     });
 
     eventSource.addEventListener("github_vuln_sync_started", () => {
@@ -116,5 +145,5 @@ export function useSyncEvents({
     };
   }, []);
 
-  return { isSyncing, isGitHubSyncing };
+  return { isSyncing, isGitHubSyncing, failedSyncTeams };
 }
