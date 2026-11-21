@@ -10,7 +10,7 @@ workflows:
         - 'actions/setup-node@v7.1.0'
         - 'aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25'
         - 'github/codeql-action@v4.39.3'
-        - 'nais/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50'
+        - 'nais/deploy@b1a9a40dae937091497f8f29c5ea5334cc1c0643'
         - 'nais/docker-build-push@v0'
         - 'nais/login@40b72a35a18ddf2ad74b632461139ab838cc2a2f'
         - 'pnpm/action-setup@v6.1.1'
@@ -105,9 +105,9 @@ dependencies:
             - 'aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25'
             - 'oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4'
             - 'sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6'
-    'nais/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50':
-        ref: 'v3'
-        commit: 'sha1-6a9dcd6df697ec2d38edc78cadb0b9acd1232f50'
+    'nais/deploy@b1a9a40dae937091497f8f29c5ea5334cc1c0643':
+        ref: 'deploy-v3'
+        commit: 'sha1-b1a9a40dae937091497f8f29c5ea5334cc1c0643'
         owner_id: 29488289
         repo_id: 166402203
         uses:
