@@ -32,7 +32,7 @@ jobs:
       - run: pnpm run lint
       - run: pnpm test
       - run: pnpm run build
-      - uses: nais/docker-build-push@v0
+      - uses: nais/docker-build-push@v1
         id: docker-push
         with:
           team: appsec
