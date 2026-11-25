@@ -78,6 +78,21 @@ describe("LocaleLayout development banner", () => {
 
     expect(screen.queryByText("banner.underDevelopment")).not.toBeInTheDocument();
   });
+
+  it.each([
+    ["en", "/en/admin"],
+    ["nb", "/nb/admin"],
+    ["en", "/en/admin/"],
+    ["nb", "/nb/admin/team/team-a"],
+  ])("hides the banner on the admin route %s %s", (locale, pathname) => {
+    useParamsMock.mockReturnValue({ locale });
+    usePathnameMock.mockReturnValue(pathname);
+
+    render(<LocaleLayout>Admin content</LocaleLayout>);
+
+    expect(screen.queryByText("banner.underDevelopment")).not.toBeInTheDocument();
+    expect(screen.getByText("Admin content")).toBeVisible();
+  });
 });
 
 describe("LocaleLayout sync failure warning", () => {

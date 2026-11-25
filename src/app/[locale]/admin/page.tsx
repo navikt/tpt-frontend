@@ -7,7 +7,6 @@ import { useTeamsSla } from "@/app/modules/admin/hooks/useTeamsSla";
 import { AdminSummaryCards } from "@/app/modules/admin/components/AdminSummaryCards";
 import { TeamsOverviewTable } from "@/app/modules/admin/components/TeamsOverviewTable";
 import { TeamsSlaTable } from "@/app/modules/admin/components/TeamsSlaTable";
-import { VulnerabilitySearch } from "@/app/modules/admin/components/VulnerabilitySearch";
 
 export default function AdminPage() {
   const t = useTranslations("admin");
@@ -43,10 +42,6 @@ export default function AdminPage() {
             totalCriticalOverdue={slaData?.totalCriticalOverdue}
           />
         ) : null}
-
-        <Box>
-          <VulnerabilitySearch />
-        </Box>
 
         <Box>
           <Heading size="medium" level="2" style={{ marginBottom: "1rem" }}>

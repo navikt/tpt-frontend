@@ -1,14 +1,12 @@
 // @vitest-environment node
 
 import { getToken, requestOboToken } from "@navikt/oasis";
-import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   mockSecurityStatusPayload,
   mockVulnerabilitiesPayload,
 } from "@/app/mocks/mockPayloads";
 import { GET as getTeamVulnerabilities } from "../admin/vulnerabilities/team/[teamSlug]/route";
-import { GET as searchVulnerabilities } from "../admin/vulnerability-search/route";
 import { POST as collect } from "../datacollector/collect/route";
 import { GET as debug } from "../debug/route";
 import { GET as refreshGithub } from "../github/refresh/route";
@@ -65,51 +63,6 @@ describe("backend proxy route variations", () => {
     expect(fetchMock.mock.calls[0]?.[0]).toBe("http://backend/admin/vulnerabilities/team/team%2Fa%20%26%20b");
     expect(response.body).toBe(backend.body);
     expect(await response.json()).toEqual({ teams: [] });
-  });
-
-  it("does not fetch for an empty search query", async () => {
-    const response = await searchVulnerabilities(new NextRequest("http://localhost/api/admin/vulnerability-search?q=%20"));
-
-    expect(await response.json()).toEqual({ results: [], totalCount: 0 });
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(requestOboToken).not.toHaveBeenCalled();
-  });
-
-  it("retains admin search filtering and the flattened result shape", async () => {
-    fetchMock.mockResolvedValue(Response.json({
-      teams: [{
-        team: "example-team",
-        workloads: [{
-          id: "workload-id",
-          name: "application",
-          environment: "prod-gcp",
-          repository: "example-org/application",
-          vulnerabilities: [
-            { identifier: "CVE-2026-1234", packageName: "example-package", riskScore: 80 },
-            { identifier: "CVE-2026-5678", packageName: "other-package", riskScore: 10 },
-          ],
-        }],
-      }],
-    }));
-
-    const response = await searchVulnerabilities(
-      new NextRequest("http://localhost/api/admin/vulnerability-search?q=%20EXAMPLE-PACKAGE%20"),
-    );
-
-    expect(fetchMock.mock.calls[0]?.[0]).toBe("http://backend/api/vulnerabilities");
-    expect(await response.json()).toEqual({
-      results: [{
-        identifier: "CVE-2026-1234",
-        workloadName: "application",
-        workloadId: "workload-id",
-        team: "example-team",
-        environment: "prod-gcp",
-        repository: "example-org/application",
-        riskScore: 80,
-        packageName: "example-package",
-      }],
-      totalCount: 1,
-    });
   });
 
   it("normalizes a bodyless GitHub refresh acknowledgement to the existing 202 JSON response", async () => {

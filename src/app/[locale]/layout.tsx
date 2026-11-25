@@ -15,12 +15,13 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const { isSyncing, failedSyncTeams } = useVulnerabilitiesContext();
   const t = useTranslations();
   const pathname = usePathname();
-  const { vulnId } = useParams();
+  const { vulnId, locale } = useParams();
+  const isAdminPage = pathname === `/${locale}/admin` || pathname.startsWith(`/${locale}/admin/`);
 
   return (
     <Page>
       <AppHeader />
-      {!pathname.includes("/prioritization") && !vulnId && (
+      {!isAdminPage && !pathname.includes("/prioritization") && !vulnId && (
         <GlobalAlert status="announcement" className={styles.devBanner}>
           <GlobalAlert.Header>
             <GlobalAlert.Title>
