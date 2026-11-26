@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 export const useCheckResults = () => {
     const [checkResults, setCheckResults] = useState<RepoWithGroupedChecks[]>([])
@@ -26,8 +26,23 @@ export const useCheckResults = () => {
             })
     }, [])
 
+    const suppressCheck = useCallback(async (repoName: string, checkName: string) => {
+        const path = [...repoName.split("/"), checkName].map(encodeURIComponent).join("/")
+        const res = await fetch(`/api/datacollector/checks/${path}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ suppress: true }),
+        })
+        if (!res.ok) throw new Error(`Failed to suppress check: ${res.status}`)
+        setCheckResults((current) => current.map((repo) => repo.name !== repoName ? repo : {
+            ...repo,
+            good: repo.good.filter((check) => check.name !== checkName),
+            bad: repo.bad.filter((check) => check.name !== checkName),
+        }))
+    }, [])
+
     return {
-        checkResults, isLoading, hasError
+        checkResults, isLoading, hasError, suppressCheck
     }
 }
 
@@ -41,6 +56,7 @@ const groupedChecks = (backendReply: RepoChecks): RepoWithGroupedChecks[] =>
             bad: []
         }
         results?.forEach(result => {
+            if (result.suppressed) return
             if (result.type === "NeedsWork") { repo.bad.push(result) } else { repo.good.push(result) }
         })
         return repo
@@ -53,6 +69,7 @@ export type CheckResult = {
     severity: "LOW" | "MEDIUM" | "HIGH" | "UNKNOWN";
     whenChecked: string;
     reasons?: string[];
+    suppressed?: boolean;
 }
 
 export type RepoCheckResults = {

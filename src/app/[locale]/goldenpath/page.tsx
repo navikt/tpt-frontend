@@ -41,7 +41,7 @@ const severityColors: Record<Severity, "danger" | "warning" | "neutral" | "info"
 };
 
 export default function GoldenPathPage() {
-  const { checkResults: allCheckResults, isLoading, hasError } = useCheckResults();
+  const { checkResults: allCheckResults, isLoading, hasError, suppressCheck } = useCheckResults();
   const { data, teamFilters, applicationFilters } = useVulnerabilitiesContext();
   const checkResults = useMemo(
     () =>
@@ -273,7 +273,13 @@ export default function GoldenPathPage() {
                       </HStack>
                     </Accordion.Header>
                     <Accordion.Content>
-                      <RepositoryChecks repository={repo.displayName} checks={repo.visibleChecks} formatDate={formatDate} />
+                      <RepositoryChecks
+                        repository={repo.displayName}
+                        repoName={repo.name}
+                        checks={repo.visibleChecks}
+                        formatDate={formatDate}
+                        onSuppress={suppressCheck}
+                      />
                     </Accordion.Content>
                   </Accordion.Item>
                 ))}
@@ -314,7 +320,13 @@ export default function GoldenPathPage() {
                         </HStack>
                       </Accordion.Header>
                       <Accordion.Content>
-                        <RepositoryChecks repository={repo.displayName} checks={repo.good} formatDate={formatDate} />
+                        <RepositoryChecks
+                          repository={repo.displayName}
+                          repoName={repo.name}
+                          checks={repo.good}
+                          formatDate={formatDate}
+                          onSuppress={suppressCheck}
+                        />
                       </Accordion.Content>
                     </Accordion.Item>
                   ))}
@@ -347,19 +359,28 @@ function SeverityTag({ severity, count }: { severity: Severity; count?: number }
 
 function RepositoryChecks({
   repository,
+  repoName,
   checks,
   formatDate,
+  onSuppress,
 }: {
   repository: string;
+  repoName: string;
   checks: CheckResult[];
   formatDate: (date: string) => string;
+  onSuppress: (repoName: string, checkName: string) => Promise<void>;
 }) {
   const t = useTranslations("goldenpath");
 
   return (
     <VStack gap="space-12" className={styles.checkList}>
       {checks.map((check) => (
-        <CheckCard key={check.name} check={check} formatDate={formatDate} />
+        <CheckCard
+          key={check.name}
+          check={check}
+          formatDate={formatDate}
+          onSuppress={() => onSuppress(repoName, check.name)}
+        />
       ))}
       <Link
         href={`https://github.com/${repository.split("/").map(encodeURIComponent).join("/")}`}
@@ -375,12 +396,28 @@ function RepositoryChecks({
 function CheckCard({
   check,
   formatDate,
+  onSuppress,
 }: {
   check: CheckResult;
   formatDate: (date: string) => string;
+  onSuppress: () => Promise<void>;
 }) {
   const t = useTranslations("goldenpath");
   const validDate = !Number.isNaN(Date.parse(check.whenChecked));
+  const [isSuppressing, setIsSuppressing] = useState(false);
+  const [suppressFailed, setSuppressFailed] = useState(false);
+
+  const handleSuppress = async () => {
+    setIsSuppressing(true);
+    setSuppressFailed(false);
+    try {
+      await onSuppress();
+    } catch (error) {
+      console.error(error);
+      setSuppressFailed(true);
+      setIsSuppressing(false);
+    }
+  };
 
   return (
     <Box className={styles.checkCard} background="neutral-soft" borderRadius="8">
@@ -402,6 +439,22 @@ function CheckCard({
           ))}
         </VStack>
       )}
+      <HStack gap="space-8" align="center" className={styles.suppressRow}>
+        <Button
+          type="button"
+          size="small"
+          variant="tertiary"
+          data-color="neutral"
+          loading={isSuppressing}
+          onClick={handleSuppress}
+          aria-label={t("suppressCheck", { check: check.desc })}
+        >
+          {t("suppress")}
+        </Button>
+        {suppressFailed && (
+          <BodyShort size="small" role="alert">{t("suppressError")}</BodyShort>
+        )}
+      </HStack>
     </Box>
   );
 }

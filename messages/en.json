@@ -613,6 +613,9 @@
     "passing": "Passing",
     "noMatchingChecks": "No repositories match your search or severity filters.",
     "loading": "Loading checks...",
-    "loadError": "Check results could not be loaded. Try again later."
+    "loadError": "Check results could not be loaded. Try again later.",
+    "suppress": "Suppress",
+    "suppressCheck": "Suppress check: {check}",
+    "suppressError": "The check could not be suppressed. Try again later."
   }
 }

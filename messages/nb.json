@@ -613,6 +613,9 @@
     "passing": "Godkjent",
     "noMatchingChecks": "Ingen repositorier passer med søket eller alvorlighetsfiltrene.",
     "loading": "Laster sjekker ...",
-    "loadError": "Klarte ikke å laste sjekkeresultater. Prøv igjen senere."
+    "loadError": "Klarte ikke å laste sjekkeresultater. Prøv igjen senere.",
+    "suppress": "Skjul",
+    "suppressCheck": "Skjul sjekk: {check}",
+    "suppressError": "Klarte ikke å skjule sjekken. Prøv igjen senere."
   }
 }

@@ -88,6 +88,10 @@
   padding-inline-start: var(--ax-space-16);
 }
 
+.suppressRow {
+  margin-block-start: var(--ax-space-8);
+}
+
 .emptyState {
   padding: var(--ax-space-24);
 }

@@ -15,7 +15,7 @@ type BackendMode = "json" | "stream" | "sse";
 
 interface BackendFetchOptions {
   path: string;
-  method?: "GET" | "POST";
+  method?: "GET" | "POST" | "PATCH";
   forwardQuery?: boolean;
   mode?: BackendMode;
   mock?: unknown;
