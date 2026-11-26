@@ -102,6 +102,10 @@ describe("CompliancePage", () => {
     render(<CompliancePage />);
 
     expect(screen.getByText("noTeamView.title")).toBeInTheDocument();
+    expect(screen.getByText("dataSource.compliance.summary")).toBeVisible();
+    expect(screen.getByText("noTeamView.checkMembership")).toBeVisible();
+    expect(screen.getByText("noTeamView.checkNaisTeam")).toBeVisible();
+    expect(screen.getByText("noTeamView.contactAppsec")).toBeVisible();
     expect(screen.queryByText("empty-team")).not.toBeInTheDocument();
   });
 });

@@ -4,11 +4,12 @@ import {
   InternalHeader,
   Spacer,
   Tabs,
-  Button,
-  BodyShort,
+  HStack,
 } from "@navikt/ds-react";
+import NextLink from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { ALL_ROLES } from "../shared/contexts/RoleContext";
 import { useRoleContext } from "../shared/hooks/useRoleContext";
 import { useUser } from "../shared/hooks/useUser";
 import {
@@ -18,7 +19,6 @@ import {
 } from "../shared/navigation";
 import { AvatarMenu } from "./AvatarMenu";
 import { useSyncExternalStore } from "react";
-import { PersonRectangleIcon } from "@navikt/aksel-icons";
 import { useVulnerabilitiesContext } from "../contexts/VulnerabilitiesContext";
 import { serializeFilters } from "../modules/vulnerabilities/utils/queryParamHelpers";
 import WorkContextFilter from "./WorkContextFilter";
@@ -50,14 +50,14 @@ export function AppHeader() {
   const t = useTranslations();
   const locale = useLocale();
   const pathname = usePathname();
+  const isStartPage = pathname === `/${locale}` || pathname === `/${locale}/`;
   const {
     effectiveRole,
     isLoading: isRoleLoading,
-    setSelectedRole,
   } = useRoleContext();
   const { user, isLoading: isUserLoading } = useUser();
-  const router = useRouter();
   const isClient = useIsClient();
+  const displayRole = ALL_ROLES.find((role) => role === effectiveRole);
 
   const { teamFilters, applicationFilters } = useVulnerabilitiesContext();
   const globalFilterParams = new URLSearchParams();
@@ -116,48 +116,45 @@ export function AppHeader() {
 
   return (
     <>
-      <InternalHeader>
-        <InternalHeader.Title href={href("")}>
-          {t("common.appTitle")}
-        </InternalHeader.Title>
+      <HStack asChild wrap={isStartPage}>
+        <InternalHeader>
+          <InternalHeader.Title href={href("")}>
+            {t("common.appTitle")}
+          </InternalHeader.Title>
 
-        {visibleSections.map((section) => {
-          const sectionPath = section.subLinks?.[0]?.path ?? section.path;
-          const isActive = section === activeSection;
-          return (
-            <InternalHeader.Title
-              key={section.path}
-              href={href(sectionPath)}
-              aria-current={isActive ? "page" : undefined}
-              style={{
-                fontWeight: isActive ? 600 : 400,
-                color: isActive ? "white" : "rgb(223, 225, 229)",
-                textDecoration: isActive ? "underline" : "none",
-                textUnderlineOffset: "4px",
-              }}
-            >
-              {t(section.labelKey)}
-            </InternalHeader.Title>
-          );
-        })}
+          {visibleSections.map((section) => {
+            const sectionPath = section.subLinks?.[0]?.path ?? section.path;
+            const isActive = section === activeSection;
+            return (
+              <InternalHeader.Title
+                key={section.path}
+                href={href(sectionPath)}
+                aria-current={isActive ? "page" : undefined}
+                style={{
+                  fontWeight: isActive ? 600 : 400,
+                  color: isStartPage ? "var(--ax-text-neutral)" : isActive ? "white" : "rgb(223, 225, 229)",
+                  textDecoration: isActive ? "underline" : "none",
+                  textUnderlineOffset: "4px",
+                }}
+              >
+                {t(section.labelKey)}
+              </InternalHeader.Title>
+            );
+          })}
 
-        <Spacer />
-        <WorkContextFilter />
-        {isClient && !isRoleLoading && (
-          <Button
-            variant="tertiary"
-            size="small"
-            icon={<PersonRectangleIcon aria-hidden />}
-            onClick={() => {
-              setSelectedRole(null);
-              router.push(`/${locale}`);
-            }}
+          <Spacer />
+          <WorkContextFilter />
+          <InternalHeader.Title
+            as={NextLink}
+            href={`/${locale}?welcome=true${filterParams ? `&${filterParams}` : ""}`}
           >
-            <BodyShort size="small">{t("roleContext.changeRole")}</BodyShort>
-          </Button>
-        )}
-        {!isUserLoading && user && <AvatarMenu email={user.email} />}
-      </InternalHeader>
+            {isClient && !isRoleLoading && displayRole
+              ? t("roleContext.viewingAs", { role: t(`roleContext.${displayRole}`) })
+              : t("roleContext.chooseRole")}
+          </InternalHeader.Title>
+          {!isUserLoading && user && <AvatarMenu email={user.email} />}
+        </InternalHeader>
+      </HStack>
 
       {showSubNav && (
         <div

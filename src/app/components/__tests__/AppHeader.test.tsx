@@ -7,16 +7,18 @@ import {
 } from "@/app/shared/contexts/RoleContext";
 import { AppHeader } from "../AppHeader";
 
-const { getKvItemMock, useVulnerabilitiesContextMock, pushMock } = vi.hoisted(() => ({
+const { getKvItemMock, setKvItemMock, removeKvItemMock, useVulnerabilitiesContextMock, pushMock } = vi.hoisted(() => ({
   getKvItemMock: vi.fn(),
+  setKvItemMock: vi.fn(),
+  removeKvItemMock: vi.fn(),
   useVulnerabilitiesContextMock: vi.fn(),
   pushMock: vi.fn(),
 }));
 
 vi.mock("@/app/shared/utils/indexedDbCache", () => ({
   getKvItem: getKvItemMock,
-  setKvItem: vi.fn(),
-  removeKvItem: vi.fn(),
+  setKvItem: setKvItemMock,
+  removeKvItem: removeKvItemMock,
   KV_KEYS: { ROLE_CONTEXT: "role-context" },
 }));
 
@@ -29,7 +31,8 @@ vi.mock("@/app/shared/hooks/useUser", () => ({
 }));
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: () => (key: string, params?: Record<string, unknown>) =>
+    key === "roleContext.viewingAs" ? `Viewing as: ${params?.role}` : key,
   useLocale: () => "en",
 }));
 
@@ -100,6 +103,33 @@ describe("role-based navigation and admin access", () => {
     expect(screen.queryByRole("link", { name: "header.etterlevelse" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "header.vulnerabilities" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "header.goldenPath" })).not.toBeInTheDocument();
+  });
+
+  it("shows the current role in a no-redirect landing link without clearing the stored choice", async () => {
+    useVulnerabilitiesContextMock.mockReturnValue({
+      data: { userRole: "DEVELOPER", teams: [] },
+      isLoading: false,
+      teamFilters: { "my-team": true },
+      applicationFilters: { "my-app": true },
+    });
+    renderHeader();
+
+    const link = await screen.findByRole("link", { name: "Viewing as: roleContext.LEADER" });
+    expect(link).toHaveAttribute("href", "/en?welcome=true&team=my-team&app=my-app");
+    expect(screen.getByLabelText("role")).toHaveTextContent(
+      JSON.stringify({ actualRole: "DEVELOPER", effectiveRole: "LEADER" }),
+    );
+    expect(setKvItemMock).not.toHaveBeenCalled();
+    expect(removeKvItemMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps the landing entry visible before a display role is selected", async () => {
+    getKvItemMock.mockResolvedValue(null);
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "roleContext.chooseRole" }))
+      .toHaveAttribute("href", "/en?welcome=true");
+    await waitFor(() => expect(getKvItemMock).toHaveBeenCalled());
   });
 
   it("does not grant admin access through a selected role", async () => {

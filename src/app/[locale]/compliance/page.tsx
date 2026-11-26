@@ -11,6 +11,7 @@ import NoTeamView from "../views/NoTeamView";
 import { Loader, Box, VStack } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { useTranslations } from "next-intl";
+import { DataSourceNote } from "@/app/shared/components/DataSourceNote";
 
 export default function CompliancePage() {
   const { data: statusData, isLoading: isStatusLoading, error: statusError } = useSecurityStatus();
@@ -42,7 +43,12 @@ export default function CompliancePage() {
   }
 
   if (!statusData || teams.length === 0) {
-    return <NoTeamView />;
+    return (
+      <VStack gap="space-16">
+        <DataSourceNote tab="compliance" />
+        <NoTeamView />
+      </VStack>
+    );
   }
 
   const isDeveloper = effectiveRole === "DEVELOPER" || effectiveRole === "TEAM_MEMBER";
@@ -52,6 +58,7 @@ export default function CompliancePage() {
 
   return (
     <VStack gap="space-16">
+      <DataSourceNote tab="compliance" />
       {isDeveloper
         ? <DeveloperComplianceView teams={teams} historyMonths={historyMonths} />
         : isFewTeamsLeader

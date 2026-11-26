@@ -63,8 +63,9 @@ system, risk scoring (`getRiskFactors()`), Aksel UI patterns, and i18n keys unde
 
 Navigation entries in `shared/navigation.ts` carry an optional `allowedRoles` field (`DEVELOPER`, `TEAM_MEMBER`,
 `TEAM_LEADER`, `LEADER`). A link is visible to all users if `allowedRoles` is omitted, otherwise
-only to users whose effective role matches. Users select their role on the welcome page and can change it from
-the header; `RoleContextSwitcher.tsx` also provides a development-only selector.
+only to users whose effective role matches. Users select their role on the welcome page. The header shows the
+current display role and opens `/[locale]?welcome=true` without redirecting or clearing the stored role;
+confirmation returns to that role's default tab. `RoleContextSwitcher.tsx` also provides a development-only selector.
 The backend's `ADMIN` value is exposed only as `isAdmin` in the role context, independently of the selected role.
 It controls the Admin link in the avatar menu and never bypasses navigation filtering. Backend authorization
 continues to enforce access to admin endpoints.

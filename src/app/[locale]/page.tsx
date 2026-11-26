@@ -2,13 +2,13 @@
 
 import { useRoleContext } from "@/app/shared/hooks/useRoleContext";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
-import { Loader, Box, Button, BodyShort, Heading, Tag } from "@navikt/ds-react";
+import { Loader, Button, BodyShort, Box, Detail, Fieldset, Heading, HStack, Label, List, Tag, VStack, HGrid } from "@navikt/ds-react";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
+import { LandingExplanation } from "@/app/components/LandingExplanation";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { AppRole } from "@/app/shared/contexts/RoleContext";
-import styles from "./page.module.css";
 
 function redirectPath(locale: string, role: string): string {
   return role === "DEVELOPER" ? `/${locale}/prioritization` : `/${locale}/compliance`;
@@ -17,57 +17,63 @@ function redirectPath(locale: string, role: string): string {
 function RoleCard({
   role,
   selected,
+  suggested,
   onSelect,
+  onContinue,
 }: {
   role: AppRole;
   selected: boolean;
+  suggested: boolean;
   onSelect: (role: AppRole) => void;
+  onContinue: (role: AppRole) => void;
 }) {
-  const t = useTranslations("welcome.roles");
-
-  const subtitleVariant: Record<AppRole, "alt1" | "info" | "warning" | "success"> = {
-    DEVELOPER: "alt1",
-    TEAM_MEMBER: "info",
-    LEADER: "warning",
-    TEAM_LEADER: "success",
-  };
+  const t = useTranslations("welcome");
 
   return (
-    <button
+    <Box
+      as="button"
       type="button"
       onClick={() => onSelect(role)}
-      className={styles.roleCard}
-      style={selected ? {
-        borderColor: "var(--ax-border-accent)",
-        boxShadow: "0 0 0 1px var(--ax-border-accent)",
-      } : undefined}
+      onDoubleClick={() => onContinue(role)}
       aria-pressed={selected}
+      background={selected ? "accent-soft" : "default"}
+      borderColor={selected ? "accent" : "neutral-subtle"}
+      borderWidth="2"
+      borderRadius="8"
+      padding="space-12"
+      minWidth="0"
+      style={{ cursor: "pointer", textAlign: "left", font: "inherit", color: "var(--ax-text-neutral)" }}
     >
-      <Box style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-        <Heading size="small" level="3">
-          {t(`${role}.title`)}
-        </Heading>
-        <Tag variant={subtitleVariant[role]} size="small" style={{ alignSelf: "flex-start" }}>
-          {t(`${role}.subtitle`)}
-        </Tag>
-      </Box>
-
-      <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-        {t(`${role}.description`)}
-      </BodyShort>
-    </button>
+      <VStack gap="space-8" align="start">
+        <HStack gap="space-4" align="center" wrap>
+          <BodyShort as="span" size="small" weight="semibold">
+            {t(`roles.${role}.title`)}
+          </BodyShort>
+          {suggested && (
+            <Tag variant="strong" data-color="info" size="xsmall">
+              {t("suggested")}
+            </Tag>
+          )}
+        </HStack>
+        <Detail as="span" textColor="subtle">
+          {t(`roles.${role}.description`)}
+        </Detail>
+      </VStack>
+    </Box>
   );
 }
 
 export default function Home() {
   const { data: vulnData, error } = useVulnerabilitiesContext();
   const {
+    actualRole,
     effectiveRole,
     isInitialized,
     isLoading: isRoleLoading,
     hasSelectedRole,
     availableRoles,
     setSelectedRole,
+    selectedRole,
   } = useRoleContext();
 
   const t = useTranslations("errors");
@@ -76,32 +82,35 @@ export default function Home() {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const showWelcome = searchParams.get("welcome") === "true";
 
   const buildRedirectUrl = useCallback(
     (role: string): string => {
       const base = redirectPath(locale, role);
-      const query = searchParams.toString();
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("welcome");
+      const query = params.toString();
       return query ? `${base}?${query}` : base;
     },
     [locale, searchParams]
   );
 
   const [pendingRole, setPendingRole] = useState<AppRole | null>(null);
+  const chosenRole = pendingRole ?? availableRoles.find((role) => role === selectedRole) ?? null;
 
-  // If a role is already cached, skip welcome and redirect immediately
   useEffect(() => {
     if (!isInitialized || isRoleLoading) return;
     if (!vulnData && !error) return;
 
-    if (hasSelectedRole) {
+    if (hasSelectedRole && !showWelcome) {
       router.replace(buildRedirectUrl(effectiveRole || "TEAM_MEMBER"));
     }
-  }, [isInitialized, isRoleLoading, vulnData, error, hasSelectedRole, effectiveRole, buildRedirectUrl, router]);
+  }, [isInitialized, isRoleLoading, vulnData, error, hasSelectedRole, effectiveRole, buildRedirectUrl, router, showWelcome]);
 
-  function handleConfirm() {
-    if (!pendingRole) return;
-    setSelectedRole(pendingRole);
-    router.replace(buildRedirectUrl(pendingRole));
+  function handleConfirm(role: AppRole | null = chosenRole) {
+    if (!role) return;
+    if (role !== selectedRole) setSelectedRole(role);
+    router.replace(buildRedirectUrl(role));
   }
 
   if (error) {
@@ -113,87 +122,72 @@ export default function Home() {
     );
   }
 
-  // Show loader while API is in flight or while redirecting (role already set)
-  if (!isInitialized || isRoleLoading || hasSelectedRole) {
+  if (!isInitialized || isRoleLoading || (hasSelectedRole && !showWelcome)) {
     return (
-      <Box
-        paddingBlock="space-24"
-        style={{ display: "flex", justifyContent: "center" }}
-      >
+      <VStack paddingBlock="space-24" align="center">
         <Loader size="large" title={tCommon("loading")} />
-      </Box>
+      </VStack>
     );
   }
 
-  // Welcome / role selection screen
   return (
-    <Box
-      paddingBlock="space-24"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "2rem",
-        maxWidth: "1100px",
-        margin: "0 auto",
-        padding: "3rem 1.5rem",
-      }}
+    <VStack
+      gap="space-28"
+      paddingBlock="space-16"
+      maxWidth="1160px"
+      marginInline="auto"
     >
-      {/* Header */}
-      <Box style={{ textAlign: "center", maxWidth: "640px" }}>
-        <BodyShort
-          size="small"
-          weight="semibold"
-          style={{
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            color: "var(--a-text-subtle)",
-            marginBottom: "0.75rem",
-          }}
-        >
-          {tWelcome("eyebrow")}
-        </BodyShort>
-        <Heading size="xlarge" level="1" style={{ marginBottom: "1rem" }}>
-          {tWelcome("heading")}
-        </Heading>
-        <BodyShort style={{ color: "var(--a-text-subtle)" }}>
-          {tWelcome("subheading")}
-        </BodyShort>
+      <LandingExplanation />
+      <Box as="section" aria-labelledby="get-started" padding="space-20" borderColor="neutral-subtle" borderWidth="1" borderRadius="12">
+        <VStack gap="space-12">
+          <Heading size="medium" level="2" id="get-started">{tWelcome("getStarted")}</Heading>
+          <HGrid columns={{ xs: 1, lg: "minmax(0, 1fr) minmax(0, 2fr)" }} gap="space-24">
+            <VStack as="section" gap="space-12" aria-labelledby="your-teams">
+              <Label as="div" size="small" id="your-teams">{tWelcome("teams.title")}</Label>
+              <Box asChild marginBlock="space-0">
+                <List as="ol" size="small">
+                  {(["nais", "teamkatalogen", "leadership"] as const).map((step) => (
+                    <List.Item key={step}>
+                      <Detail as="div" textColor="subtle">{tWelcome(`teams.steps.${step}`)}</Detail>
+                    </List.Item>
+                  ))}
+                </List>
+              </Box>
+              <Detail as="div" textColor="subtle">{tWelcome("teams.missing")}</Detail>
+              <Detail as="div" textColor="subtle">{tWelcome("teams.relevance")}</Detail>
+            </VStack>
+            <Fieldset legend={tWelcome("heading")} size="small">
+              <VStack gap="space-8">
+                <Detail as="div" textColor="subtle">{tWelcome("subheading")}</Detail>
+                <HGrid columns={{ xs: 1, sm: "repeat(auto-fit, minmax(150px, 1fr))" }} gap="space-8">
+                  {availableRoles.map((role) => (
+                    <RoleCard
+                      key={role}
+                      role={role}
+                      selected={chosenRole === role}
+                      suggested={actualRole === role}
+                      onSelect={setPendingRole}
+                      onContinue={handleConfirm}
+                    />
+                  ))}
+                </HGrid>
+                <HStack justify="end">
+                  <Button
+                    variant="primary"
+                    size="small"
+                    disabled={!chosenRole}
+                    onClick={() => handleConfirm()}
+                  >
+                    {chosenRole
+                      ? tWelcome("selectButton", { role: tWelcome(`roles.${chosenRole}.title`) })
+                      : tWelcome("selectPrompt")}
+                  </Button>
+                </HStack>
+              </VStack>
+            </Fieldset>
+          </HGrid>
+        </VStack>
       </Box>
-
-      {/* Role cards grid */}
-      <Box
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${availableRoles.length}, minmax(220px, 1fr))`,
-          gap: "1.25rem",
-          width: "100%",
-        }}
-      >
-        {availableRoles.map((role) => (
-          <RoleCard
-            key={role}
-            role={role}
-            selected={pendingRole === role}
-            onSelect={setPendingRole}
-          />
-        ))}
-      </Box>
-
-      {/* CTA */}
-      <Box style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
-        <Button
-          variant="primary"
-          size="medium"
-          disabled={!pendingRole}
-          onClick={handleConfirm}
-        >
-          {pendingRole ? tWelcome("selectButton") : tWelcome("selectPrompt")}
-        </Button>
-        <BodyShort size="small" style={{ color: "var(--a-text-subtle)" }}>
-          {tWelcome("changeAnytime")}
-        </BodyShort>
-      </Box>
-    </Box>
+    </VStack>
   );
 }
