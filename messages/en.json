@@ -443,7 +443,47 @@
   "noTeamView": {
     "title": "No teams found",
     "description": "We were unable to link you to any development teams.",
-    "message": "It appears you are not a member of any teams in our system. Please contact the appsec team if you believe this is an error."
+    "checkMembership": "Check that you belong to the correct team, cluster or product area in Teamkatalogen.",
+    "checkNaisTeam": "Check that the team lists its Nais team in Teamkatalogen. Ask your team's technical staff to add it if missing. Developers can also check their membership in the Nais console.",
+    "contactAppsec": "If both are correct and you still see no data, contact the appsec team.",
+    "teamkatalogen": "Open Teamkatalogen",
+    "naisConsole": "Check membership in the Nais console"
+  },
+  "dataSource": {
+    "about": "About this data",
+    "usage": "How we use the data",
+    "limitations": "Important to know",
+    "requirement": "K267.3 in Etterlevelse",
+    "prioritization": {
+      "title": "Prioritization",
+      "summary": "AppSec's custom Risk Score helps you decide which vulnerabilities to fix first.",
+      "usage": "AppSec's custom ranking uses available external vulnerability metadata and Nais platform context to prioritize vulnerabilities in your workloads. Open vulnerability details to see the metadata behind each score.",
+      "limitations": "The ranking supports work that prevents and resolves compliance issues. Use it alongside deadline checks; the Risk Score is not a compliance assessment."
+    },
+    "vulnerabilities": {
+      "title": "All vulnerabilities",
+      "summary": "Find and filter vulnerabilities across your team's workloads.",
+      "usage": "Use this view to investigate specific vulnerabilities and affected workloads. Filtering helps you narrow the list; Prioritization helps you decide what to fix first.",
+      "limitations": "This list supports investigation and compliance follow-up, but does not establish full compliance."
+    },
+    "github": {
+      "title": "GitHub",
+      "summary": "Find dependencies that need follow-up in your repositories.",
+      "usage": "AppSec's ranking of repository vulnerability alerts helps you identify dependencies that need attention. Golden path is a separate repository view with passed or not passed results for each check, not Risk Scores.",
+      "limitations": "Repository findings can be relevant to the same applications. Their scores are not directly comparable with those in Prioritization and are not a compliance assessment."
+    },
+    "compliance": {
+      "title": "Compliance",
+      "summary": "Follow up the measurable parts of K267.3 covered by TPT.",
+      "usage": "We use recorded vulnerability deadlines and deployment age to identify follow-up needs. Trend compares new findings with recorded resolutions to help you follow progress.",
+      "limitations": "The results cover selected checks and available data. An absence of findings is not proof of full compliance or security."
+    },
+    "goldenpath": {
+      "title": "Golden path",
+      "summary": "See where your repositories follow Nav's golden path.",
+      "usage": "We use repository checks to show which golden path practices are in place and which need follow-up. Each check is shown as passed or not passed; the results are not a vulnerability risk ranking.",
+      "limitations": "Repository checks can inform security follow-up. Their results are not vulnerability Risk Scores or a full compliance assessment."
+    }
   },
   "admin": {
     "navTitle": "Admin",
@@ -481,59 +521,78 @@
     }
   },
   "welcome": {
-    "eyebrow": "Welcome to TPT",
-    "heading": "Which of these sounds most like you?",
-    "subheading": "Pick the role you relate to most and we'll shape your dashboard around what matters in your day. You can change this anytime in settings.",
-    "selectButton": "Select role",
-    "selectPrompt": "Select a role to continue",
-    "changeAnytime": "You can switch roles anytime from settings.",
-    "youWillSee": "You'll see",
+    "getStarted": "Get started",
+    "heading": "2. Choose your view",
+    "subheading": "Only changes the layout, not your teams. Switch anytime from the top bar.",
+    "selectButton": "Continue as {role}",
+    "selectPrompt": "Select a view to continue",
+    "suggested": "Suggested",
+    "teams": {
+      "title": "1. Your teams",
+      "steps": {
+        "nais": "First, we check your Nais team memberships.",
+        "teamkatalogen": "If none are found, we check the Nais teams linked to your Teamkatalogen teams.",
+        "leadership": "If still none are found, we check the Nais teams linked to teams you lead."
+      },
+      "missing": "Missing one? Check that it lists a Nais team in Teamkatalogen.",
+      "relevance": "This picks relevant data, not access rights. Nav developers can already see it in Nais and GitHub."
+    },
+    "explanation": {
+      "title": "Titt på ting",
+      "intro": "Vulnerability prioritization and compliance for Nav teams.",
+      "feedback": "Work in progress — feedback welcome",
+      "panels": {
+        "nais": {
+          "title": "From the Nais platform",
+          "description": "· vulnerabilities in your running workloads"
+        },
+        "github": {
+          "title": "From GitHub",
+          "description": "· your repositories"
+        }
+      },
+      "cards": {
+        "compliance": {
+          "question": "What needs follow-up across my teams?",
+          "body": "Follow-up on the measurable parts of K267.3 covered by TPT.",
+          "limitations": "An absence of findings is not proof of full compliance or security."
+        },
+        "prioritization": {
+          "question": "What should we fix first?",
+          "body": "AppSec's Risk Score combines external vulnerability metadata with Nais platform context.",
+          "limitations": "Helps prevent and resolve compliance issues, but the Risk Score does not assess compliance."
+        },
+        "github": {
+          "question": "What needs follow-up in our repositories?",
+          "body": "Vulnerability alerts and golden path checks in your repositories.",
+          "limitations": "Repository findings can inform application follow-up. Scores are not directly comparable with those in Prioritization."
+        }
+      },
+      "purpose": "What the data is for"
+    },
     "roles": {
       "DEVELOPER": {
         "title": "Developer",
-        "subtitle": "Technical view",
-        "description": "I'm responsible for patching and fixing vulnerabilities in our products.",
-        "bullets": [
-          "Specific vulnerabilities in your services",
-          "Prioritized list of what's urgent",
-          "Technical details and remediation guides"
-        ]
+        "description": "Individual vulnerabilities and remediation."
       },
       "TEAM_MEMBER": {
         "title": "Team Member",
-        "subtitle": "Technical view",
-        "description": "I work in a team and need an overview of our security situation.",
-        "bullets": [
-          "Security prioritization and vulnerabilities",
-          "Compliance status for your team",
-          "Deployment status and targets"
-        ]
+        "description": "Individual vulnerabilities and remediation."
       },
       "LEADER": {
         "title": "Other leaders",
-        "subtitle": "Non-technical view",
-        "description": "I'm responsible for multiple teams or departments and need a high-level view to delegate and prioritize work.",
-        "bullets": [
-          "Security status across teams",
-          "Overview of what's urgent",
-          "Risk picture per team"
-        ]
+        "description": "Team-level status across multiple teams."
       },
       "TEAM_LEADER": {
         "title": "Team Leader",
-        "subtitle": "Non-technical view",
-        "description": "I lead one to three teams and need an overview of what requires action.",
-        "bullets": [
-          "Status for my teams",
-          "Overview of what's urgent",
-          "Which teams need to take action"
-        ]
+        "description": "Team-level status for one to three teams."
       }
     }
   },
   "roleContext": {
     "viewAs": "View as",
-    "changeRole": "Change role",
+    "viewingAs": "Viewing as: {role}",
+    "chooseRole": "Choose view",
     "DEVELOPER": "Developer",
     "TEAM_MEMBER": "Team Member",
     "LEADER": "Other leaders",

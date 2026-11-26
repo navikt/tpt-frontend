@@ -16,12 +16,13 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
   const t = useTranslations();
   const pathname = usePathname();
   const { vulnId, locale } = useParams();
+  const isStartPage = pathname === `/${locale}` || pathname === `/${locale}/`;
   const isAdminPage = pathname === `/${locale}/admin` || pathname.startsWith(`/${locale}/admin/`);
 
   return (
     <Page>
       <AppHeader />
-      {!isAdminPage && !pathname.includes("/prioritization") && !vulnId && (
+      {!isStartPage && !isAdminPage && !pathname.includes("/prioritization") && !vulnId && (
         <GlobalAlert status="announcement" className={styles.devBanner}>
           <GlobalAlert.Header>
             <GlobalAlert.Title>
@@ -42,7 +43,7 @@ function LocaleLayoutContent({ children }: { children: React.ReactNode }) {
       )}
       <Page.Block
         as="main"
-        width={pathname.includes("/compliance") ? "xl" : "lg"}
+        width={isStartPage || pathname.includes("/compliance") ? "xl" : "lg"}
         gutters
       >
         <Suspense fallback={null}>

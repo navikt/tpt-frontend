@@ -84,6 +84,7 @@ describe("GoldenPathPage", () => {
 
     render(<GoldenPathPage />);
 
+    expect(screen.getByText("dataSource.goldenpath.summary")).toBeVisible();
     expect(screen.queryByText("navikt/high-repo")).not.toBeInTheDocument();
     expect(screen.getByText("navikt/medium-repo")).toBeInTheDocument();
   });

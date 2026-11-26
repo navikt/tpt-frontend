@@ -22,6 +22,7 @@ import type { CheckResult } from "@/app/modules/goldenpath/useCheckResults";
 import { filterGoldenPathChecks, getGoldenPathDisplayName } from "@/app/modules/goldenpath/filterCheckResults";
 import { useVulnerabilitiesContext } from "@/app/contexts/VulnerabilitiesContext";
 import styles from "./page.module.css";
+import { DataSourceNote } from "@/app/shared/components/DataSourceNote";
 
 type Severity = CheckResult["severity"];
 type SortOption = "severity" | "checks" | "repository";
@@ -140,6 +141,8 @@ export default function GoldenPathPage() {
           {lastChecked ? t("lastChecked", { date: formatDate(lastChecked) }) : t("noCheckTime")}
         </BodyShort>
       </HStack>
+
+      <DataSourceNote tab="goldenpath" />
 
       {!isLoading && !hasError && (
         <>

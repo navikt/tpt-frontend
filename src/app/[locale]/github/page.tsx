@@ -10,6 +10,7 @@ import { useVulnerabilitiesContext } from "../../contexts/VulnerabilitiesContext
 import { filterRepositoriesByWorkContext } from "../../modules/github/utils/filterRepositoriesByWorkContext";
 import { useTranslations } from "next-intl";
 import { Box, BodyShort, Loader, VStack, Heading } from "@navikt/ds-react";
+import { DataSourceNote } from "@/app/shared/components/DataSourceNote";
 
 export default function GitHubPage() {
   return (
@@ -96,6 +97,8 @@ function GitHubPageContent() {
             {t("pageSubtitle")}
           </BodyShort>
         </VStack>
+
+        <DataSourceNote tab="github" />
 
         {/* Summary stats */}
         <GitHubSummaryStats

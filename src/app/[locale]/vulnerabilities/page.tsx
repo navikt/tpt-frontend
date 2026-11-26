@@ -2,6 +2,7 @@
 import styles from "../page.module.css";
 import Vulnerabilities from "../../components/vulnerabilities/Vulnerabilities";
 import { useTranslations } from "next-intl";
+import { DataSourceNote } from "@/app/shared/components/DataSourceNote";
 
 export default function Page() {
   const t = useTranslations("vulnerabilitiesPage");
@@ -14,6 +15,7 @@ export default function Page() {
           <p>
             {t("description")}
           </p>
+          <DataSourceNote tab="vulnerabilities" />
           <Vulnerabilities />
         </div>
       </main>

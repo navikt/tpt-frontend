@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { BodyShort } from "@navikt/ds-react";
 import { ChatElipsisIcon } from "@navikt/aksel-icons";
 
-const SLACK_URL = "https://nav-it.slack.com/archives/C06P91VN27M";
+export const SLACK_URL = "https://nav-it.slack.com/archives/C06P91VN27M";
 
 export function FeedbackButton() {
   const [expanded, setExpanded] = useState(false);

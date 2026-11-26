@@ -93,6 +93,16 @@ describe("LocaleLayout development banner", () => {
     expect(screen.queryByText("banner.underDevelopment")).not.toBeInTheDocument();
     expect(screen.getByText("Admin content")).toBeVisible();
   });
+
+  it.each(["en", "nb"])("hides the full-width banner on the %s start page", (locale) => {
+    useParamsMock.mockReturnValue({ locale });
+    usePathnameMock.mockReturnValue(`/${locale}`);
+
+    render(<LocaleLayout>Start page content</LocaleLayout>);
+
+    expect(screen.queryByText("banner.underDevelopment")).not.toBeInTheDocument();
+    expect(screen.getByText("Start page content")).toBeVisible();
+  });
 });
 
 describe("LocaleLayout sync failure warning", () => {

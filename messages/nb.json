@@ -443,7 +443,47 @@
   "noTeamView": {
     "title": "Ingen team funnet",
     "description": "Vi kunne ikke koble deg til noen utviklingsteam.",
-    "message": "Det ser ut til at du ikke er medlem av noen team i vårt system. Ta kontakt med team appsec hvis du tror dette er en feil."
+    "checkMembership": "Sjekk at du tilhører riktig team, cluster eller produktområde i Teamkatalogen.",
+    "checkNaisTeam": "Sjekk at teamet har oppført sitt Nais-team i Teamkatalogen. Be teamets tekniske medarbeidere legge det til hvis det mangler. Utviklere kan også sjekke medlemskapet sitt i Nais-konsollen.",
+    "contactAppsec": "Kontakt team appsec hvis begge deler er riktig og du fortsatt ikke ser data.",
+    "teamkatalogen": "Åpne Teamkatalogen",
+    "naisConsole": "Sjekk medlemskap i Nais-konsollen"
+  },
+  "dataSource": {
+    "about": "Om disse dataene",
+    "usage": "Hvordan vi bruker dataene",
+    "limitations": "Viktig å vite",
+    "requirement": "K267.3 i Etterlevelse",
+    "prioritization": {
+      "title": "Prioritering",
+      "summary": "AppSecs egendefinerte risikoscore hjelper deg å velge hvilke sårbarheter du bør fikse først.",
+      "usage": "AppSecs rangering bruker tilgjengelige eksterne sårbarhetsdata og informasjon fra Nais-plattformen til å prioritere sårbarheter i applikasjonene dine. Åpne detaljene for en sårbarhet for å se dataene bak risikoscoren.",
+      "limitations": "Rangeringen støtter arbeid som forebygger og utbedrer avvik. Bruk den sammen med kontroll av frister. Risikoscoren er ikke en etterlevelsesvurdering."
+    },
+    "vulnerabilities": {
+      "title": "Alle sårbarheter",
+      "summary": "Finn og filtrer sårbarheter på tvers av teamets applikasjoner.",
+      "usage": "Bruk denne visningen til å undersøke bestemte sårbarheter og berørte applikasjoner. Filtrer listen for å avgrense søket. Bruk Prioritering for å velge hva du bør fikse først.",
+      "limitations": "Listen støtter undersøkelser og oppfølging av avvik, men bekrefter ikke full etterlevelse."
+    },
+    "github": {
+      "title": "GitHub",
+      "summary": "Finn avhengigheter som trenger oppfølging i repoene dine.",
+      "usage": "AppSecs rangering av sårbarhetsvarsler hjelper dere å finne avhengigheter som trenger oppfølging. Golden path er en egen repovisning med bestått eller ikke bestått per sjekk, ikke risikoscore.",
+      "limitations": "Funn i repoer kan være relevante for de samme applikasjonene. Risikoscorene kan ikke sammenlignes direkte med dem i Prioritering. De er ikke en etterlevelsesvurdering."
+    },
+    "compliance": {
+      "title": "Etterlevelse",
+      "summary": "Følg opp de målbare delene av K267.3 som TPT dekker.",
+      "usage": "Vi bruker registrerte frister for sårbarheter og alder på deployments til å finne hva som trenger oppfølging. Trenden sammenligner nye funn med registrerte utbedringer for å vise utviklingen.",
+      "limitations": "Resultatene gjelder utvalgte kontroller og tilgjengelige data. Fravær av funn er ikke en bekreftelse på full etterlevelse eller sikkerhet."
+    },
+    "goldenpath": {
+      "title": "Golden path",
+      "summary": "Se hvor repoene dine følger Navs golden path.",
+      "usage": "Vi bruker sjekker av repoene til å vise hvilke golden path-praksiser som er på plass, og hva som trenger oppfølging. Hver sjekk vises som bestått eller ikke bestått. Dette er ikke en rangering av sårbarhetsrisiko.",
+      "limitations": "Sjekker av repoene kan støtte sikkerhetsoppfølging. Resultatene er ikke risikoscore for sårbarheter eller en full etterlevelsesvurdering."
+    }
   },
   "admin": {
     "navTitle": "Admin",
@@ -481,61 +521,80 @@
     }
   },
   "welcome": {
-    "eyebrow": "Velkommen til TPT",
-    "heading": "Hvilken av disse ligner mest på deg?",
-    "subheading": "Velg rollen som passer best, så tilpasser vi dashbordet etter hva som er viktig i din arbeidshverdag. Du kan endre dette når som helst i innstillingene.",
-    "selectButton": "Velg rolle",
-    "selectPrompt": "Velg en rolle for å fortsette",
-    "changeAnytime": "Du kan bytte rolle når som helst fra innstillingene.",
-    "youWillSee": "Du vil se",
+    "getStarted": "Kom i gang",
+    "heading": "2. Velg visning",
+    "subheading": "Endrer bare oppsettet, ikke teamene dine. Bytt når som helst fra topplinjen.",
+    "selectButton": "Fortsett som {role}",
+    "selectPrompt": "Velg en visning for å fortsette",
+    "suggested": "Foreslått",
+    "teams": {
+      "title": "1. Teamene dine",
+      "steps": {
+        "nais": "Først sjekker vi hvilke Nais-team du tilhører.",
+        "teamkatalogen": "Finner vi ingen, sjekker vi Nais-teamene som er koblet til teamene dine i Teamkatalogen.",
+        "leadership": "Finner vi fortsatt ingen, sjekker vi Nais-teamene som er koblet til teamene du leder."
+      },
+      "missing": "Mangler et team? Sjekk at det har et Nais-team oppført i Teamkatalogen.",
+      "relevance": "Dette velger relevante data, ikke tilgangsrettigheter. Nav-utviklere kan allerede se dem i Nais og GitHub."
+    },
+    "explanation": {
+      "title": "Titt på ting",
+      "intro": "Prioritering av sårbarheter og etterlevelse for Nav-team.",
+      "feedback": "Under utvikling – tilbakemeldinger er velkomne",
+      "panels": {
+        "nais": {
+          "title": "Fra Nais-plattformen",
+          "description": "· sårbarheter i applikasjonene som kjører"
+        },
+        "github": {
+          "title": "Fra GitHub",
+          "description": "· repoene dine"
+        }
+      },
+      "cards": {
+        "compliance": {
+          "question": "Hva trenger oppfølging i teamene mine?",
+          "body": "Oppfølging av de målbare delene av K267.3 som TPT dekker.",
+          "limitations": "Ingen funn betyr ikke at alle krav er oppfylt eller at alt er sikkert."
+        },
+        "prioritization": {
+          "question": "Hva bør vi fikse først?",
+          "body": "AppSecs risikoscore kombinerer eksterne sårbarhetsdata med informasjon fra Nais-plattformen.",
+          "limitations": "Hjelper dere å forebygge og utbedre avvik. Risikoscoren er ikke en vurdering av etterlevelse."
+        },
+        "github": {
+          "question": "Hva trenger oppfølging i repoene våre?",
+          "body": "Sårbarhetsvarsler og golden path-sjekker i repoene deres.",
+          "limitations": "Funnene kan sees i sammenheng med applikasjonene deres. Risikoscorene kan ikke sammenlignes direkte med dem i Prioritering."
+        }
+      },
+      "purpose": "Hva dataene brukes til"
+    },
     "roles": {
       "DEVELOPER": {
         "title": "Utvikler",
-        "subtitle": "Teknisk visning",
-        "description": "Jeg er ansvarlig for å patche og fikse sårbarheter i produktene våre.",
-        "bullets": [
-          "Spesifikke sårbarheter i dine tjenester",
-          "Prioritert liste over hva som haster",
-          "Tekniske detaljer og utbedringsguider"
-        ]
+        "description": "Enkeltsårbarheter og utbedringer."
       },
       "TEAM_MEMBER": {
-        "title": "Team Member",
-        "subtitle": "Teknisk visning",
-        "description": "Jeg jobber i et team og trenger oversikt over sikkerhetssituasjonen vår.",
-        "bullets": [
-          "Sikkerhetsprioritering og sårbarheter",
-          "Compliance-status for teamet ditt",
-          "Deployment-status og målsettinger"
-        ]
+        "title": "Teammedlem",
+        "description": "Enkeltsårbarheter og utbedringer."
       },
       "LEADER": {
         "title": "Andre ledere",
-        "subtitle": "Ikke-teknisk visning",
-        "description": "Jeg har ansvar for flere team eller avdelinger og trenger overblikk for å delegere og prioritere arbeid.",
-        "bullets": [
-          "Sikkerhetsstatus på tvers av team",
-          "Oversikt over hva som haster",
-          "Risikobilde per team"
-        ]
+        "description": "Teamstatus på tvers av flere team."
       },
       "TEAM_LEADER": {
         "title": "Teamleder",
-        "subtitle": "Ikke-teknisk visning",
-        "description": "Jeg leder ett til tre team og trenger oversikt over hva som trenger handling.",
-        "bullets": [
-          "Status for mine team",
-          "Oversikt over hva som haster",
-          "Hvilke team må ta tak i noe"
-        ]
+        "description": "Teamstatus for ett til tre team."
       }
     }
   },
   "roleContext": {
     "viewAs": "Vis som",
-    "changeRole": "Bytt rolle",
+    "viewingAs": "Viser som: {role}",
+    "chooseRole": "Velg visning",
     "DEVELOPER": "Utvikler",
-    "TEAM_MEMBER": "Team Member",
+    "TEAM_MEMBER": "Teammedlem",
     "LEADER": "Andre ledere",
     "TEAM_LEADER": "Teamleder",
     "developer": "Utvikler",
